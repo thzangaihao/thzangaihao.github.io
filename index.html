@@ -1,12 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>我的生物信息学博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海钊知识港</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --primary-bg: #f8f9fa;
+            --sidebar-bg: #ffffff;
+            --text-main: #2c3e50;
+            --border-color: #eee;
+        }
+
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--primary-bg); color: var(--text-main); margin: 0; }
+
+        /* --- 顶栏设计 --- */
+        nav { 
+            background: var(--primary-color); 
+            color: white; 
+            padding: 1rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        /* Logo 样式优化：点击无下划线，白色 */
+        nav .logo a { font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none; }
+        nav .nav-links a { color: white; text-decoration: none; margin-left: 20px; transition: 0.3s; font-size: 0.95rem; }
+        nav .nav-links a:hover { color: var(--accent-color); }
+        nav .nav-links i { margin-right: 5px; } /* 图标间距 */
+
+        .container { max-width: 1200px; margin: 2rem auto; display: flex; gap: 2rem; padding: 0 1rem; }
+        .left-col { flex: 1; min-width: 280px; }
+        .profile-card, .category-card { 
+            background: var(--sidebar-bg); border-radius: 12px; padding: 1.5rem; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem;
+        }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; background: #ddd; margin: 0 auto 1rem; display: block; object-fit: cover; }
+        .bio { text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; }
+        
+        .category-item { display: block; text-decoration: none; color: inherit; padding: 0.8rem; border-radius: 8px; transition: 0.2s; }
+        .category-item:hover { background: #f0f7ff; color: var(--accent-color); }
+        .category-item h4 { margin: 0 0 4px 0; font-size: 1rem; }
+        .category-item p { margin: 0; font-size: 0.8rem; color: #7f8c8d; }
+
+        .right-col { flex: 3; }
+        .note-card { 
+            background: white; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .note-card h3 { margin-top: 0; color: var(--accent-color); }
+        .tag { background: #eef2f3; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; color: #666; }
+
+        @media (max-width: 850px) {
+            .container { flex-direction: column; }
+            nav { flex-direction: column; padding: 1rem; }
+            nav .nav-links { margin-top: 1rem; display: flex; flex-wrap: wrap; justify-content: center; }
+            nav .nav-links a { margin: 5px 10px; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello, World!</h1>
-    <p>这是我的第一个网页。我正在学习如何通过 GitHub 托管内容。</p>
-    <p>当前时间：2026年1月</p>
+
+    <nav>
+        <div class="logo"><a href="index.html">海钊知识港</a></div>
+        <div class="nav-links">
+            <a href="articles/wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+            <a href="articles/dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+            <a href="articles/resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+            <a href="articles/about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="left-col">
+            <div class="profile-card">
+                <img src="img/avatar.jpg" alt="头像" class="avatar">
+                <div class="bio">
+                    <h3>Haizhao Tang</h3>
+                    <p>四川大学 生物科学</p>
+                    <p style="font-size: 0.85rem; color: #666;">干/湿实验笔记整理&思维记录站</p>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <h3>栏目入口</h3>
+                <a href="articles/wet_lab/wet_lab_index.html" class="category-item">
+                    <h4>🧪 湿实验</h4>
+                    <p>测序原理、载体构建、基因工程</p>
+                </a>
+                <a href="articles/dry_lab/dry_lab_index.html" class="category-item">
+                    <h4>💻 干实验</h4>
+                    <p>分子对接、生信脚本、Linux 配置</p>
+                </a>
+                <a href="articles/resources/resources_index.html" class="category-item">
+                    <h4>📚 资源站</h4>
+                    <p>工具链接、复用管线</p>
+                </a>
+                <a href="articles/about/about_index.html" class="category-item">
+                    <h4>🙋 关于我</h4>
+                    <p>了解我的研究兴趣与技能</p>
+                </a>
+            </div>
+        </aside>
+
+        <section class="right-col">
+            <article class="note-card" id="dry">
+                <span class="tag">干实验</span>
+                <h3>富集分析与超几何分布</h3>
+                <p>在进行富集分析时</p>
+                <small>2026-01-15</small>
+            </article>
+
+            <article class="note-card" id="wet">
+                <span class="tag">湿实验</span>
+                <h3>植物逆境分子生物学：ABA 信号通路总结</h3>
+                <p>整理了本科选修课中关于干旱胁迫下 SnRK2 激酶的激活机制。</p>
+                <small>2026-01-14</small>
+            </article>
+        </section>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: #7f8c8d;">
+        &copy; 2026 海钊. Powered by GitHub Pages.
+    </footer>
+
 </body>
 </html>
