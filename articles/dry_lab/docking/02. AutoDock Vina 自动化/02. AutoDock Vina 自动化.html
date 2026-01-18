@@ -29,13 +29,189 @@
 
             <h1>02. AutoDock Vina 自动化</h1>
             <div class="meta">
-                <span><i class="far fa-calendar"></i> 2025-12-17</span>
+                <span><i class="far fa-calendar"></i> 2026-01-18</span>
                 <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 分子对接</span>
             </div>
 
             <div class="content">
                 <h2>前言</h2>
-                    <p>111</p>
+                    <p>在面对大量小分子和蛋白时，我们不可能手动一一对接，基于此，我编写了一套能够复用的脚本，在Linux终端能够对n个小分子和m个蛋白质进行m*n次对接，并将比结合能生成一个TSV矩阵，此文主要介绍了该流程的使用指南。</p>
+                <h2>1. 工作目录</h2>
+                    <p>创建工作目录并存放文件：</p>
+                    <pre><code class="language-bash">
+.
+├── 0_1.py                     # 将四个脚本存放在工作目录根目录下
+├── 0. Ligand_molecular_cif    # 存放所有配体的.cif文件
+├── 0. Receptor_protein_cif    # 存放所有受体的.cif文件
+├── 1_2.py
+├── 2_3.py
+└── 3_4.py
+                    </code></pre>
+                <h2>2. 加氢加电荷</h2>
+                    <p>执行0_1.py文件：</p>
+                    <pre><code class="language-bash">python 0_1.py</code></pre>
+                    <p>这一步利用pymol对所有cif文件加入氢原子生成<code>.pdb</code>中间文件，再调用OpenBabel计算电荷，生成<code>.pdbqt</code>文件存放在自动生成的<code>'1. Ligand_molecular_pdbqt'</code>和<code>'1. Receptor_protein_pdbqt'</code>文件夹下面：</p>
+                    <pre><code class="language-bash">
+.
+├── 0_1.py                     # 将四个脚本存放在工作目录根目录下
+├── 0. Ligand_molecular_cif    # 存放所有配体的.cif文件
+├── 0. Receptor_protein_cif    # 存放所有受体的.cif文件
+├── 1_2.py
+├── 1. Ligand_molecular_pdbqt  # 存放待对接的配体.pdbqt文件（自动生成）
+├── 1. Receptor_protein_pdbqt  # 存放待对接的受体.pdbqt文件（自动生成）
+├── 2_3.py
+└── 3_4.py
+                    </code></pre>
+                    你可以用记事本查看<code>.pdbqt</code>文件，其中，q那一栏就是计算后的电荷：
+                    <pre><code class="language-txt">
+REMARK  Name = /home/your_name/......
+REMARK                            x       y       z     vdW  Elec       q    Type
+REMARK                         _______ _______ _______ _____ _____    ______ ____
+ATOM      1  N   MET A   1      30.745 -73.396 -34.690  0.00  0.00    -0.320 NA
+ATOM      2  CA  MET A   1      30.359 -74.463 -35.621  0.00  0.00    +0.138 C 
+ATOM      3  C   MET A   1      28.926 -74.142 -36.032  0.00  0.00    +0.231 C 
+ATOM      4  O   MET A   1      28.065 -74.208 -35.182  0.00  0.00    -0.274 OA
+ATOM      5  CB  MET A   1      30.501 -75.842 -34.975  0.00  0.00    +0.038 C 
+                    </code></pre>
+                <h2>3. 配置文件生成</h2>
+                    <p>执行1_2.py文件：</p>
+                    <pre><code class="language-bash">python 1_2.py</code></pre>
+                    <p>这一步是根据<code>.pdbqt</code>文件里的最大原子坐标计算盒子边界，实时盲对接，你也可以在生成的配置文件去结合ADT去手动控制盒子坐标和大小：</p>
+                    <pre><code class="language-txt">
+receptor = /home/your_name/......
+# ligand = (将在运行命令中指定)
+
+center_x = -7.856
+center_y = -18.101
+center_z = -10.146
+
+size_x = 100.846
+size_y = 130.343
+size_z = 108.605
+
+cpu = 64                 # 计算线程数
+exhaustiveness = 64      # 穷举度
+                    </code></pre>
+                    <p>后续对接因为Vina问题，暂且没有实现完美并行，因此采用过易并行策略，一次对接任务跑在一个线程上面。</p>
+                    <p>穷举度越大，越容易发现低结合能口袋，一般32足够。</p>
+                    <p>生成的文件存放在自动生成的<code>2. Docking_Config</code>文件夹下面：</p>
+                    <pre><code class="language-bash">
+.
+├── 0_1.py                     # 将四个脚本存放在工作目录根目录下
+├── 0. Ligand_molecular_cif    # 存放所有配体的.cif文件
+├── 0. Receptor_protein_cif    # 存放所有受体的.cif文件
+├── 1_2.py
+├── 1. Ligand_molecular_pdbqt  # 存放待对接的配体.pdbqt文件（自动生成）
+├── 1. Receptor_protein_pdbqt  # 存放待对接的受体.pdbqt文件（自动生成）
+├── 2_3.py
+├── 2. Docking_Config          # 存放受体盒子配置参数文件（自动生成）
+└── 3_4.py
+                    </code></pre>
+                    <blockquote>
+                        <p>请注意，计算核心，穷举度的设置并没有在脚本运行过程中，请直接修改<code>1_2.py</code>源代码：</p>
+                    </blockquote>
+                    <pre><code class="language-python">
+# ============= 3. 生成 Vina 配置文件 =============
+def write_config_file(receptor_path, output_dir, box_params):
+    """
+    生成 conf.txt 文件
+    """
+    cx, cy, cz, sx, sy, sz = box_params
+    
+    # 获取相对文件名
+    rec_name = os.path.basename(receptor_path)
+    base_name = os.path.splitext(rec_name)[0]
+    
+    config_path = os.path.join(output_dir, f"conf_{base_name}.txt")
+    
+    # Vina 配置内容模板
+    # 注意：receptor 和 ligand 的路径我们在后续运行脚本里动态指定，
+    # 这里只存盒子参数，或者写入相对路径。
+    # 为了通用性，这里只写入盒子参数。
+    
+    content = f"""
+        receptor = {receptor_path}
+        # ligand = (将在运行命令中指定)
+
+        center_x = {cx:.3f}
+        center_y = {cy:.3f}
+        center_z = {cz:.3f}
+
+        size_x = {sx:.3f}
+        size_y = {sy:.3f}
+        size_z = {sz:.3f}
+
+        cpu = 64                   # 修改这里
+        exhaustiveness = 64        # 修改这里
+        """
+    with open(config_path, 'w') as f:
+        f.write(content)
+    
+    return config_path
+                    </code></pre>
+                <h2>4. 进行对接</h2>
+                    <p>执行2_3.py文件：</p>
+                    <pre><code class="language-bash">python 2_3.py</code></pre>
+                    <p>这一步是最耗时的一部，建议tmux挂起，在32穷举度下一个对接大概要跑2-4个小时，对接后的文件以小分子<code>.pdbqt</code>文件的形式存放在<code>3. Docking_Results</code>，同样，也是自动生成的文件夹。</p>
+                    <pre><code class="language-bash">
+.
+├── 0_1.py                     # 将四个脚本存放在工作目录根目录下
+├── 0. Ligand_molecular_cif    # 存放所有配体的.cif文件
+├── 0. Receptor_protein_cif    # 存放所有受体的.cif文件
+├── 1_2.py
+├── 1. Ligand_molecular_pdbqt  # 存放待对接的配体.pdbqt文件（自动生成）
+├── 1. Receptor_protein_pdbqt  # 存放待对接的受体.pdbqt文件（自动生成）
+├── 2_3.py
+├── 2. Docking_Config          # 存放受体盒子配置参数文件（自动生成）
+├── 3_4.py
+└── 3. Docking_Results         # 存放对接结果文件（自动生成）
+                    </code></pre>
+                    <p>一次会生成多个对接结果并按照比结合能由小到大进行排序。在查看时别忘了把受体大分子文件一同加载。</p>
+                    <p>结合能相关信息文件存放在<code>.log</code>文件夹里面，可以用txt直接进行查看：</p>
+                    <pre><code class="language-txt">
+mode |   affinity | dist from best mode
+     | (kcal/mol) | rmsd l.b.| rmsd u.b.
+-----+------------+----------+----------
+    1         -7.4      0.000      0.000
+    2         -7.1      5.540      7.781
+    3         -7.0      2.554      3.895
+    4         -6.9      3.361      7.658
+    5         -6.9      2.114      3.237
+    6         -6.8     22.516     26.119
+    7         -6.8     24.384     28.283
+    8         -6.8      4.873      8.732
+    9         -6.7      4.464      8.510
+Writing output ... done.                        
+                    </code></pre>
+                <h2>5. 比结合能汇总</h2>
+                    <p>执行3_4.py文件：</p>
+                    <pre><code class="language-bash">python 3_4.py</code></pre>
+                    <p>取每一个对接结果的最小值，汇总为<code>.tsv</code>文件存放于工作目录根目录下：
+                    <pre><code class="language-bash">
+.
+├── 0_1.py                     # 将四个脚本存放在工作目录根目录下
+├── 0. Ligand_molecular_cif    # 存放所有配体的.cif文件
+├── 0. Receptor_protein_cif    # 存放所有受体的.cif文件
+├── 1_2.py
+├── 1. Ligand_molecular_pdbqt  # 存放待对接的配体.pdbqt文件（自动生成）
+├── 1. Receptor_protein_pdbqt  # 存放待对接的受体.pdbqt文件（自动生成）
+├── 2_3.py
+├── 2. Docking_Config          # 存放受体盒子配置参数文件（自动生成）
+├── 3_4.py
+├── 3. Docking_Results         # 存放对接结果文件（自动生成）
+└── Final_Matrix_ReceptorRow.tsv
+                    </code></pre>
+                    <p>使用excel或者记事本查看：</p>
+                    <pre><code class="language-txt">
+Receptor  	 Ligand_1	 Ligand_2	 Ligand_3
+Receptor_1	 -7.4    	 -5.8    	 -7.1
+Receptor_2	 -7.7    	 -6.2    	 -3.1
+Receptor_3	 -6.4    	 *       	 -4.2
+Receptor_4	 -7.8    	 -3.8    	 -8.2
+Receptor_5	 *       	 -4.8    	 -4.9                                              
+                    </code></pre>
+                    <p>其中，星号代表对接失败，缺少结合能。</p>
+                    <p>关于比结合能的意义和取值，我们将在下一篇文章中讲解。
             </div>
         </div>
         

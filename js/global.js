@@ -1,11 +1,17 @@
 /* ============================================================
    文件名: global.js
-   描述: 全站通用脚本 (包含 MathJax、底栏加载、Tab切换、复制功能等)
-   适用页面: 首页、索引页、文章页
+   描述: 全站通用脚本
+   模块:
+   1. 配置 (MathJax)
+   2. 工具 (复制功能)
+   3. 逻辑 (底栏、Tab切换、哈希跳转)
+   4. 插件 (Prism 代码高亮、代码块增强)
+   5. 初始化 (DOMContentLoaded)
    ============================================================ */
 
+
 /* ------------------------------------------------------------
-   1. 全局配置 (必须在库加载前执行)
+   1. 全局配置 (Configuration)
    ------------------------------------------------------------ */
 window.MathJax = {
     tex: {
@@ -18,202 +24,278 @@ window.MathJax = {
     }
 };
 
-/* ------------------------------------------------------------
-   2. 全局工具函数 (供 HTML onclick 调用)
-   ------------------------------------------------------------ */
-
-   /* --- 全局变量：用于追踪当前的复制状态 --- */
-   let copyFeedbackTimer = null;    // 记录当前的定时器 ID
-   let currentActiveElement = null; // 记录当前正在显示“已复制”的元素
-   let originalContentCache = "";   // 缓存该元素的原始 HTML 内容
-   
-   /**
-    * 优化后的复制函数
-    */
-   function copyToClipboard(text, element, event) {
-       // 1. 处理“点击另一个元素”的情况
-       // 如果当前有元素正在显示反馈，且点击的是【另一个】元素
-       if (currentActiveElement && currentActiveElement !== element) {
-           resetCopyFeedback(); // 立即让上一个元素恢复原样
-       }
-   
-       // 2. 处理“连续点击同一个元素”的情况
-       // 如果点击的是同一个元素，我们需要清除之前的定时器，以便重新开始 1.5s 计时
-       if (copyFeedbackTimer) {
-           clearTimeout(copyFeedbackTimer);
-       }
-   
-       // 3. 执行复制操作
-       navigator.clipboard.writeText(text).then(() => {
-           // 如果是第一次点击（或状态已复位），记录原始内容
-           if (currentActiveElement !== element) {
-               currentActiveElement = element;
-               originalContentCache = element.innerHTML;
-           }
-   
-           // 显示反馈样式
-           element.innerHTML = '<i class="fas fa-check" style="color: #27ae60;"></i> 已复制';
-           
-           // 4. 设置 1.5秒后恢复
-           // 无论是连续点击还是新点击，都会重新启动这 1.5秒的倒计时
-           copyFeedbackTimer = setTimeout(() => {
-               resetCopyFeedback();
-           }, 1500);
-   
-       }).catch(err => {
-           console.error('无法复制内容: ', err);
-       });
-   }
-   
-   /**
-    * 内部辅助函数：将当前激活的元素恢复原状
-    */
-   function resetCopyFeedback() {
-       if (currentActiveElement) {
-           currentActiveElement.innerHTML = originalContentCache;
-           currentActiveElement = null;
-           originalContentCache = "";
-       }
-       if (copyFeedbackTimer) {
-           clearTimeout(copyFeedbackTimer);
-           copyFeedbackTimer = null;
-       }
-   }
-
-/**
- * 集合切换函数 (用于索引页 Tab 切换)
- */
-function showCollection(collectionId, btnElement) {
-    // 1. 隐藏所有文章列表
-    const lists = document.querySelectorAll('.article-list');
-    lists.forEach(list => list.classList.remove('active'));
-    
-    // 2. 显示目标列表
-    const target = document.getElementById(collectionId);
-    if (target) target.classList.add('active');
-
-    // 3. 按钮状态切换
-    const btns = document.querySelectorAll('.collection-btn');
-    btns.forEach(btn => btn.classList.remove('active'));
-    if (btnElement) btnElement.classList.add('active');
-}
 
 /* ------------------------------------------------------------
-   3. 内部辅助函数 (不直接暴露给 HTML)
+   2. 全局工具函数 (Utilities)
    ------------------------------------------------------------ */
 
-/**
- * 加载底栏
- */
-function loadFooter() {
-    // 优先读取页面中定义的 window.footerPath，如果没有定义，尝试读取 ./footer.html
-    const path = window.footerPath || './footer.html';
-    
-    fetch(path)
-        .then(response => {
-            if (!response.ok) throw new Error(`Footer file not found at: ${path}`);
-            return response.text();
-        })
-        .then(data => {
-            const placeholder = document.getElementById('footer-placeholder');
-            if (placeholder) placeholder.innerHTML = data;
-        })
-        .catch(err => console.error('底栏加载失败:', err));
-}
+/* --- 复制状态管理变量 --- */
+let copyFeedbackTimer = null;
+let currentActiveElement = null;
+let originalContentCache = "";
 
 /**
- * 强制预加载集合按钮的图标 (防止 Hover 闪烁)
+ * 2.1 通用复制函数 (用于底栏邮箱等文本链接)
+ * 特点: 点击后显示 "已复制" 文字反馈
  */
-function preloadButtonImages() {
-    const btns = document.querySelectorAll('.collection-btn');
-    if (btns.length === 0) return;
+function copyToClipboard(text, element, event) {
+    if (event) event.preventDefault(); // 阻止链接默认跳转
 
-    btns.forEach(btn => {
-        const style = btn.getAttribute('style');
-        if (!style) return;
+    // 如果点击了新元素，立即重置上一个元素的状态
+    if (currentActiveElement && currentActiveElement !== element) {
+        resetCopyFeedback();
+    }
+    // 如果连续点击，重置定时器
+    if (copyFeedbackTimer) clearTimeout(copyFeedbackTimer);
+
+    navigator.clipboard.writeText(text).then(() => {
+        // 首次点击，缓存原始内容
+        if (currentActiveElement !== element) {
+            currentActiveElement = element;
+            originalContentCache = element.innerHTML;
+        }
+
+        // 显示反馈
+        element.innerHTML = '<i class="fas fa-check" style="color: #27ae60;"></i> 已复制';
         
-        // 提取 CSS 变量中的 url路径
-        const matches = style.match(/url\(['"]?([^'"]+)['"]?\)/g);
-        if (matches) {
-            matches.forEach(urlFunc => {
-                const src = urlFunc.replace(/url\(['"]?|['"]?\)/g, '');
-                new Image().src = src; // 触发浏览器缓存
-            });
-        }
-    });
+        // 1.5秒后自动恢复
+        copyFeedbackTimer = setTimeout(() => {
+            resetCopyFeedback();
+        }, 1500);
+
+    }).catch(err => console.error('复制失败:', err));
 }
 
 /**
- * 处理 URL 哈希跳转
+ * 内部辅助: 恢复元素原状
  */
-function handleHashNavigation() {
-    const hash = window.location.hash.substring(1);
-    if (hash) {
-        const targetBtn = document.querySelector(`button[onclick*="'${hash}'"]`);
-        if (targetBtn) {
-            showCollection(hash, targetBtn);
-        }
+function resetCopyFeedback() {
+    if (currentActiveElement) {
+        currentActiveElement.innerHTML = originalContentCache;
+        currentActiveElement = null;
+        originalContentCache = "";
+    }
+    if (copyFeedbackTimer) {
+        clearTimeout(copyFeedbackTimer);
+        copyFeedbackTimer = null;
     }
 }
 
+/**
+ * 2.2 代码块专用复制函数
+ * 特点: 仅改变图标状态，不显示大段文字
+ */
+function copyCode(text, btnElement) {
+    navigator.clipboard.writeText(text).then(() => {
+        const originalHtml = btnElement.innerHTML;
+        btnElement.innerHTML = '<i class="fas fa-check"></i>'; // 仅显示对勾
+        btnElement.classList.add('copied');
+        
+        setTimeout(() => {
+            btnElement.innerHTML = originalHtml;
+            btnElement.classList.remove('copied');
+        }, 1500);
+    }).catch(err => {
+        console.error('复制失败:', err);
+        btnElement.innerText = 'Error';
+    });
+}
+
+
 /* ------------------------------------------------------------
-   Prism.js 自动高亮加载器 (动态注入)
+   3. 页面逻辑函数 (Page Logic)
    ------------------------------------------------------------ */
+
+/**
+ * 3.1 加载公共底栏 (Footer)
+ */
+function loadFooter() {
+    const path = window.footerPath || './footer.html';
+    
+    fetch(path)
+        .then(res => {
+            if (!res.ok) throw new Error(`Footer not found at: ${path}`);
+            return res.text();
+        })
+        .then(data => {
+            const el = document.getElementById('footer-placeholder');
+            if (el) el.innerHTML = data;
+        })
+        .catch(err => console.error('底栏加载错误:', err));
+}
+
+/**
+ * 3.2 索引页 Tab 切换
+ */
+function showCollection(collectionId, btnElement) {
+    // 切换文章列表显隐
+    document.querySelectorAll('.article-list').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById(collectionId);
+    if (target) target.classList.add('active');
+
+    // 切换按钮激活状态
+    document.querySelectorAll('.collection-btn').forEach(el => el.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
+}
+
+/**
+ * 3.3 处理 URL 哈希跳转 (#data -> 自动打开对应 Tab)
+ * 包含“强制回顶”逻辑，解决浏览器自动滚动导致的布局错位
+ */
+function handleHashNavigation() {
+    const hash = window.location.hash.substring(1);
+    if (!hash) return;
+
+    // 查找对应按钮
+    const targetBtn = document.querySelector(`button[onclick*="'${hash}'"]`);
+    if (targetBtn) {
+        showCollection(hash, targetBtn);
+        
+        // 核心修复：强制滚回顶部，对抗浏览器的锚点定位
+        // 执行两次以确保覆盖浏览器的默认行为
+        window.scrollTo(0, 0);
+        setTimeout(() => window.scrollTo(0, 0), 10);
+    }
+}
+
+
+/* ------------------------------------------------------------
+   4. 代码高亮系统 (Code Highlighting)
+   ------------------------------------------------------------ */
+
+/**
+ * 4.1 动态加载 Prism.js (按需加载，不浪费流量)
+ */
+/* ------------------------------------------------------------
+   4. 代码高亮系统 (Code Highlighting)
+   ------------------------------------------------------------ */
+
+/**
+ * 4.1 动态加载 Prism.js (增强版：修复路径问题 + 自动去缩进)
+ */
 function loadPrismHighlighter() {
-    // 1. 检查当前页面是否有代码块，如果没有，直接退出，不浪费资源
-    if (!document.querySelector('pre code')) return;
+    // 1. 检查是否有代码块
+    const codeBlocks = document.querySelectorAll('pre code');
+    if (codeBlocks.length === 0) return;
 
-    // console.log("检测到代码块，正在加载 Prism 高亮引擎...");
+    // --- [新增] 预处理：去除 HTML 源码缩进带来的多余空格 ---
+    codeBlocks.forEach(code => {
+        // 获取原始文本
+        let text = code.textContent;
+        // 1. 去掉首尾空行
+        text = text.replace(/^\n+|\n+$/g, '');
+        // 2. 计算最小缩进量
+        const lines = text.split('\n');
+        const indent = lines.reduce((min, line) => {
+            if (line.trim().length === 0) return min; // 跳过空行
+            const spaces = line.match(/^ */)[0].length;
+            return spaces < min ? spaces : min;
+        }, Infinity);
+        // 3. 每一行都切掉这个缩进
+        if (indent > 0 && indent !== Infinity) {
+            text = lines.map(line => line.substring(indent)).join('\n');
+        }
+        code.textContent = text;
+    });
+    // -------------------------------------------------------
 
-    // 2. 定义资源路径 (使用稳定的 CDN)
-    // 选用 "Tomorrow Night" 主题，完美匹配你的 #2c3e50 深色背景
-    const cssUrl = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
-    const coreUrl = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js';
-    const loaderUrl = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js';
+    const cdnBase = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0';
+    const cssUrl = `${cdnBase}/themes/prism-tomorrow.min.css`;
+    const coreUrl = `${cdnBase}/prism.min.js`;
+    const loaderUrl = `${cdnBase}/plugins/autoloader/prism-autoloader.min.js`;
 
-    // 3. 动态加载 CSS
+    // 2. 加载 CSS
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = cssUrl;
     document.head.appendChild(link);
 
-    // 4. 动态加载 JS (核心库 -> 自动加载插件)
-    // 辅助函数：加载脚本并返回 Promise
-    const loadScript = (url) => {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = url;
-            script.onload = resolve;
-            script.onerror = reject;
-            document.body.appendChild(script);
-        });
-    };
+    // 3. 辅助函数：串行加载 JS
+    const loadScript = (url) => new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+    });
 
-    // 按顺序加载：先加载核心，再加载自动识别插件
+    // 4. 按顺序加载：核心 -> 自动识别插件 -> [关键修复] 配置路径
     loadScript(coreUrl)
         .then(() => loadScript(loaderUrl))
         .then(() => {
-            // console.log("Prism 高亮引擎加载完成");
+            // [关键修复] 显式告诉 Autoloader 去哪里下载语言包
+            // 解决 "Loading..." 失败或不显示颜色的核心
+            if (window.Prism && window.Prism.plugins && window.Prism.plugins.autoloader) {
+                window.Prism.plugins.autoloader.languages_path = `${cdnBase}/components/`;
+            }
+            
+            // 强制触发一次全局高亮
+            window.Prism.highlightAll();
         })
-        .catch(err => console.error("Prism 加载失败:", err));
+        .catch(err => console.error("Prism load failed:", err));
 }
 
+/**
+ * 4.2 代码块增强 (添加 Mac 风格顶部栏)
+ */
+function enhanceCodeBlocks() {
+    document.querySelectorAll('pre code').forEach(code => {
+        const pre = code.parentElement;
+        // 防止重复处理
+        if (pre.parentElement.classList.contains('code-wrapper')) return;
+
+        // 提取语言名称
+        let langName = 'TEXT';
+        const langClass = Array.from(code.classList).find(c => c.startsWith('language-'));
+        if (langClass) langName = langClass.replace('language-', '').toUpperCase();
+
+        // 1. 创建容器
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-wrapper';
+
+        // 2. 创建顶部栏
+        const header = document.createElement('div');
+        header.className = 'code-header';
+
+        // 左侧：语言标签
+        const langLabel = document.createElement('span');
+        langLabel.className = 'lang-label';
+        langLabel.innerText = langName;
+
+        // 右侧：复制按钮
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-code-btn';
+        copyBtn.innerHTML = '<i class="far fa-copy"></i>';
+        copyBtn.onclick = () => copyCode(pre.innerText, copyBtn);
+
+        header.appendChild(langLabel);
+        header.appendChild(copyBtn);
+
+        // 3. 组装 DOM
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(header);
+        wrapper.appendChild(pre);
+    });
+}
+
+
 /* ------------------------------------------------------------
-   4. 页面初始化逻辑 (DOMContentLoaded)
+   5. 初始化入口 (Initialization)
    ------------------------------------------------------------ */
 window.addEventListener('DOMContentLoaded', () => {
     
-    // === A. 所有页面通用的逻辑 ===
-    loadFooter(); // 加载底栏
-    loadPrismHighlighter();
-
-    // === B. 仅在“索引页”执行的逻辑 (通过 body class 判断) ===
-    if (document.body.classList.contains('category-page')) {
-        handleHashNavigation(); // 检查是否有 #rnaseq 这种哈希
+    // [重要] 禁用浏览器自动恢复滚动位置 (配合 handleHashNavigation 使用)
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
     }
 
-    // === C. 仅在“文章页”执行的逻辑 ===
-    if (document.body.classList.contains('article-page')) {
-        // 如果未来有文章页特有的逻辑(比如生成目录)，写在这里
+    // A. 通用加载逻辑
+    loadFooter();
+    enhanceCodeBlocks();    // 先构建代码块外壳
+    loadPrismHighlighter(); // 后加载高亮逻辑
+
+    // B. 索引页专用逻辑 (Category Page)
+    if (document.body.classList.contains('category-page')) {
+        handleHashNavigation();
     }
 });
