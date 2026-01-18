@@ -1,0 +1,288 @@
+/* 引入图标配置文件 */
+@import url('./icons.css');
+
+/* ============================================================
+   文件名: global.css
+   描述: 全站通用样式表 (首页 + 索引页 + 文章页 + 底栏)
+   ============================================================ */
+
+/* --- 1. 全局变量与重置 --- */
+:root { 
+    --primary-color: #2c3e50; 
+    --accent-color: #3498db; 
+    --primary-bg: #f8f9fa; 
+    --sidebar-bg: #ffffff; 
+    --text-main: #2c3e50; 
+    --border-color: #eee;
+}
+
+* { box-sizing: border-box; }
+
+body { 
+    font-family: 'Helvetica Neue', Arial, sans-serif; 
+    background: var(--primary-bg); 
+    color: var(--text-main); 
+    margin: 0; 
+    line-height: 1.6; 
+}
+
+a { text-decoration: none; color: inherit; transition: 0.2s; }
+
+/* --- 2. 顶部导航栏 (所有页面通用) --- */
+nav { 
+    background: var(--primary-color); 
+    color: white; 
+    padding: 1rem 2rem; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    position: sticky; top: 0; z-index: 1000; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    line-height: 1.5; 
+}
+nav .logo a { font-size: 1.5rem; font-weight: bold; color: white; }
+nav .nav-links a { color: rgba(255,255,255,0.9); margin-left: 20px; font-size: 0.95rem; }
+nav .nav-links a:hover { color: var(--accent-color); }
+nav .nav-links i { margin-right: 5px; }
+nav .nav-links a.active { color: var(--accent-color) !important; font-weight: bold; }
+
+/* --- 3. 通用布局容器 --- */
+.container { 
+    max-width: 1200px; 
+    margin: 2rem auto; 
+    display: flex; 
+    gap: 2rem; 
+    padding: 0 1rem; 
+    min-height: 85vh; /* 保证内容少时footer沉底 */
+}
+/* 左侧栏基础样式 */
+.left-col { flex: 1; }
+/* 右侧栏基础样式 */
+.right-col { flex: 3; }
+
+
+/* ============================================================
+   4. 首页专用样式 (Home Page)
+   生效条件: <body class="home-page">
+   ============================================================ */
+.home-page .left-col { min-width: 320px; } /* 首页左栏较宽 */
+
+/* 个人信息卡片 & 分类卡片 */
+.profile-card, 
+.category-card { 
+    background: var(--sidebar-bg); 
+    border-radius: 12px; 
+    padding: 1.5rem; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+    margin-bottom: 1.5rem; 
+}
+
+.avatar { width: 100px; height: 100px; border-radius: 50%; background: #ddd; margin: 0 auto 1rem; display: block; object-fit: cover; }
+.bio { text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; }
+
+.category-card h3 { margin-top: 0; margin-bottom: 1rem; color: #666; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
+.category-item { display: block; padding: 0.8rem; border-radius: 8px; transition: 0.2s; }
+.category-item:hover { background: #f0f7ff; color: var(--accent-color); }
+.category-item h4 { margin: 0 0 4px 0; font-size: 1rem; display: flex; align-items: center; }
+.category-item h4 i { width: 25px; margin-right: 8px; color: var(--primary-color); text-align: center; }
+.category-item p { margin: 0; font-size: 0.8rem; color: #7f8c8d; padding-left: 33px; }
+
+/* 首页右侧笔记卡片 */
+.note-card { 
+    background: white; border-radius: 12px; padding: 2rem; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem;
+    transition: transform 0.3s, box-shadow 0.3s; 
+    display: block; 
+}
+.note-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+.tag { background: #eef2f3; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; color: #666; display: inline-block; margin-bottom: 0.5rem;}
+.note-card h3 { margin: 0.5rem 0; color: var(--accent-color); }
+.note-card small { color: #aaa; display: block; margin-top: 1rem; }
+
+
+/* ============================================================
+   5. 二级索引页专用样式 (Category Index)
+   生效条件: <body class="category-page">
+   ============================================================ */
+.category-page .left-col { min-width: 250px; } /* 二级页面左栏稍窄 */
+
+/* 侧边集合菜单 */
+.collection-menu { background: var(--sidebar-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 100px; }
+.collection-menu h3 { margin-top: 0; font-size: 1.1rem; color: #666; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+
+/* 集合按钮 */
+.collection-btn {
+    display: flex; align-items: center; width: 100%; text-align: left;
+    padding: 10px 15px; margin-bottom: 5px; border: none; background: none;
+    border-radius: 6px; cursor: pointer; font-size: 0.95rem;
+    color: var(--text-main); transition: all 0.2s;
+}
+.collection-btn:hover { background: #f0f7ff; color: var(--accent-color); }
+.collection-btn.active { background: var(--accent-color); color: white; }
+.collection-btn i { margin-right: 8px; width: 20px; text-align: center; }
+
+/* 自定义图片图标容器 */
+.btn-icon {
+    display: inline-block; width: 20px; height: 20px; margin-right: 10px;
+    background-image: var(--icon-default); background-size: contain;
+    background-repeat: no-repeat; background-position: center;
+    transition: background-image 0.2s;
+}
+.collection-btn:hover .btn-icon { background-image: var(--icon-hover); }
+.collection-btn.active .btn-icon { background-image: var(--icon-active); }
+
+/* 文章列表显隐控制 */
+.article-list { display: none; animation: fadeIn 0.3s ease; }
+.article-list.active { display: block; }
+
+.list-header { margin-bottom: 1.5rem; border-left: 5px solid var(--accent-color); padding-left: 1rem; }
+.list-header h2 { margin: 0; font-size: 1.8rem; }
+.list-header p { color: #666; margin: 5px 0 0 0; }
+
+.article-item { background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; display: flex; justify-content: space-between; align-items: center; }
+.article-item:hover { transform: translateX(5px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-left: 3px solid var(--accent-color); }
+.article-info h4 { margin: 0 0 5px 0; font-size: 1.1rem; }
+.article-info p { margin: 0; font-size: 0.85rem; color: #888; }
+.article-date { font-size: 0.8rem; color: #aaa; white-space: nowrap; margin-left: 1rem; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+
+/* ============================================================
+   6. 三级文章详情页专用样式 (Article Detail)
+   生效条件: <body class="article-page">
+   ============================================================ */
+.article-page { line-height: 1.8; word-wrap: break-word; }
+
+.article-container {
+    max-width: 900px; margin: 3rem auto; background: white;
+    padding: 4rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.back-link { display: inline-block; margin-bottom: 2rem; color: #666; font-size: 0.9rem; }
+.back-link:hover { color: var(--accent-color); transform: translateX(-5px); }
+
+.article-page h1 { color: var(--primary-color); font-size: 2.2rem; margin-bottom: 0.5rem; line-height: 1.3; }
+.meta { color: #999; font-size: 0.9rem; margin-bottom: 3rem; border-bottom: 1px solid #eee; padding-bottom: 1.5rem; }
+
+/* 内容排版 */
+.content h2 { border-left: 5px solid var(--accent-color); padding-left: 15px; margin: 3rem 0 1.5rem; font-size: 1.6rem; color: var(--primary-color); }
+.content h3 { margin: 2rem 0 1rem; color: #34495e; font-size: 1.3rem; }
+.content p { margin-bottom: 1.2rem; text-align: justify; }
+.content img { display: block; max-width: 100%; height: auto; margin: 2rem auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+blockquote { margin: 2rem 0; padding: 1rem 1.5rem; background: #f1f8ff; border-left: 4px solid var(--accent-color); color: #555; border-radius: 0 8px 8px 0; }
+blockquote p { margin: 0; }
+
+/* 表格优化 */
+.content table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.95rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
+.content th { background-color: var(--primary-color); color: white; padding: 12px 15px; text-align: left; font-weight: 600; }
+.content td { padding: 12px 15px; border-bottom: 1px solid #eee; color: #555; }
+.content tr:nth-of-type(even) { background-color: #f9f9f9; }
+.content tr:hover { background-color: #f1f7ff; }
+
+/* MathJax 移动端优化 */
+mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 10px 0; }
+
+
+/* ============================================================
+   7. 底栏 Footer 样式 (所有页面通用)
+   ============================================================ */
+.site-footer {
+    background: var(--primary-color); color: white;
+    padding: 3rem 0 1rem; margin-top: 4rem; font-size: 0.95rem;
+}
+.footer-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2rem;
+}
+.footer-col { flex: 1; min-width: 250px; }
+.footer-col h3 {
+    font-size: 1.1rem; border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5rem; margin-bottom: 1rem; display: inline-block;
+}
+.footer-links { display: flex; flex-direction: column; gap: 10px; }
+.footer-links a { color: rgba(255, 255, 255, 0.8); display: inline-flex; align-items: center; }
+.footer-links a:hover { color: white; transform: translateX(5px); }
+.footer-links i { margin-right: 10px; width: 20px; text-align: center; }
+.copyright-bar {
+    text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 2rem; padding-top: 1.5rem; color: rgba(255, 255, 255, 0.5); font-size: 0.85rem;
+}
+
+
+/* ============================================================
+   8. 辅助工具样式 (复制功能等)
+   ============================================================ */
+a[onclick*="copyToClipboard"] {
+    cursor: copy !important;
+    position: relative;
+}
+
+/* 让反馈内容出现时带一点淡入效果 */
+.footer-links a i.fa-check {
+    animation: fadeInIcon 0.2s ease-in;
+}
+
+@keyframes fadeInIcon {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================================
+   9. 移动端响应式 (统一处理)
+   断点: 850px (适配竖屏平板)
+   ============================================================ */
+@media (max-width: 850px) {
+    /* 容器调整 */
+    .container { flex-direction: column; }
+    .collection-menu { position: static; margin-bottom: 2rem;}
+
+    /* 导航栏 2x2 网格布局 */
+    nav { flex-direction: column; padding: 1rem; }
+    nav .nav-links { 
+        margin-top: 1rem; width: 100%; display: flex; flex-wrap: wrap; 
+        justify-content: center; gap: 10px; 
+    }
+    nav .nav-links a { 
+        margin-left: 0; flex: 0 0 45%; text-align: center; 
+        white-space: nowrap; padding: 8px 0; 
+        background: rgba(255,255,255,0.1); border-radius: 6px; font-size: 0.9rem;
+    }
+
+    /* 详情页左右边距 */
+    .article-container { margin: 1rem; padding: 1.5rem; }
+}
+
+/* ============================================================
+   10. 代码块高亮样式 (适配 Prism.js Tomorrow 主题)
+   ============================================================ */
+
+/* 1. 覆盖 Prism 的默认背景色，使用你的品牌色 #2c3e50 */
+:not(pre) > code[class*="language-"], 
+pre[class*="language-"] {
+    background: #2c3e50 !important; /* 强制保持深蓝色背景 */
+    border-radius: 8px;             /* 保持圆角 */
+    border: 1px solid rgba(255,255,255,0.1); /* 加一点微弱的边框更有质感 */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);  /* 加深阴影，更有层次感 */
+    margin: 1.5rem 0;               /* 上下间距 */
+}
+
+/* 2. 调整内边距和字体 */
+code[class*="language-"], 
+pre[class*="language-"] {
+    font-family: Consolas, Monaco, 'Andale Mono', monospace !important;
+    font-size: 0.9em !important;
+    text-shadow: none !important; /* 去掉 Prism 默认的文字阴影，看起来更扁平干净 */
+    line-height: 1.6 !important;
+}
+
+/* 3. 修复行内代码 (比如 `ls -l`) 的样式 */
+/* :not(pre) > code 意思是：不在 pre 标签里的 code 标签 */
+:not(pre) > code {
+    background: #f4f4f4;
+    color: #e74c3c;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: Consolas, monospace;
+}

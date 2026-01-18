@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>01. AutoDock Vina 基本使用 - 海钊知识港</title>
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <a href="../../dry_lab_index.html#docking" class="back-link"><i class="fas fa-arrow-left"></i> 返回 干实验 / 分子对接</a>
+
+            <h1>01. AutoDock Vina 基本使用</h1>
+            <div class="meta">
+                <span><i class="far fa-calendar"></i> 2025-12-17</span>
+                <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 分子对接</span>
+            </div>
+
+            <div class="content">
+                <h2>前言</h2>
+                    <p>分子对接就是把一个小分子和一个蛋白质进行互作模拟，看什么情况下，它们之间的结合能最低，此时会形成一个稳定的复合物，所有的分子蛋白互作都是这样的。能量最低原理就告诉我们，任何物理系统（宏观或微观）在不受外力干扰下，总是自发地趋向于达到总能量最低、最稳定的状态。而计算机要寻找的就是什么情况下它们的结合能最低。</p>
+                <h2>1. 文件准备</h2>
+                    <h3>1.1 配体文件</h3>
+                        <p>配体文件下载：</p>
+                        <ol>
+                            <li>Pub Chem
+                                <p><a href="https://pubchem.ncbi.nlm.nih.gov" target="_blank" style="color: #3498db;">https://pubchem.ncbi.nlm.nih.gov</a></p>
+                                <p>直接键入分子名称，搜索，下载3D Conformer的SDF格式文件。</p>
+                            </li>
+                            <li>RCBS
+                                <p><a href="https://www.rcsb.org" target="_blank" style="color: #3498db;">https://www.rcsb.org</a></p>
+                                <p>直接键入分子名称，搜索结合复合物，在Unique Ligands下点击配体代号连接，下载SDF格式或CIF格式文件。</p>
+                            </li>
+                        </ol>
+                    <h3>1.2 蛋白文件</h3>
+                        <p>蛋白文件下载：</p>
+                        <ol>
+                            <li>
+                                <p>AlphaFold 在线版</p>
+                                <p>直接下载，默认有5个cif文件，将第一个cif文件单独拎出来，一般编号为0的是预测结构最好的。</p>
+                            </li>
+                            <li>
+                                <p>PDB</p>
+                                <p>你感兴趣哪个下载哪个cif文件。</p>
+                            </li>
+                        </ol>
+                <h2>2. 蛋白文件预处理</h2>
+                    <ol>
+                        <li>加氢</li>
+                            <p>对蛋白cif文件进行氢原子添加，可以在pymol中手动进行</p>
+                        <li>转格式</li>
+                            <p>将加好氢的蛋白转存为pdb格式</p>
+                    </ol>
+                <h2>3. 处理受体蛋白</h2>
+                    <ol>
+                        <li>启动 AutoDockTools，ADT</li>
+                        <li>加载蛋白</li>
+                            <p>菜单栏：File -> Read Molecule</p>
+                            <p>选择你刚才用 PyMOL 转换好的 PDB 文件</p>
+                        <li>处理蛋白</li>
+                            <p>加电荷：菜单栏 Edit -> Charges -> Add Kollman Charges</p>
+                            <p>加原子类型：菜单栏 Edit -> Atoms -> Assign AD4 type</p>
+                            <p>清除非蛋白原子，需要 Edit -> Delete -> Delete Water</p>
+                        <li>保存为 PDBQT</li>
+                            <p>菜单栏：Grid -> Macromolecule -> Choose</p>
+                            <p>在弹出的列表里选中你的蛋白，点击 Select Molecule</p>
+                    </ol>
+                <h2>4. 处理配体小分子</h2>
+                    <ol>
+                        <li>小分子转格式</li>
+                            <p>在pymol中将小分子由SDF转为pdb格式</p>
+                        <li>加载小分子</li>
+                            <P>菜单栏：Ligand -> Input -> Open</P>
+                        <li>定义根和扭转键（ADT 通常会自动识别）</li>
+                            <p>菜单栏：Ligand -> Torsion Tree -> Detect Root</p>
+                            <p>菜单栏：Ligand -> Torsion Tree -> Choose Torsions（这一步可以看到有多少个键是可以旋转的，通常默认即可）</p>
+                        <li>保存为 PDBQT</li>
+                            <p>菜单栏：Ligand -> Output -> Save as PDBQT</p>
+                    </ol>
+                <h2>5. 画盒子</h2>
+                    <ol>
+                        <li>设置 Map 类型</li>
+                            <p>菜单栏：Grid -> Macromolecule -> Choose (再次选中刚才保存的蛋白 PDBQT)</p>
+                            <p>菜单栏：Grid -> Set Map Types -> Directly -> 选中你的配体 PDBQT 文件</p>
+                        <li>打开盒子工具</li>
+                            <p>菜单栏：Grid -> Grid Box</p>
+                            <p>这时会出现一个像“调音台”一样的窗口，画面上会出现一个彩色的长方体盒子</p>
+                        <li>调整位置</li>
+                            <p>如果知道结合位点：转动转盘，把盒子移动并缩放到刚好包裹住那个口袋</p>
+                            <p>如果不知道（盲对接）：你需要把盒子调得足够大，完全包裹住整个蛋白质</p>
+                        <li>记录参数</li>
+                            <p>记录窗口里的 6 个数字：</p>
+                            <p>Center Grid Box (X, Y, Z)：盒子的中心坐标。</p>
+                            <p>Size (X, Y, Z)：盒子的大小（单位是埃 Å）。</p>
+                            <p>点击 File -> Close saving current</p>
+                    </ol>
+                <h2>6. 编写配置文件</h2>
+                    <p>在你的文件夹里新建一个文本文件，命名为 config.txt，内容如下：</p>
+                    <pre><code class="language-txt">
+    receptor = protein.pdbqt    # 你的蛋白文件名
+    ligand = ligand.pdbqt       # 你的小分子文件名
+
+    center_x = 10.5             # 刚才你在 Grid Box 里记下的数字
+    center_y = 22.1
+    center_z = -5.3
+
+    size_x = 40                 # 刚才 Grid Box 的大小
+    size_y = 40
+    size_z = 40
+
+    energy_range = 4            # 结果显示的能量跨度
+    exhaustiveness = 8          # 搜索细致度，8是标准，想更准可以设 16 或 32（时间变长）
+    num_modes = 9               # 输出多少个结果
+                    </code></pre>
+                <h2>7. 开始运行</h2>
+                    <ol>
+                        <li>准备环境</li>
+                            <p>下载 vina.exe。</p>
+                            <p>把 vina.exe、protein.pdbqt、ligand.pdbqt、config.txt 放在同一个文件夹里。</p>
+                        <li>运行</li>
+                            <p>在文件夹空白处，按住 Shift + 右键 -> 打开 Powershell 窗口。</p>
+                            <p>输入命令：</p>
+                                <pre><code class="language-bash">
+    .\vina.exe --config config.txt --log log.txt --out result.pdbqt
+                                </code></pre>
+                            <p>回车，程序跑完后，会生成 result.pdbqt。</p>
+                        <li>查看</li>
+                            <p>用pymol同时打开result.pdbqt和protein.pdbqt，此时显示的就是小分子对接上去的位置。</p>
+                    </ol>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

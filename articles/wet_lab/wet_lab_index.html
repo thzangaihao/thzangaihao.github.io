@@ -6,11 +6,13 @@
         <title>湿实验索引 - 海钊知识港</title>
         
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" href="../../css/category-index.css">
-        <script src="../../js/main.js"></script>
+        <link rel="stylesheet" href="../../css/global.css">
+
+        <script src="../../js/global.js"></script>
+        <script>window.footerPath = '../../footer.html';</script>
     </head>
 
-    <body>
+    <body class="category-page">
         <nav>
             <div class="logo"><a href="../../index.html">海钊知识港</a></div>
             <div class="nav-links">
@@ -25,24 +27,47 @@
             <aside class="left-col">
                 <div class="collection-menu">
                     <h3><i class="fas fa-folder"></i> 集合列表</h3>
-                    <button class="collection-btn active" onclick="showCollection('vec', this)">
-                        <i class="fas fa-project-diagram"></i> 载体设计
+                    <button class="collection-btn active" onclick="showCollection('pcr', this)">
+                        <i class="fas fa-dna"></i> 多聚酶链式反应 (PCR)
                     </button>
-                    <button class="collection-btn" onclick="showCollection('pcr', this)">
-                        <i class="fas fa-dna"></i> PCR原理
+
+                    <button class="collection-btn" onclick="showCollection('vec', this)">
+                        <i class="fas fa-project-diagram"></i> 载体设计
                     </button>
                 </div>
             </aside>
 
             <section class="right-col">
-                
-                <div id="vec" class="article-list active">
+                <div id="pcr" class="article-list active">
+                    <div class="list-header">
+                        <h2>多聚酶链式反应 (PCR)</h2>
+                        <p>生物学可以被划分为两个时代：一个没有PCR，一个有PCR</p>
+                    </div>
+
+                    <a href="./多聚酶链式反应 (PCR)/01. 多聚酶链式反应 (PCR)/01. PCR是用来干什么的？.html" class="article-item">
+                        <div class="article-info">
+                            <h4>01. PCR是用来干什么的？</h4>
+                            <p>一种批量获得线性DNA分子的技术</p>
+                        </div>
+                        <span class="article-date">2026-01-08</span>
+                    </a>
+
+                    <a href="./多聚酶链式反应 (PCR)/02. 如何设计一条引物？/02. 如何设计一条引物？.html" class="article-item">
+                        <div class="article-info">
+                            <h4>02. 如何设计一条引物？</h4>
+                            <p>控制复性温度、避免引物自连、避免引物降解</p>
+                        </div>
+                        <span class="article-date">2026-01-08</span>
+                    </a>
+                </div>
+
+                <div id="vec" class="article-list">
                     <div class="list-header">
                         <h2>载体设计</h2>
                         <p>如何设计一个引物：考虑Tm值、引物自连和保护碱基</p>
                     </div>
                     
-                    <a href="#" class="article-item">
+                    <a href="./载体设计/01. 测试/" class="article-item">
                         <div class="article-info">
                             <h4>01. Snapgene的基本使用</h4>
                             <p>下载，认识Snapgene的基本界面</p>
@@ -58,26 +83,9 @@
                         <span class="article-date">2026-01-15</span>
                     </a>
                 </div>
-
-                <div id="pcr" class="article-list">
-                    <div class="list-header">
-                        <h2>PCR原理</h2>
-                        <p>生物学可以被划分为两个时代：一个没有PCR，一个有PCR</p>
-                    </div>
-
-                    <a href="#" class="article-item">
-                        <div class="article-info">
-                            <h4>01. PCR是用来干什么的？</h4>
-                            <p>明确目标，我们需要什么东西？</p>
-                        </div>
-                        <span class="article-date">2026-01-08</span>
-                    </a>
-                </div>
-
             </section>
         </div>
-        <footer style="text-align: center; padding: 2rem; color: #7f8c8d;">
-            &copy; 2026 海钊.
-        </footer>
+
+        <div id="footer-placeholder"></div>
     </body>
 </html>
