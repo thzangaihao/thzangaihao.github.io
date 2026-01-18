@@ -278,6 +278,25 @@ function enhanceCodeBlocks() {
     });
 }
 
+/* ------------------------------------------------------------
+   表格响应式增强 (自动添加滚动容器)
+   ------------------------------------------------------------ */
+function makeTablesResponsive() {
+    const tables = document.querySelectorAll('.content table');
+    
+    tables.forEach(table => {
+        // 防止重复处理
+        if (table.parentElement.classList.contains('table-wrapper')) return;
+
+        // 1. 创建外部容器
+        const wrapper = document.createElement('div');
+        wrapper.className = 'table-wrapper';
+
+        // 2. 将表格移入容器
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+    });
+}
 
 /* ------------------------------------------------------------
    5. 初始化入口 (Initialization)
@@ -293,6 +312,7 @@ window.addEventListener('DOMContentLoaded', () => {
     loadFooter();
     enhanceCodeBlocks();    // 先构建代码块外壳
     loadPrismHighlighter(); // 后加载高亮逻辑
+    makeTablesResponsive();
 
     // B. 索引页专用逻辑 (Category Page)
     if (document.body.classList.contains('category-page')) {
