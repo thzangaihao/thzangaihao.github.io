@@ -283,16 +283,10 @@ function enhanceCodeBlocks() {
    ------------------------------------------------------------ */
 function makeTablesResponsive() {
     const tables = document.querySelectorAll('.content table');
-    
     tables.forEach(table => {
-        // 防止重复处理
         if (table.parentElement.classList.contains('table-wrapper')) return;
-
-        // 1. 创建外部容器
         const wrapper = document.createElement('div');
         wrapper.className = 'table-wrapper';
-
-        // 2. 将表格移入容器
         table.parentNode.insertBefore(wrapper, table);
         wrapper.appendChild(table);
     });
