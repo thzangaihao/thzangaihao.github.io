@@ -112,16 +112,16 @@ function copyCode(text, btnElement) {
 function loadFooter() {
     const path = window.footerPath || './footer.html';
     
-    fetch(path)
-        .then(res => {
-            if (!res.ok) throw new Error(`Footer not found at: ${path}`);
-            return res.text();
-        })
-        .then(data => {
-            const el = document.getElementById('footer-placeholder');
-            if (el) el.innerHTML = data;
-        })
-        .catch(err => console.error('底栏加载错误:', err));
+    return fetch(path)
+    .then(res => {
+        if (!res.ok) throw new Error(`Footer not found at: ${path}`);
+        return res.text();
+    })
+    .then(data => {
+        const el = document.getElementById('footer-placeholder');
+        if (el) el.innerHTML = data;
+    })
+    .catch(err => console.error('底栏加载错误:', err));
 }
 
 /**
@@ -150,11 +150,6 @@ function handleHashNavigation() {
     const targetBtn = document.querySelector(`button[onclick*="'${hash}'"]`);
     if (targetBtn) {
         showCollection(hash, targetBtn);
-        
-        // 核心修复：强制滚回顶部，对抗浏览器的锚点定位
-        // 执行两次以确保覆盖浏览器的默认行为
-        window.scrollTo(0, 0);
-        setTimeout(() => window.scrollTo(0, 0), 10);
     }
 }
 
@@ -293,22 +288,93 @@ function makeTablesResponsive() {
 }
 
 /* ------------------------------------------------------------
-   5. 初始化入口 (Initialization)
+   自动渲染文章列表 (基于 build_index.py 生成的数据)
    ------------------------------------------------------------ */
-window.addEventListener('DOMContentLoaded', () => {
+function renderArticleCards() {
+    // 1. 检查是否有数据库
+    if (!window.ARTICLE_DATABASE || !Array.isArray(window.ARTICLE_DATABASE)) {
+        // console.log("未找到文章数据库，跳过自动渲染");
+        return;
+    }
+
+    // 2. 检查当前页面是否是“索引页” (通过 class="category-page" 判断)
+    if (!document.body.classList.contains('category-page')) return;
+
+    // 3. 遍历数据库中的每一篇文章
+    window.ARTICLE_DATABASE.forEach(article => {
+        // 核心逻辑：寻找当前页面是否存在对应 collection ID 的容器
+        // 比如文章属于 'pcr'，就找 id="pcr" 的 div
+        const container = document.getElementById(article.collection);
+
+        // 如果容器不存在（说明这篇文章不属于当前大类），直接跳过
+        if (!container) return;
+
+        // 4. 生成卡片 HTML
+        // 注意：我们需要处理一下路径。数据库存的是 'articles/...'
+        // 但如果我们在二级页面，可能需要 '../' 或 '../../'
+        // 最简单的办法是使用 绝对路径 ( /articles/... )，或者根据当前层级计算
+        // 这里假设你的网站部署在根目录，使用根相对路径
+        const linkPath = getRelativePath(article.path);
+
+        const cardHtml = `
+            <a href="${linkPath}" class="article-item">
+                <div class="article-info">
+                    <h4>${article.title}</h4>
+                    <p>${article.summary}</p>
+                </div>
+                <span class="article-date">${article.date}</span>
+            </a>
+        `;
+
+        // 5. 插入到容器末尾
+        container.insertAdjacentHTML('beforeend', cardHtml);
+    });
+}
+
+/**
+ * 辅助函数：根据当前页面层级，修正链接路径
+ * 简单粗暴版：假设数据库里的 path 是 "articles/wet_lab/..."
+ * 如果我们在 "articles/wet_lab/index.html"，需要加 "../../" 吗？
+ * 为了稳定性，建议 Python 脚本生成时直接生成 "/articles/..." (根路径)
+ * 或者在这里简单处理：
+ */
+function getRelativePath(dbPath) {
+    // 如果你在本地预览 (file://)，根路径 / 可能会失效
+    // 建议：让 build_index.py 生成的路径以 "/" 开头，例如 "/articles/..."
+    // 如果部署在 GitHub Pages (https://user.github.io/repo/), 可能需要加仓库名
+    // 这里暂时直接返回，如果链接打不开，我们需要调整 Python 脚本
     
-    // [重要] 禁用浏览器自动恢复滚动位置 (配合 handleHashNavigation 使用)
+    // 临时方案：假设二级页面都在 articles/xxx/ 目录下，引用 articles/yyy/
+    // 需要回退两层
+    return '../../' + dbPath; 
+}
+
+/* ------------------------------------------------------------
+   5. 初始化入口 (Initialization) - [修改版]
+   ------------------------------------------------------------ */
+// [核心修改] 加上 async 关键字
+window.addEventListener('DOMContentLoaded', async () => {
+    
+    // 1. 基础配置
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
 
-    // A. 通用加载逻辑
-    loadFooter();
-    enhanceCodeBlocks();    // 先构建代码块外壳
-    loadPrismHighlighter(); // 后加载高亮逻辑
-    makeTablesResponsive();
+    // 2. [关键] 先等待底栏加载完毕！
+    // 只有底栏插进去了，页面高度确定了，我们再做后面的事
+    await loadFooter(); 
 
-    // B. 索引页专用逻辑 (Category Page)
+    // 3. 底栏就位后，再加载其他装饰（高亮等）
+    enhanceCodeBlocks();    
+    loadPrismHighlighter(); 
+    
+    // 如果有自动生成文章卡片的逻辑，也放在这里
+    if (typeof renderArticleCards === 'function') {
+        renderArticleCards();
+    }
+
+    // 4. [最后] 处理跳转逻辑
+    // 此时页面高度已完全撑开，滚动计算才是准确的
     if (document.body.classList.contains('category-page')) {
         handleHashNavigation();
     }
