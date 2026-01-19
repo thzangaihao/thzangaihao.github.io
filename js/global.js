@@ -124,16 +124,18 @@ function loadFooter() {
     .catch(err => console.error('底栏加载错误:', err));
 }
 
-/**
- * 3.2 索引页 Tab 切换
- */
+/* ------------------------------------------------------------
+   3.2 索引页 Tab 切换 (适配幽灵 ID)
+   ------------------------------------------------------------ */
 function showCollection(collectionId, btnElement) {
-    // 切换文章列表显隐
+    // 1. 隐藏所有列表
     document.querySelectorAll('.article-list').forEach(el => el.classList.remove('active'));
-    const target = document.getElementById(collectionId);
+    
+    // 2. 显示目标列表 [核心修改：加上 -section 后缀]
+    const target = document.getElementById(collectionId + '-section');
     if (target) target.classList.add('active');
 
-    // 切换按钮激活状态
+    // 3. 切换按钮激活状态
     document.querySelectorAll('.collection-btn').forEach(el => el.classList.remove('active'));
     if (btnElement) btnElement.classList.add('active');
 }
@@ -290,32 +292,20 @@ function makeTablesResponsive() {
 /* ------------------------------------------------------------
    自动渲染文章列表 (基于 build_index.py 生成的数据)
    ------------------------------------------------------------ */
+   /* ------------------------------------------------------------
+   自动渲染文章列表 (适配幽灵 ID)
+   ------------------------------------------------------------ */
 function renderArticleCards() {
-    // 1. 检查是否有数据库
-    if (!window.ARTICLE_DATABASE || !Array.isArray(window.ARTICLE_DATABASE)) {
-        // console.log("未找到文章数据库，跳过自动渲染");
-        return;
-    }
-
-    // 2. 检查当前页面是否是“索引页” (通过 class="category-page" 判断)
+    if (!window.ARTICLE_DATABASE || !Array.isArray(window.ARTICLE_DATABASE)) return;
     if (!document.body.classList.contains('category-page')) return;
 
-    // 3. 遍历数据库中的每一篇文章
     window.ARTICLE_DATABASE.forEach(article => {
-        // 核心逻辑：寻找当前页面是否存在对应 collection ID 的容器
-        // 比如文章属于 'pcr'，就找 id="pcr" 的 div
-        const container = document.getElementById(article.collection);
+        // [核心修改] 数据库里存的是 "alphafold"，但 HTML 里是 "alphafold-section"
+        const container = document.getElementById(article.collection + '-section');
 
-        // 如果容器不存在（说明这篇文章不属于当前大类），直接跳过
         if (!container) return;
 
-        // 4. 生成卡片 HTML
-        // 注意：我们需要处理一下路径。数据库存的是 'articles/...'
-        // 但如果我们在二级页面，可能需要 '../' 或 '../../'
-        // 最简单的办法是使用 绝对路径 ( /articles/... )，或者根据当前层级计算
-        // 这里假设你的网站部署在根目录，使用根相对路径
         const linkPath = getRelativePath(article.path);
-
         const cardHtml = `
             <a href="${linkPath}" class="article-item">
                 <div class="article-info">
@@ -325,8 +315,6 @@ function renderArticleCards() {
                 <span class="article-date">${article.date}</span>
             </a>
         `;
-
-        // 5. 插入到容器末尾
         container.insertAdjacentHTML('beforeend', cardHtml);
     });
 }
@@ -350,23 +338,30 @@ function getRelativePath(dbPath) {
 }
 
 /* ------------------------------------------------------------
-   5. 初始化入口 (Initialization)
+   5. 初始化入口 (找回 async/await)
    ------------------------------------------------------------ */
-window.addEventListener('DOMContentLoaded', () => {
+// [重要] 加上 async
+window.addEventListener('DOMContentLoaded', async () => {
     
-    // [重要] 禁用浏览器自动恢复滚动位置 (配合 handleHashNavigation 使用)
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
 
-    // A. 通用加载逻辑
-    loadFooter();
-    enhanceCodeBlocks();    // 先构建代码块外壳
-    loadPrismHighlighter(); // 后加载高亮逻辑
-    makeTablesResponsive();
-    renderArticleCards();   // 文章数据库加载
+    // 1. [必须] 先等待底栏加载，撑开页面底部
+    await loadFooter();
 
-    // B. 索引页专用逻辑 (Category Page)
+    // 2. [必须] 再渲染文章卡片，撑开页面中部
+    renderArticleCards(); 
+
+    // 3. 加载其他装饰
+    enhanceCodeBlocks();    
+    loadPrismHighlighter(); 
+    makeTablesResponsive();
+
+    // 4. [最后] 处理 Tab 切换
+    // 此时 HTML 里的 ID 是 xxx-section，浏览器不会自动跳
+    // JS 会根据 URL hash 手动把对应的 Tab 显示出来 (active)
+    // 用户看到的界面就是：页面在顶部，对应的 Tab 内容已显示。完美！
     if (document.body.classList.contains('category-page')) {
         handleHashNavigation();
     }
