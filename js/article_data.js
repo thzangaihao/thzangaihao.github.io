@@ -1,14 +1,14 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/01/19_20:2929
+// 生成时间: 2026/01/19_22:4051
 // 文章总数: 6
 
 window.ARTICLE_DATABASE = [
     {
-        "title": "01. AlphaFold 在线版使用说明",
+        "title": "01. AlphaFold3 在线版使用说明",
         "collection": "alphafold",
-        "date": "2026-01-19",
+        "date": "2026-01-20",
         "summary": "通过AlphaFold在线服务器进行简单任务",
-        "path": "articles/dry_lab/alphafold/01. AlphaFold 在线版使用说明/01. AlphaFold 在线版使用说明.html"
+        "path": "articles/dry_lab/alphafold/01. AlphaFold3 在线版使用说明/01. AlphaFold3 在线版使用说明.html"
     },
     {
         "title": "01. AutoDock Vina 基本使用",
@@ -32,11 +32,11 @@ window.ARTICLE_DATABASE = [
         "path": "articles/dry_lab/rnaseq/enrichment_analysis/enrichment_analysis.html"
     },
     {
-        "title": "02. AlphaFold 离线版使用说明",
+        "title": "02. AlphaFold3 离线版使用说明",
         "collection": "alphafold",
         "date": "2026-01-19",
         "summary": "在集群上部署AlphaFold实现任意小分子对接的蛋白质共预测",
-        "path": "articles/dry_lab/alphafold/02. AlphaFold 离线版使用说明/02. AlphaFold 离线版使用说明.html"
+        "path": "articles/dry_lab/alphafold/02. AlphaFold3 离线版使用说明/02. AlphaFold3 离线版使用说明.html"
     },
     {
         "title": "02. AutoDock Vina 自动化",

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>02. AlphaFold3 离线版使用说明 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="alphafold"> 
+        <meta name="collection-title" content="AlphaFold">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-01-19">
+        <meta name="description" content="在集群上部署AlphaFold实现任意小分子对接的蛋白质共预测">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>02. AlphaFold3 离线版使用说明</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                <p>离线版版本的 AlphaFold3 (AF3) 相比在线版本可以支持任意小分子的对接共预测。我们使用传统的分子对接例如 Vian 一般都进行刚性对接和半柔性对接，而受体与配体的生物学结合一般都存在较大的构象改变。因此使用 AlphaFold 同时预测＋对接，可以极大的提高预测精度和对接精度，这也是 AF3 最为先进的一点。本文以 slurm 任务提交集群作业为例。</p>
+                <h2>1. 资源核实</h2>
+                <p>由于 AF3 模型在进行结构推理和扩散模型优化时，对 GPU 的张量计算能力及显存容量有极高要求（单次任务显存需求通常超过 40GB），所以在进行任务前我们务必需要检查配置，后续以集群查询为例。</p>
+                <p>另外别忘记查看集群或服务器是否本地部署了 AF3 。</p>
+                <ol>
+                    <li>查看分区</li>
+                    <p>输入以下命令查看所有分区的简要状态：</p>
+                    <pre><code class="language-bash">sinfo</code></pre>
+                    <p>其中一个 Partition 就是一个分区，它用于管理用户对这个分区下节点使用的权限，如果你没有这个分区的使用权限，那你就调用不了这个分区下的节点资源。</p>
+                    <pre><code class="language-bash">
+PARTITION        AVAIL  TIMELIMIT  NODES  STATE NODELIST
+Partition1          up   infinite     10    mix cu[01-03]
+Partition2          up   infinite     10  alloc cu04
+Partition3          up   infinite     10 drain* cu[02-04]
+Partition4          up   infinite     10  drain cu[08,38-39,72,96-97]
+Partition5          up   infinite     10    mix cu[01,03]
+                    </code></pre>
+                    <li>查看分区可用资源</li>
+                    <p>输入以下命令查看所有分区的资源：</p>
+                    <pre><code class="language-bash">sinfo -o "%20P %20G %10D %c %m"</code></pre>
+                    <p>注意 GRES 这一列，如果为 (null) 就代表着这个分区下没有显卡资源，需要使用有显卡的分区：</p>
+                    <pre><code class="language-bash">
+PARTITION            GRES                  NODES      CPUS MEMORY
+Partition1           (null)                8          512  2000000
+Partition2           (null)                8          512  2000000
+Partition3           gpu:nvidia_h100-sxm4  8          512  2000000
+                    </code></pre>
+                </ol>
+                <h2>2. 任务文件编写</h2>
+                    <p>AF3 的每一次对接任务都是以一个<code>.json</code>文件来储存的，里面包含你要预测的氨基酸序列，配体小分子的 smiles 表达，当然还支持其它互作对象共预测，我们就继续以小分子对接为例，其 AF3 离线版本标准<code>.json</code>写法如下：</p>
+                    <pre><code class="language-json">
+{
+    "name": "Fs001365_t01",
+    "dialect": "alphafold3",
+    "version": 1,
+    "sequences": [
+        {
+        "protein": {
+            "id": "A",
+            "sequence": "MDIDSYRYRVPKP......"
+        }
+        },
+        {
+        "ligand": {
+            "id": "B",
+            "smiles": "C[C@H](/C=C(\\C)/C=C/C(=O)NO)C(=O)C1=CC=C(C=C1)N(C)C"
+        }
+        }
+    ],
+    "modelSeeds": [1]
+}
+                    </code></pre>
+                    <p>其中<code>sequence</code>为氨基酸序列，<code>smiles</code>为配体小分子的 smiles 表达。</p>
+                    <blockquote><p>当我们有大量的序列需要预测对接时，我们一般会存放在一个<code>.fasta</code>文件中，此时直接运行相关脚本，会自动生成所有的任务标准文件。</p></blockquote>
+                <h2>3. 创建工作目录</h2>
+                <pre><code class="language-bash">
+.
+├── 0.json              # 存放预测任务文件
+│   ├── task_01.json
+│   └── task_02.json
+└ task.slurm            # 存放集群slurem任务提交文件
+                </code></pre>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

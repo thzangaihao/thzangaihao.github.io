@@ -319,6 +319,54 @@ function renderArticleCards() {
     });
 }
 
+/* ------------------------------------------------------------
+   文章页自动化 (自动生成返回链接、日期、分类标签)
+   ------------------------------------------------------------ */
+function autoFillArticleInfo() {
+    // 1. 只在文章详情页执行 (检查是否有 article-container)
+    const container = document.querySelector('.article-container');
+    if (!container) return;
+
+    // 2. 读取 Meta 配置
+    const getMeta = (name) => document.querySelector(`meta[name="${name}"]`)?.content;
+
+    const collectionId = getMeta('collection');         // e.g. "data"
+    const collectionTitle = getMeta('collection-title');// e.g. "数据挖掘"
+    const parentPath = getMeta('parent-path');          // e.g. "../../dry_lab_index.html"
+    const parentTitle = getMeta('parent-title');        // e.g. "干实验"
+    const date = getMeta('date');                       // e.g. "2025-11-28"
+
+    // 如果关键信息缺失，则不执行
+    if (!collectionId || !parentPath || !date) return;
+
+    // 3. 生成“返回链接” HTML
+    // 逻辑：<a href="{父路径}#{集合ID}" ...> 返回 {父标题} / {集合标题} </a>
+    const backLinkHtml = `
+        <a href="${parentPath}#${collectionId}" class="back-link">
+            <i class="fas fa-arrow-left"></i> 返回 ${parentTitle} / ${collectionTitle}
+        </a>
+    `;
+
+    // 4. 生成“元信息栏” HTML
+    const metaHtml = `
+        <div class="meta">
+            <span><i class="far fa-calendar"></i> ${date}</span>
+            <span style="margin-left: 20px;">
+                <i class="fas fa-folder"></i> ${collectionTitle}
+            </span>
+        </div>
+    `;
+
+    // 5. 插入到页面指定位置
+    const h1 = container.querySelector('h1');
+    if (h1) {
+        // 在 H1 之前插入返回链接
+        h1.insertAdjacentHTML('beforebegin', backLinkHtml);
+        // 在 H1 之后插入元信息
+        h1.insertAdjacentHTML('afterend', metaHtml);
+    }
+}
+
 /**
  * 辅助函数：根据当前页面层级，修正链接路径
  * 简单粗暴版：假设数据库里的 path 是 "articles/wet_lab/..."
@@ -357,6 +405,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     enhanceCodeBlocks();    
     loadPrismHighlighter(); 
     makeTablesResponsive();
+    
+    // 渲染文章详情页的头部信息
+    autoFillArticleInfo();
 
     // 4. [最后] 处理 Tab 切换
     // 此时 HTML 里的 ID 是 xxx-section，浏览器不会自动跳
