@@ -110,7 +110,7 @@ function copyCode(text, btnElement) {
  * 3.1 加载公共底栏 (Footer)
  */
 function loadFooter() {
-    const path = window.footerPath || './footer.html';
+    const path = window.footerPath || '/footer.html';
     
     return fetch(path)
     .then(res => {
@@ -350,31 +350,23 @@ function getRelativePath(dbPath) {
 }
 
 /* ------------------------------------------------------------
-   5. 初始化入口 (Initialization) - [修改版]
+   5. 初始化入口 (Initialization)
    ------------------------------------------------------------ */
-// [核心修改] 加上 async 关键字
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', () => {
     
-    // 1. 基础配置
+    // [重要] 禁用浏览器自动恢复滚动位置 (配合 handleHashNavigation 使用)
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
 
-    // 2. [关键] 先等待底栏加载完毕！
-    // 只有底栏插进去了，页面高度确定了，我们再做后面的事
-    await loadFooter(); 
+    // A. 通用加载逻辑
+    loadFooter();
+    enhanceCodeBlocks();    // 先构建代码块外壳
+    loadPrismHighlighter(); // 后加载高亮逻辑
+    makeTablesResponsive();
+    renderArticleCards();   // 文章数据库加载
 
-    // 3. 底栏就位后，再加载其他装饰（高亮等）
-    enhanceCodeBlocks();    
-    loadPrismHighlighter(); 
-    
-    // 如果有自动生成文章卡片的逻辑，也放在这里
-    if (typeof renderArticleCards === 'function') {
-        renderArticleCards();
-    }
-
-    // 4. [最后] 处理跳转逻辑
-    // 此时页面高度已完全撑开，滚动计算才是准确的
+    // B. 索引页专用逻辑 (Category Page)
     if (document.body.classList.contains('category-page')) {
         handleHashNavigation();
     }
