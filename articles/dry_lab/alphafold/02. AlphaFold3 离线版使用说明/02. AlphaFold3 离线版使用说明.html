@@ -98,6 +98,145 @@ Partition3           gpu:nvidia_h100-sxm4  8          512  2000000
 │   └── task_02.json
 └ task.slurm            # 存放集群slurem任务提交文件
                 </code></pre>
+                <p>其中，输出文件夹和单次任务的对接日志输出会自动生成，无需担心。</p>
+                <h2>4. 编写任务提交文件</h2>
+                <p>因为我们是在集群服务器上进行任务，一般来说集群服务器都是以作业队列方式提交任务的，因此我们要写一个<code>.slurm</code>任务提交文件。</p>
+                <p>一次对接任务就要单独执行一次任务递交，我们先进行单次任务尝试提交，如果能正常运行，我们稍后会写一个脚本进行批量提交：</p>
+                <pre><code class="language-bash">
+                    #!/bin/bash
+                    #SBATCH --job-name="task_01"            # 该次提交任务的名字
+                    #SBATCH --partition=example             # 提交队列
+                    #SBATCH --nodes=1
+                    #SBATCH --ntasks=1
+                    #SBATCH --cpus-per-task=32 
+                    #SBATCH --gres=gpu:nvidia_h100-sxm4:1   # 指定调用显卡型号
+                    #SBATCH --time=2:00:00                  # 任务运行最长时间，两小时足够了
+                    #SBATCH --error=%j.error.log            # 输出错误日志
+                    #SBATCH --output=%j.stdout.log          # 输出标准日志
+                    
+                    # 1. 加载必要的环境
+                    module load singularity/4.3.3           # 加载对接命令，如果系统默认环境变量有就不用管它
+                    module load python/3.11.1               # 加载python环境，一般AF3内置有，错误日志会报错，不用管它
+
+                    
+                    # 2. 设置用户工作路径
+                    export AF3_USER_PATH=/home/user_name/af3_work_dir       # 注意修改工作目录
+                    export AF3_INPUT=${AF3_USER_PATH}/0.json/task_01.json
+                    export AF3_OUTPUT=${AF3_USER_PATH}/output
+                    
+                    # 3. 设置集群公共资源路径
+                    export AF3_RESOURCES_DIR=/data/AlphaFold3
+                    export AF3_IMAGE=${AF3_RESOURCES_DIR}/images/alphafold3.sif
+                    export AF3_CODE_DIR=${AF3_RESOURCES_DIR}/alphafold3
+                    export AF3_MODEL_PARAMETERS_DIR=${AF3_RESOURCES_DIR}/weights
+                    export AF3_DATABASES_DIR=${AF3_RESOURCES_DIR}/databases
+                    
+                    # 4. 确保输出目录存在
+                    mkdir -p $AF3_OUTPUT
+                    
+                    echo "开始为 ${AF3_INPUT} 执行 AlphaFold 3 计算..."
+                    
+                    # 5. 调用 Singularity 容器运行 AF3
+                    singularity exec \
+                      --nv \
+                      --bind $AF3_INPUT:/root/af_input \
+                      --bind $AF3_OUTPUT:/root/af_output \
+                      --bind $AF3_MODEL_PARAMETERS_DIR:/root/models \
+                      --bind $AF3_DATABASES_DIR:/root/public_database \
+                      --bind $AF3_CODE_DIR:/root/af3code \
+                      $AF3_IMAGE \
+                      python3 /root/af3code/run_alphafold.py \
+                      --json_path=/root/af_input \
+                      --model_dir=/root/models \
+                      --db_dir=/root/public_database \
+                      --output_dir=/root/af_output
+                </code></pre>
+                <p>保存为<code>task_01.slurm</code>文件，进行提交：</p>
+                <pre><code class="language-bash">sbatch task_01.slurm </code></pre>
+                <p>提交后会显示任务ID，使用如下命令查看任务状态：</p>
+                <pre><code class="language-bash">
+                    sacct -j 任务ID --format=JobID,JobName,State,ExitCode,Elapsed
+                </code></pre>
+                <pre><code class="language-bash">
+JobID           JobName      State ExitCode    Elapsed 
+------------ ---------- ---------- -------- ---------- 
+00001        000001_do+    RUNNING      0:0   00:05:00 
+00001.batch       batch    RUNNING      0:0   00:05:00 
+00001.extern     extern    RUNNING      0:0   00:05:00 
+                </code></pre>
+                <p>并时刻注意日志，以免发生了报错还不知道。</p>
+                <p>当标准输出日志<code>.stdout.log</code>出现：</p>
+                <pre><code class="language-bash">Done running 1 fold jobs.</code></pre>
+                <p>则说明该次预测对接结束，进入 output 文件夹进行查看。</p>
+                <h2>5. 自动化</h2>
+                <h3>5.1 对接任务文件生成</h3>
+                <p>准备材料：<ol>
+                    <li>整个待预测蛋白的<code>.fasta</code>氨基酸序列。</li>
+                    <li>所有对接小分子的<code>SMILES</code>文件，为方便管理，按照以下样式记录，保存为<code>.smiles</code>文件。</li>
+                    <pre><code class="language-txt">
+>ATP
+C1=NC(=C2C(=N1)N(C=N2)[C@H]3[C@@H]([C@@H]([C@H](O3)COP(=O)(O)OP(=O)(O)OP(=O)(O)O)O)O)N.C1=NC(=C2C(=N1)N(C=N2)[C@H]3[C@@H]([C@@H]([C@H](O3)COP(=O)(O)OP(=O)(O)OP(=O)(O)O)O)O)N
+>NADPH
+C1C=CN(C=C1C(=O)N)[C@H]2[C@@H]([C@@H]([C@H](O2)COP(=O)(O)OP(=O)(O)OC[C@@H]3[C@H]([C@H]([C@@H](O3)N4C=NC5=C(N=CN=C54)N)OP(=O)(O)O)O)O)O
+>58880-19-6
+C[C@H](/C=C(\\C)/C=C/C(=O)NO)C(=O)C1=CC=C(C=C1)N(C)C
+                    </code></pre>
+                    <li>脚本。</li>
+                </ol></p>
+                <p>运行脚本<code>01. 对接任务生成.py</code>，自动生成所有的 AF3 任务文件：</p>
+                    <pre><code class="language-Plaintext">
+JSON/
+├── ATP/
+│   ├── ATP_PEP_01.json
+│   ├── ATP_PEP_02.json
+│   └── ...
+├── NADPH/
+│   ├── NADPH_PEP_01.json
+│   └── ...
+                    </code></pre>
+                <h3>5.2 集群任务部署</h3>
+                <p>迁移文件及任务提交脚本。确保你的目录结构在集群是这样的：</p>
+                <pre><code class="language-Plaintext">
+./
+├── JSON/               (由上一步脚本生成的文件夹)
+│   ├── ATP/
+│   │   └── ...json
+│   └── ...
+└── 2. 任务提交.py
+                </code></pre>
+                <p>执行脚本，任务提交。</p>
+                <pre><code class="language-bash">python 02. 任务提交.py</code></pre>
+                <pre><code class="language-bash">
+准备提交 200 个任务...
+结果目录: Results/<CAS_ID>/<Task_Name>
+日志目录: Logs/<CAS_ID>/
+确认开始提交? (y/n): y
+[1/200] 提交: ATP_PEP_01 ... 成功 (JobID: 00001)
+[2/200] 提交: ATP_PEP_01 ... 成功 (JobID: 00002)
+[3/200] 提交: ATP_PEP_01 ... 成功 (JobID: 00003)
+[4/200] 提交: ATP_PEP_01 ... 成功 (JobID: 00004)
+[5/200] 提交: ATP_PEP_01 ... 成功 (JobID: 00005)
+[6/200] 提交: ATP_PEP_01 ... 成功 (JobID: 00006)
+......
+--------------------------------------------------
+完成! 成功提交 200/200 个任务。
+使用 'squeue -u user_name' 查看队列状态。           # 这个命令在有些集群上无法正常显示，请留意输出日志。
+                </code></pre>
+                <p>同样，实时注意着输出日志，不要报错了还没发现。</p>
+                <pre><code class="language-Plaintext">
+./
+├── Results/
+│   └── ATP/
+│       └── ATP_PEP_01/  (结果存放在这里)
+│           └── seed-1_sample-0.json ...
+├── Logs/
+│   └── ATP/
+│       ├── ATP_PEP_01.out
+│       └── ATP_PEP_01.err
+                </code></pre>
+                <p>输出查看请看后续文章。</p>
+                <h3>5.3 数据矩阵汇总</h3>
+                <p>运行数据汇总脚本，分别生成ipTM，pTM得分矩阵。</p>
             </div>
         </div>
 

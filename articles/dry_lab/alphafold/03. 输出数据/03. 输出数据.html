@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>03. 输出数据 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="alphafold"> 
+        <meta name="collection-title" content="AlphaFold">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-01-20">
+        <meta name="description" content="PAE 矩阵、plDDT、pTM 与 ipTM 得分">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>03. 输出数据</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                <p>AlphaFold 预测会给你5个结果，其中编号最小的一般是最好的，在这里，我们主要看输出信息的 PAE 矩阵，plDDT，pTM与ipTM得分，这几个指标详细的描述了预测蛋白质中每一部分的可信度。</p>
+                <h2>1. 数据结构</h2>
+                <p>不管是在线版还是离线版，下载下来的数据文件都是一样的</p>
+                <pre><code class="language-Plaintext">
+.
+├── ex_1_confidences.json
+├── ex_1_data.json
+├── ex_1_model.cif
+├── ex_1_summary_confidences.json
+├── TERMS_OF_USE.md
+├── ranking_scores.csv
+├── seed-1_sample-0
+│   ├── confidences.json
+│   ├── model.cif
+│   └── summary_confidences.json
+├── seed-1_sample-1
+│   ├── confidences.json
+│   ├── model.cif
+│   └── summary_confidences.json
+├── seed-1_sample-2
+│   ├── confidences.json
+│   ├── model.cif
+│   └── summary_confidences.json
+├── seed-1_sample-3
+│   ├── confidences.json
+│   ├── model.cif
+│   └── summary_confidences.json
+└── seed-1_sample-4
+    ├── confidences.json
+    ├── model.cif
+    └── summary_confidences.json
+
+5 directories, 21 files
+                </code></pre>
+                <p>一般我们就看最外面的最优结果，其中 PAE 矩阵文件和 plDDT 片段得分矩阵数据记录在<code>_data.json</code>文件中，pTM 和 ipTM得分记录在 <code>_confidences.json</code>文件中。单次对接结果所有文件计分在<code>ranking_scores.csv</code>文件中。具体结果在<code>.cif</code>中，我们可以使用 Pymlo 等软件进行预览。</p>
+                <h2>2. PAE 矩阵</h2>
+                <h3>2.1 查看方式与工具</h3>
+                <p>在线版预测中，可以直接在 AF 官网结果界面中看到所有的信息。</p>
+                <img src="./P1.png" alt="AF PAE" class="article-img">
+                <p>而对于离线版，我们则需要借助一些专门查看 PAE 矩阵的网站工具，例如<a href="https://pae-viewer.uni-goettingen.de/" target="_blank" style="color: #3498db;">https://pae-viewer.uni-goettingen.de/</a>，上传加载<code>.cif</code>和<code>_data.json</code>就可以进行预览了。</p>
+                <h3>2.2 PAE 矩阵意义</h3>
+                <p>PAE 矩阵的横坐标和纵坐标都是一个个氨基酸，纵坐标为参考氨基酸，横坐标是以该参考氨基酸作为参照物时，其预测的氨基酸与真实位置的不确定性位置大小，单位为 埃斯特朗 $Å$（$1Å = 1\times 10^{-10}m $）。该值越大，说明相对于参考氨基酸，这个预测的氨基酸位置不确定性很大。</p>
+                <blockquote><p>注意，PAE 矩阵不具备对角线对称性，当以氨基酸A作为参考时B的可能位置，和以氨基酸B作为参考时A的可能位置不具备相同的等价性。</p></blockquote>
+                <p>对角线意义：以氨基酸自身作为参考，氨基酸自身的位置肯定是100%准确的，因此不确定性大小为0$Å$。</p>
+                <h2>3. 得分</h2>
+                <p>plDDT 得分为片段相较于蛋白整体的可信度，我们会在三维浏览时结合 PAE 一起查看。当分子结合在低 plDDT 得分片段区域时，解读需要谨慎。</p>
+                <p>pTM 得分是预测整体的得分，值越大越好，一般大于 0.8 时才有较大的研究价值，ipTM 得分只会在做分子互作时才有，表示互作可信度，值越大越好。</p>
+                <p>在后续我们通过 Pymol 等软件去寻找相互作用的可能位点，详细请参考其它文章。</p>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
