@@ -386,6 +386,137 @@ function getRelativePath(dbPath) {
 }
 
 /* ------------------------------------------------------------
+   3.3 目录生成 (修复跳转状态不同步 BUG 版)
+   ------------------------------------------------------------ */
+function generateTOC() {
+    const container = document.querySelector('.article-container');
+    const content = document.querySelector('.content');
+    if (!container || !content) return;
+
+    const headers = content.querySelectorAll('h2, h3');
+    if (headers.length < 2) {
+        container.style.opacity = '1'; 
+        return;
+    }
+
+    // --- DOM 构建 ---
+    const wrapper = document.createElement('div');
+    wrapper.className = 'article-layout-wrapper';
+    container.parentNode.insertBefore(wrapper, container);
+    
+    const sidebar = document.createElement('aside');
+    sidebar.className = 'article-sidebar';
+    sidebar.innerHTML = `<div class="toc-card"><h3><i class="fas fa-list-ul"></i> 目录</h3><ul id="toc-list"></ul></div>`;
+    
+    wrapper.appendChild(container);
+    wrapper.appendChild(sidebar);
+
+    const list = sidebar.querySelector('#toc-list');
+    
+    // 辅助函数：安全的滚动侧边栏
+    const scrollSidebar = (link) => {
+        const card = document.querySelector('.toc-card');
+        if (!card) return;
+        
+        // 只有当卡片设置了 position: relative 时，offsetTop 才是准确的相对值
+        const linkTop = link.offsetTop; 
+        const linkHeight = link.offsetHeight;
+        const cardHeight = card.clientHeight;
+        const scrollTop = card.scrollTop;
+
+        // 简单的可视区域检测：如果跑出去了，就滚回来
+        // 留出 60px 的上下余量，体验更好
+        if (linkTop < scrollTop + 20 || linkTop > scrollTop + cardHeight - 20) {
+            card.scrollTo({ top: linkTop - 60, behavior: 'smooth' });
+        }
+    };
+
+    headers.forEach((h, i) => {
+        if (!h.id) h.id = 'sec-' + i;
+        const li = document.createElement('li');
+        if (h.tagName === 'H3') li.className = 'toc-sub-item';
+        
+        // 创建链接
+        const link = document.createElement('a');
+        link.href = `#${h.id}`;
+        link.className = 'toc-link';
+        link.dataset.target = h.id;
+        link.textContent = h.textContent;
+
+        // [点击事件优化]
+        link.onclick = (e) => {
+            e.preventDefault();
+            isClicking = true; // 上锁
+
+            // 1. UI 立即响应
+            document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            
+            // 2. 侧边栏立即跟随滚动 (修复点击后目录不跟过去的问题)
+            scrollSidebar(link);
+
+            // 3. 页面平滑滚动
+            document.getElementById(h.id).scrollIntoView({ behavior: 'smooth' });
+
+            // 4. 延长锁的时间，确保滚动完全停止
+            // 如果连续点击，会重置定时器
+            if (window.clickTimer) clearTimeout(window.clickTimer);
+            window.clickTimer = setTimeout(() => { isClicking = false; }, 1000);
+        };
+
+        li.appendChild(link);
+        list.appendChild(li);
+    });
+
+    void wrapper.offsetWidth;
+    wrapper.classList.add('loaded');
+
+    // --- 滚动监听修复 ---
+    
+    let isClicking = false;
+    const visibleHeaders = new Set();
+
+    const observer = new IntersectionObserver(entries => {
+        // [核心修复] 第一步：始终更新数据模型！
+        // 无论是否在点击，都要记录谁进来了、谁出去了
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                visibleHeaders.add(entry.target.id);
+            } else {
+                visibleHeaders.delete(entry.target.id);
+            }
+        });
+
+        // [核心修复] 第二步：只拦截 UI 更新
+        // 如果正在点击跳转，数据已经记下来了，但不要乱改高亮
+        if (isClicking) return;
+
+        // 仲裁逻辑：找 DOM 顺序最靠前的可见标题
+        let activeId = null;
+        for (const header of headers) {
+            if (visibleHeaders.has(header.id)) {
+                activeId = header.id;
+                break; 
+            }
+        }
+
+        if (activeId) {
+            document.querySelectorAll('.toc-link').forEach(l => {
+                const isActive = l.dataset.target === activeId;
+                l.classList.toggle('active', isActive);
+                
+                if (isActive) {
+                    scrollSidebar(l);
+                }
+            });
+        }
+
+    }, { rootMargin: '0px 0px -80% 0px', threshold: 0 });
+
+    headers.forEach(h => observer.observe(h));
+}
+
+/* ------------------------------------------------------------
    5. 初始化入口 (找回 async/await)
    ------------------------------------------------------------ */
 // [重要] 加上 async
@@ -408,6 +539,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // 渲染文章详情页的头部信息
     autoFillArticleInfo();
+    // 目录
+    generateTOC();
 
     // 4. [最后] 处理 Tab 切换
     // 此时 HTML 里的 ID 是 xxx-section，浏览器不会自动跳

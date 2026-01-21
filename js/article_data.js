@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/01/20_20:2324
-// 文章总数: 8
+// 生成时间: 2026/01/21_18:5008
+// 文章总数: 9
 
 window.ARTICLE_DATABASE = [
     {
@@ -30,6 +30,13 @@ window.ARTICLE_DATABASE = [
         "date": "2025-11-28",
         "summary": "列联分析、独立性检验与卡方检验",
         "path": "articles/dry_lab/gwas/01. 全基因组关联分析基础原理/01. 全基因组关联分析基础原理.html"
+    },
+    {
+        "title": "01. 转录组分析系列",
+        "collection": "python",
+        "date": "2025-11-28",
+        "summary": "这里写文章的一句话简介。",
+        "path": "articles/resources/python/01. 转录组分析系列/01. 转录组分析系列.html"
     },
     {
         "title": "01. 转录组分析系列：富集分析",
