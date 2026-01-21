@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>03. AlphaFold系列 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="python"> 
+        <meta name="collection-title" content="Python 自动化">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-01-21">
+        <meta name="description" content="AlphaFold 任务自动化">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>03. AlphaFold系列</h1>
+            
+            <div class="content">
+                <h2>1. 在线版 model0 cif 复制</h2>
+                <p>在线版下载预测文件中最优预测结构<code>model0.cif</code>的复制，输出提取结果文件夹。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>1. 在线版 model0 cif 复制</h5>
+                                <span>文件格式：.py | 大小：3.0 KB</span>
+                            </div>
+                        </div>
+                        <a href="./1. 在线版 model0 cif 复制.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <h2>2. 在线版 pTM 矩阵生成</h2>
+                <p>在线版下载预测文件中最优预测结构<code>model0.cif</code>的得分提取，汇总为<code>.tsv</code>矩阵。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>2. 在线版 pTM 矩阵生成</h5>
+                                <span>文件格式：.py | 大小：3.7 KB</span>
+                            </div>
+                        </div>
+                        <a href="./2. 在线版 pTM 矩阵生成.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <h2>3. 离线版对接预测任务</h2>
+                <p>将准备好的<code>.fasta</code>文件和<code>.smiles</code>文件进行笛卡尔积循环，自动遍历所有小分子和所有蛋白的组合，生成所有的<code>.json</code>对接任务。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>3. 离线版对接预测任务</h5>
+                                <span>文件格式：.py | 大小：7.8 KB</span>
+                            </div>
+                        </div>
+                        <a href="./3. 离线版对接预测任务.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <h2>4. 离线版队列批量提交</h2>
+                <p>适用于集群服务器。只需要修改脚本文件头就可以确定运行硬件资源确定，自动生成<code>.slurm</code>任务文件，并进行<code>sbatch .slurm</code>提交，再删除<code>.slurm</code>任务文件，打印任务 ID。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>4. 离线版队列批量提交</h5>
+                                <span>文件格式：.py | 大小：6.0 KB</span>
+                            </div>
+                        </div>
+                        <a href="./4. 离线版队列批量提交.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <h2>5. 离线版得分矩阵生成</h2>
+                <p>对离线预测后的结果分别进行 ranking score、pTM、ipTM 得分汇总生成矩阵，适用于<code>3. 离线版对接预测任务.py</code>笛卡尔积循环任务的汇总。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>5. 离线版得分矩阵生成</h5>
+                                <span>文件格式：.py | 大小：4.5 KB</span>
+                            </div>
+                        </div>
+                        <a href="./5. 离线版得分矩阵生成.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
