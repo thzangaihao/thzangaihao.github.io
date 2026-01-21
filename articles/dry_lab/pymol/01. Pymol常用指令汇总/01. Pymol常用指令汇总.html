@@ -35,8 +35,44 @@
             <h1>01. Pymol常用指令汇总</h1>
             
             <div class="content">
-                <h2>1. 第一章</h2>
-                <p>正文内容...</p>
+                <h2>1. 表面静电势能计算着色</h2>
+                <p>计算真空静电势,mode=2生成protein_obj_e_map对象，注意真实情况不能用真空，需要使用 APBS (Adaptive Poisson-Boltzmann Solver) 进行静电势精确计算。</p>
+                <pre><code class="language-python">
+util.protein_vacuum_esp("protein_obj", mode=2, quiet=0)
+                </code></pre>
+                <h2>2. 标签显示方案</h2>
+                <h3>2.1 氨基酸显示方案</h3>
+                <p>显示“单字母 + 编号”（例如 A50）选择需要标记的氨基酸：</p>
+                <pre><code class="language-python">
+# 格式为：单字母 + 编号 (如 W120)，显示在α碳原子上 (CA)
+label target_res and n. CA, "%s%s" % (oneletter, resi)
+                </code></pre>
+                <h3>2.2 标签位置调整</h3>
+                <p>注意：[X, Y, Z] 是相对于该原子坐标的偏移量。</p>
+                <pre><code class="language-python">
+# 以 CA 为坐标原点，给 50 号残基设置一个偏移
+set label_position, [2, 2, 0], resi 50 and n. CA
+                </code></pre>
+                <h3>2.3 标签美化</h3>
+                <p>对所有标签统一设置：</p>
+                <pre><code class="language-python">
+美化：调整字体大小、颜色和位置
+set label_size, 20
+set label_color, yellow
+set label_position, [1, 1, 1]
+                </code></pre>
+                <p>使用 Editing Mode 按住左 Ctrl 用鼠标右键拖动以此来精细化调节标签。</p>
+                <h3>2.4 标签删除</h3>
+                <p>对于单个标签的精确删除：</p>
+                <pre><code class="language-python">
+# 删除 50 号残基 CA 原子上的标签
+label resi 50 and n. CA, ""
+                </code></pre>
+                <p>对于所有标签的删除：</p>
+                <pre><code class="language-python">
+# 清除所有标签
+label all, ""
+                </code></pre>
             </div>
         </div>
 

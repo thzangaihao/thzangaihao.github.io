@@ -28,61 +28,37 @@
             <aside class="left-col">
                 <div class="collection-menu">
                     <h3><i class="fas fa-folder"></i> 集合列表</h3>
-                    <button class="collection-btn active" onclick="showCollection('rna', this)">
-                        <i class="fas fa-project-diagram"></i> 转录组分析
+                    <button class="collection-btn active" onclick="showCollection('python', this)">
+                        <i class="fa-brands fa-python"></i> Python 自动化
                     </button>
-                    <button class="collection-btn" onclick="showCollection('docking_resources', this)">
-                        <i class="fab fa-linux"></i> 分子对接
+                    <button class="collection-btn" onclick="showCollection('plasmid', this)">
+                        <i class="fa-solid fa-circle-notch fa-rotate-by" style="--fa-rotate-angle: 45deg;"></i> 质粒库
                     </button>
-                    <button class="collection-btn" onclick="showCollection('plot', this)">
-                        <i class="fas fa-dna"></i> Matplotlib绘图
+                    <button class="collection-btn" onclick="showCollection('figure', this)">
+                        <i class="fa-solid fa-images"></i> 图廊
                     </button>
                 </div>
             </aside>
 
             <section class="right-col">
-                <div id="rna-section" class="article-list active">
+                <div id="python-section" class="article-list active">
                     <div class="list-header">
-                        <h2>转录组分析</h2>
-                        <p>从原始fastq、bam文件到最终的差异分析、富集分析</p>
+                        <h2>Python 自动化</h2>
+                        <p>大规模作业自动化依赖工具</p>
                     </div>
-                    <a href="#" class="article-item">
-                        <div class="article-info">
-                            <h4>01. RSEM-Bowtie2定量分析</h4>
-                            <p>将读段比对到基因组上并进行表达的量化</p>
-                        </div>
-                        <span class="article-date">2026-01-10</span>
-                    </a>
-                    <a href="#" class="article-item">
-                        <div class="article-info">
-                            <h4>02. PyDESeq2差异分析</h4>
-                            <p>通过比较发现不同因素处理后基因表达相差较大的基因</p>
-                        </div>
-                        <span class="article-date">2026-01-15</span>
-                    </a>
                 </div>
 
-                <div id="docking_resources-section" class="article-list">
+                <div id="plasmid-section" class="article-list">
                     <div class="list-header">
-                        <h2>分子对接</h2>
-                        <p>Linux服务器大规模分子对接完整流程</p>
+                        <h2>质粒库</h2>
+                        <p>实验室常用质粒</p>
                     </div>
-                    <a href="#" class="article-item">
-                        <div class="article-info">
-                            <h4>01. 0_1</h4>
-                            <p>将原始cif文件进行加氢并计算电荷，生成pdbqt文件</p>
-                        </div>
-                        <span class="article-date">2026-01-08</span>
-                    </a>
                 </div>
 
-                <div id="plot-section" class="article-list">
+                <div id="figure-section" class="article-list">
                     <div class="list-header">
-                        <h2>Matplotlib绘图</h2>
-                    </div>
-                    <div style="padding: 2rem; text-align: center; color: #999;">
-                        <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                        <p>笔记整理中...</p>
+                        <h2>图廊</h2>
+                        <p>科研用图绘制及模板</p>
                     </div>
                 </div>
             </section>
