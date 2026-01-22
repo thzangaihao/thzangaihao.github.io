@@ -28,44 +28,45 @@
             <aside class="left-col">
                 <div class="collection-menu">
                     <h3><i class="fas fa-folder"></i> 集合列表</h3>
+
                     <button class="collection-btn active" onclick="showCollection('resume', this)">
                         <i class="fas fa-user-circle"></i> 我的简历
                     </button>
+                    
                     <button class="collection-btn" onclick="showCollection('blog', this)">
-                        <i class="fas fa-pen-fancy"></i> 笔语闲谈
+                        <i class="fas fa-pen-fancy"></i> 笔语茶谈
                     </button>
+
+                    <button class="collection-btn" onclick="showCollection('wet', this)">
+                        <i class="fa-solid fa-server"></i> 关于此站
+                    </button>
+
                 </div>
             </aside>
 
             <section class="right-col">
+
                 <div id="resume-section" class="article-list active">
                     <div class="list-header">
                         <h2>我的简历</h2>
                         <p>我是怎样的一个人？</p>
                     </div>
-            
-                    <a href="./01. 测试/01. 测试.html" class="article-item">
-                        <div class="article-info">
-                            <h4>01. 测试</h4>
-                            <p>测试</p>
-                        </div>
-                        <span class="article-date">2026-01-08</span>
-                    </a>
                 </div>
 
                 <div id="blog-section" class="article-list">
                     <div class="list-header">
-                        <h2>笔语闲谈</h2>
+                        <h2>笔语茶谈</h2>
                         <p>思维记录站</p>
                     </div>
-                    <a href="#" class="article-item">
-                        <div class="article-info">
-                            <h4>思维随笔 01</h4>
-                            <p>记录一些思考...</p>
-                        </div>
-                        <span class="article-date">2026-01-08</span>
-                    </a>
                 </div>
+
+                <div id="wet-section" class="article-list">
+                    <div class="list-header">
+                        <h2>关于此战</h2>
+                        <p>我是怎么学习从头写出这个网站的？</p>
+                    </div>
+                </div>
+
             </section>
         </div>
 

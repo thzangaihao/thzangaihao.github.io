@@ -1,8 +1,15 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/01/21_21:5110
-// 文章总数: 12
+// 生成时间: 2026/01/22_16:1559
+// 文章总数: 17
 
 window.ARTICLE_DATABASE = [
+    {
+        "title": "00. 图廊索引",
+        "collection": "figure",
+        "date": "2026-01-22",
+        "summary": "图片博物馆",
+        "path": "articles/resources/gallery/00. 图廊索引/00. 图廊索引.html"
+    },
     {
         "title": "01. AlphaFold3 在线版使用说明",
         "collection": "alphafold",
@@ -39,6 +46,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/python/01. 大规模矩阵处理/01. 大规模矩阵处理.html"
     },
     {
+        "title": "01. 条形图",
+        "collection": "figure",
+        "date": "2026-01-22",
+        "summary": "基础条形图、堆叠条形图、簇状条形图",
+        "path": "articles/resources/gallery/01. 条形图/01. 条形图.html"
+    },
+    {
         "title": "01. 转录组分析系列：富集分析",
         "collection": "rnaseq",
         "date": "2025-11-25",
@@ -60,6 +74,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/dry_lab/docking/02. AutoDock Vina 自动化/02. AutoDock Vina 自动化.html"
     },
     {
+        "title": "02. 热图",
+        "collection": "figure",
+        "date": "2026-01-22",
+        "summary": "多维数据的良好展现方式",
+        "path": "articles/resources/gallery/02. 热图/02. 热图.html"
+    },
+    {
         "title": "02. 转录组分析系列",
         "collection": "python",
         "date": "2026-01-21",
@@ -74,6 +95,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/python/03. AlphaFold系列/03. AlphaFold系列.html"
     },
     {
+        "title": "03. 火山图",
+        "collection": "figure",
+        "date": "2026-01-22",
+        "summary": "差异分析的结果总览",
+        "path": "articles/resources/gallery/03. 火山图/03. 火山图.html"
+    },
+    {
         "title": "03. 输出数据",
         "collection": "alphafold",
         "date": "2026-01-20",
@@ -86,5 +114,12 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-21",
         "summary": "Vina 刚性对接自动化",
         "path": "articles/resources/python/04. 分子对接系列/04. 分子对接系列.html"
+    },
+    {
+        "title": "05. 生物文件处理",
+        "collection": "python",
+        "date": "2026-01-22",
+        "summary": "生物信息文件格式转换，文件整合",
+        "path": "articles/resources/python/05. 生物文件处理/05. 生物文件处理.html"
     }
 ];
