@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>01. 多聚酶链式反应基本原理 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="pcr"> 
+        <meta name="collection-title" content="PCR">
+        <meta name="parent-path" content="../../wet_lab_index.html">
+        <meta name="parent-title" content="湿实验">
+        <meta name="date" content="2026-01-22">
+        <meta name="description" content="PCR是如何从一到无穷大的？">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../wet_lab_index.html" class="active"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>01. 多聚酶链式反应基本原理</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                <h2>1. PCR 反应体系组分及其作用</h2>
+                    一个标准的PCR反应体系一般为50μl，一般包含以下内容：
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>组分</th>
+                                <th>含量</th>
+                                <th>单位</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>KCl</td>
+                                <td>50</td>
+                                <td>mmol/L</td>
+                            </tr>
+                            <tr>
+                                <td>Tris-HCl</td>
+                                <td>10</td>
+                                <td>mmol/L</td>
+                            </tr>
+                            <tr>
+                                <td>MgCl2</td>
+                                <td>1.5</td>
+                                <td>mmol/L</td>
+                            </tr>
+                            <tr>
+                                <td>明胶或血清牛蛋白</td>
+                                <td>100</td>
+                                <td>μg/mL</td>
+                            </tr>
+                            <tr>
+                                <td>2种引物</td>
+                                <td>各200</td>
+                                <td>μmol/L</td>
+                            </tr>
+                            <tr>
+                                <td>模板DNA</td>
+                                <td>0.1-1</td>
+                                <td>μg</td>
+                            </tr>
+                            <tr>
+                                <td>Taq DNA聚合酶</td>
+                                <td>2</td>
+                                <td>U</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>1.1 模板DNA</h3>
+                        <p>模板DNA无需高度纯化。</p>
+                        <p>小片段扩增，扩增DNA片段理想长度在3kb以下，这是因为Taq DNA聚合酶的限制，有高扩增片段的特殊Taq DNA聚合酶。</p>
+                        <p>模板DNA的完整性不会影响目标基因的扩增，只要不要把目标基因降解了就行。</p>
+                        <p>模板用量与DNA来源有关：</p>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>来源</th>
+                                        <th>用量</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>大DNA模板（基因组）</td>
+                                        <td>1ng-1μg/50μl体系</td>
+                                    </tr>
+                                    <tr>
+                                        <td>小DNA模板（质粒等）</td>
+                                        <td>1pg-10ng/50μl体系</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        <blockquote>当模板过多时，会出现大量非特异性扩增，即前期长链的扩增。</blockquote>
+                    <h3>1.2 引物</h3>
+                        <p>潜规则，一条DNA默认左边为5'，即使标注也习惯性将5'放左边，因为易读性，合成都是5'到3'端合成</p>
+                            <h4>引物长度</h4>
+                                <p>引物长度一般为该引物序列在基因组出现期望个数为0.2个。</p>
+                                <p>例如17nt的引物，出现概率就为$\frac{1}{4^{17}}$ ，在5倍人类基因组的体积下期望存在个数为1个。</p>
+                                <p>引物不是越长越好，过长会影响配对效率，另外长引物也太贵了。</p>
+                            <h4>引物配对</h4>
+                                <p>引物3'端必须完美配对，5'端没有必要配对。</p>
+                                <p>实际上，引物5'端会加入限制酶识别位点，保护碱基等。</p>
+                            <h4>简并引物</h4>
+                                <p>简并引物就是多种引物的混合物。</p>
+                                <p>在知道蛋白序列，不知道基因组碱基序列时，我们设计简并引物进行PCR。</p>
+                            <h4>复性温度Tm</h4>
+                                <p>复性温度和引物长度有关。</p>
+                                <p>$Tm=4(C+G)+2(A+T)-5 (℃)$</p>
+                                <p>计算只计算配对部分碱基。</p>
+                                <p>两个引物Tm差值在5℃以内。</p>
+                            <h4>引物配对</h4>
+                                <p>自身配对。</p>
+                                <p>引物间配对。</p>
+                            <h4>一般规则</h4>
+                                <p>GC含量在40-50%。</p>
+                                <p>避免引物自身配对。</p>
+                    <h3>1.3 Taq DNA聚合酶</h3>
+                            <p>早期 PCR 没有耐高温的 Taq DNA 聚合酶，在PCR过程中需要不断补充 Taq DNA 聚合酶。</p>
+                            <h4>基本特点</h4>
+                                <p>具有聚合酶活性，5'>3'外切酶活性，逆转录酶活性。</p>
+                                <p>最适反应温度为70-75℃。</p>
+                                <p>最适pH8.0。</p>
+                                <p>最佳缓冲液Tris-HCl。</p>
+                                <p>最佳辅助离子Mg2+。</p>
+                                <p>热稳定性。</p>
+                            <h4>扩增产物可靠性</h4>
+                                <p>参考：天然DNA分子错误渗入率$10^{-9}$。</p>
+                                <p>Taq DNA聚合酶错误渗入率$10^{-4}$。</p>
+                                <p>一般会在扩增末端额外添加一个A碱基。</p>
+                                <p>3'>5'外切酶活性的出现能极大降低错误渗入率，其中高保真DNA聚合酶才有的特点。</p>
+                                <p>Taq DNA聚合酶只有5'>3'外切酶活性，当出现错误配对并已经生成磷酸二酯键，5'>3'外切酶活性无法从3'>5'进行切除修正。</p>
+                <h2>2. 单轮 PCR 反应过程</h2>
+                    <h4>变性 Denaturation</h4>
+                        <p>温度在 94-98℃ 之间，持续约 5-30s。目的是将体系里面所有的双链变成单链。</p>
+                    <h4>退火 Primer annealing</h4>
+                        <p>温度在 20-65℃ 之间，持续约 30s。目的让引物充分结合到模板链上。</p>
+                    <h4>延长 Extension</h4>
+                        <p>温度在 72℃ 附近，时间 15-60s/kb（因酶而异）。目的是让新链合成。</p>
+                    <blockquote>
+                        PCR的高灵敏性极其容易被污染，因此一定要加入体系对照。
+                    </blockquote>
+                <h2>3. 定量 PCR</h2>
+                    <p>目的：检验起始不同模板的浓度。</p>
+                    <p>因为有效应平台期，所以普通PCR无法进行定量检测。</p>
+                    <p>因为目的是定量，所以扩增长度限制在300bp以下。</p>
+                    <p>一般分为绝对定量PCR和相对定量PCR，前者看基因绝对拷贝数，常用于临床检测；后者看基因相对内参基因的变化趋势。</p>
+                    <h3>3.1 Real-time quantity PCR RT-qPCR</h3>
+                        <h4>相对定量 PCR</h4>
+                            <p>检测荧光强度超过检验阈值时的 PCR 轮数（CT值）。</p>
+                            <p>SYBR Green：SYBR Green 是一个染料，嵌入到 DNA 两条链中间发出荧光，同样是检测 CT 值。</p>
+                            <p>TagMan 探针：更贵，特异性更高，当只有与目标序列被扩增出来时荧光才可以检测到。一般用于临床检测，反正羊毛出在羊身上。</p>
+                            <p>融解曲线：检验 qPCR 是否出现非特异性扩增。在定量 PCR 完成时，将体系中所有 DNA 变性再复性，发出总荧光，如果出现非特异性扩增，非特异性扩增荧光强度会低一点。</p>
+                        <h4>绝对定量 PCR</h4>
+                            <p>标准曲线法：通过标准曲线法计算拷贝数，根据 CT 值换算为绝对值。</p>
+                            <p>数字绝对定量 PCR：将目标序列稀释到微流芯片中，保证芯片中只有一个目标序列。</p>
+                <h2>4. 其它PCR</h2>
+                    <h3>4.1 锚定 PCR A-PCR</h3>
+                        <p>对于已知一端的模板进行PCR扩增（就是在只能设计出一个引物的情况下），我们会加多聚体例如AAAA或CCCC给另一端创建一个位点。</p>
+                        <p>实际上，体系里所有的线性DNA都活被加上尾巴，但是我们目标片段一定也会被加上尾巴，后续通过胶回收等方法就可以分离目标片段。</p>
+                    <h3>4.2 不对称 PCR</h3>
+                        <p>目标获得大量单链DNA。</p>
+                        <p>控制引物加入量，一个多加点，一个少加点，当少加的引物用完后，就只有一条链进行扩增。</p>
+                    <h3>4.3 反向 PCR</h3>
+                        <p>对只知道目标序列中间一段的子序列时，且该子序列有一个内切酶位点。</p>
+                    <h3>4.4 反转录 PCR RT-PCR</h3>
+                        <p>多了一步反转录。</p>
+                    <h3>4.5 Overlapping PCR 重叠 PCR</h3>
+                        <p>用于任意DNA任意位置的无缝组装。</p>
+                    <h3>4.6 基于 PCR 的 DNA 克隆技术</h3>
+                        <h4>SLIC</h4>
+                            <p>T4 DNA 聚合酶：本质上是合成 DNA 聚合酶，用来合成 DNA。但是在缺少合成 DNA 条件下，会有 3'>5' 外切酶活性。</p>
+                            <p>SLIC 就是依赖 T4 DNA 聚合酶将一个目标基于构建到载体中。</p>
+                        <h4>NEB</h4>
+                            <p>Gibson组装。</p>
+                    <h3>4.7 原位 PCR</h3>
+                        <p>在切片处 PCR，保留空间特征。</p>
+                    <h3>4.8 Hot-start PCR</h3>
+                        <p>在普通 PCR 中，在未完成变性时，就会有PCR发生，这样会导致一些非特异性扩增。</p>
+                        <p>用蜡把聚合酶包裹起来，待到达完全变性温度时，蜡融化使聚合酶加入体系。</p>
+                    <h3>4.9 Touch-down PCR</h3>
+                        <p>在前几轮 PCR 时，保持较高的复性温度 Tm，来提高引物和模板的高特异性结合，在后续降低 Tm 提高产量和合成速度。</p>
+                        <p>目的是提高特异性扩增。</p>
+            </div>
+        </div>
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
