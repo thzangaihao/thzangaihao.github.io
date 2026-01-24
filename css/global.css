@@ -510,7 +510,7 @@ a[onclick*="copyToClipboard"] { cursor: copy !important; position: relative; }
     
     /* 1. 首页容器锁定高度 */
     .home-page .container {
-        height: 640px; 
+        height: 800px; 
         overflow: hidden;    
         align-items: flex-start;
     }
