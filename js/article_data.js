@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/01/22_17:1056
-// 文章总数: 18
+// 生成时间: 2026/01/24_21:4801
+// 文章总数: 19
 
 window.ARTICLE_DATABASE = [
     {
@@ -65,6 +65,13 @@ window.ARTICLE_DATABASE = [
         "date": "2025-11-25",
         "summary": "了解改变的基因具体影响了哪些生物学功能",
         "path": "articles/dry_lab/rnaseq/enrichment_analysis/enrichment_analysis.html"
+    },
+    {
+        "title": "01. 隐马尔可夫模型",
+        "collection": "algorithm",
+        "date": "2026-01-24",
+        "summary": "通过观测序列推测未知序列",
+        "path": "articles/dry_lab/algorithm/01. 隐马尔可夫模型/01. 隐马尔可夫模型.html"
     },
     {
         "title": "02. AlphaFold3 离线版使用说明",

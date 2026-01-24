@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>01. 隐马尔可夫模型 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="algorithm"> 
+        <meta name="collection-title" content="算法">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-01-24">
+        <meta name="description" content="通过观测序列推测未知序列">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>01. 隐马尔可夫模型</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                <p>我们存在两个序列，一个是状态序列，一个是输出序列，而我们的目的是根据输出序列来推断状态序列。这就是隐马尔可夫模型 (Hidden Markov Model, HMM)的核心思想。我们将以天气和行动作为例子来浅显讲解 HMM 的基本原理。</p>
+                <h2>1. 条件设定</h2>
+                <p>我们假设前三天的天气为状态序列，即我们不知道，需要推算的序列。而这三天天气下对应的行动为观测序列，就是我们已知的观测序列，我们需要根据行动序列推算天气序列。</p>
+                <p>为了简便，我们假设天气和行动都只有三个，分别为晴天、阴天、雨天。行动为睡觉、跑步、逛街。</p>
+                <p>其中，天气之间存在着转换概率：</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 150px; min-width: 150px;">昨日 | 今日</th>
+                                <th>晴天</th>
+                                <th>阴天</th>
+                                <th>雨天</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>晴天</th>
+                                <td>0.7</td>
+                                <td>0.4</td>
+                                <td>0.1</td>
+                            </tr>
+                            <tr>
+                                <th>阴天</th>
+                                <td>0.4</td>
+                                <td>0.5</td>
+                                <td>0.1</td>
+                            </tr>
+                            <tr>
+                                <th>雨天</th>
+                                <td>0.3</td>
+                                <td>0.4</td>
+                                <td>0.3</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                <p>例如，昨天天气是晴天，今天天气依然为晴天的概率为 0.5；昨天天气是晴天，今天天气依然为阴天的概率为 0.4。</p>
+                <p>每天对应的行动也有概率：</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 150px; min-width: 150px;">行动 | 天气</th>
+                                <th>晴天</th>
+                                <th>阴天</th>
+                                <th>雨天</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>跑步</th>
+                                <td>0.7</td>
+                                <td>0.2</td>
+                                <td>0.1</td>
+                            </tr>
+                            <tr>
+                                <th>逛街</th>
+                                <td>0.2</td>
+                                <td>0.3</td>
+                                <td>0.2</td>
+                            </tr>
+                            <tr>
+                                <th>睡觉</th>
+                                <td>0.1</td>
+                                <td>0.5</td>
+                                <td>0.7</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                <p>例如，今天是晴天，则今天跑步的概率为 0.7，或者说，如果今天跑步，则今天是晴天的概率为 0.7。</p>
+                <h2>2. 具体计算</h2>
+                <p>假如连续三天的行动是睡觉、跑步、逛街，求这三天最有可能的天气序列。</p>
+                <p>我们不知道第一天的前一天天气，所以我们需要一个初始概率，用来描述随机的一天各种天气出现的概率</p>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

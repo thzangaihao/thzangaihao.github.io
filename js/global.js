@@ -1,286 +1,74 @@
 /* ============================================================
    文件名: global.js
-   描述: 全站通用脚本
-   模块:
-   1. 配置 (MathJax)
-   2. 工具 (复制功能)
-   3. 逻辑 (底栏、Tab切换、哈希跳转)
-   4. 插件 (Prism 代码高亮、代码块增强)
-   5. 初始化 (DOMContentLoaded)
+   描述: 全站通用脚本 (完美修复版)
    ============================================================ */
-
 
 /* ------------------------------------------------------------
    1. 全局配置 (Configuration)
    ------------------------------------------------------------ */
 window.MathJax = {
-    tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']]
-    },
-    options: {
-        ignoreHtmlClass: 'tex2jax_ignore',
-        processHtmlClass: 'tex2jax_process'
-    }
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    options: { ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
 };
-
 
 /* ------------------------------------------------------------
    2. 全局工具函数 (Utilities)
    ------------------------------------------------------------ */
+function getRelativePath(dbPath) { return '../../' + dbPath; }
 
-/* --- 复制状态管理变量 --- */
 let copyFeedbackTimer = null;
 let currentActiveElement = null;
 let originalContentCache = "";
 
-/**
- * 2.1 通用复制函数 (用于底栏邮箱等文本链接)
- * 特点: 点击后显示 "已复制" 文字反馈
- */
-function copyToClipboard(text, element, event) {
-    if (event) event.preventDefault(); // 阻止链接默认跳转
-
-    // 如果点击了新元素，立即重置上一个元素的状态
-    if (currentActiveElement && currentActiveElement !== element) {
-        resetCopyFeedback();
-    }
-    // 如果连续点击，重置定时器
-    if (copyFeedbackTimer) clearTimeout(copyFeedbackTimer);
-
-    navigator.clipboard.writeText(text).then(() => {
-        // 首次点击，缓存原始内容
-        if (currentActiveElement !== element) {
-            currentActiveElement = element;
-            originalContentCache = element.innerHTML;
-        }
-
-        // 显示反馈
-        element.innerHTML = '<i class="fas fa-check" style="color: #27ae60;"></i> 已复制';
-        
-        // 1.5秒后自动恢复
-        copyFeedbackTimer = setTimeout(() => {
-            resetCopyFeedback();
-        }, 1500);
-
-    }).catch(err => console.error('复制失败:', err));
-}
-
-/**
- * 内部辅助: 恢复元素原状
- */
 function resetCopyFeedback() {
     if (currentActiveElement) {
         currentActiveElement.innerHTML = originalContentCache;
         currentActiveElement = null;
         originalContentCache = "";
     }
-    if (copyFeedbackTimer) {
-        clearTimeout(copyFeedbackTimer);
-        copyFeedbackTimer = null;
-    }
+    if (copyFeedbackTimer) { clearTimeout(copyFeedbackTimer); copyFeedbackTimer = null; }
 }
 
-/**
- * 2.2 代码块专用复制函数
- * 特点: 仅改变图标状态，不显示大段文字
- */
+function copyToClipboard(text, element, event) {
+    if (event) event.preventDefault();
+    if (currentActiveElement && currentActiveElement !== element) resetCopyFeedback();
+    if (copyFeedbackTimer) clearTimeout(copyFeedbackTimer);
+
+    navigator.clipboard.writeText(text).then(() => {
+        if (currentActiveElement !== element) {
+            currentActiveElement = element;
+            originalContentCache = element.innerHTML;
+        }
+        element.innerHTML = '<i class="fas fa-check" style="color: #27ae60;"></i> 已复制';
+        copyFeedbackTimer = setTimeout(() => resetCopyFeedback(), 1500);
+    }).catch(err => console.error('复制失败:', err));
+}
+
 function copyCode(text, btnElement) {
     navigator.clipboard.writeText(text).then(() => {
         const originalHtml = btnElement.innerHTML;
-        btnElement.innerHTML = '<i class="fas fa-check"></i>'; // 仅显示对勾
+        btnElement.innerHTML = '<i class="fas fa-check"></i>';
         btnElement.classList.add('copied');
-        
         setTimeout(() => {
             btnElement.innerHTML = originalHtml;
             btnElement.classList.remove('copied');
         }, 1500);
-    }).catch(err => {
-        console.error('复制失败:', err);
-        btnElement.innerText = 'Error';
-    });
+    }).catch(err => { console.error('复制失败:', err); btnElement.innerText = 'Error'; });
 }
 
-
 /* ------------------------------------------------------------
-   3. 页面逻辑函数 (Page Logic)
+   3. 核心 UI 逻辑
    ------------------------------------------------------------ */
-
-/**
- * 3.1 加载公共底栏 (Footer)
- */
 function loadFooter() {
     const path = window.footerPath || '/footer.html';
-    
     return fetch(path)
-    .then(res => {
-        if (!res.ok) throw new Error(`Footer not found at: ${path}`);
-        return res.text();
-    })
-    .then(data => {
-        const el = document.getElementById('footer-placeholder');
-        if (el) el.innerHTML = data;
-    })
-    .catch(err => console.error('底栏加载错误:', err));
+        .then(res => { if (!res.ok) throw new Error(`Footer not found`); return res.text(); })
+        .then(data => { const el = document.getElementById('footer-placeholder'); if (el) el.innerHTML = data; })
+        .catch(err => console.error('Footer Error:', err));
 }
 
-/* ------------------------------------------------------------
-   3.2 索引页 Tab 切换 (适配幽灵 ID)
-   ------------------------------------------------------------ */
-function showCollection(collectionId, btnElement) {
-    // 1. 隐藏所有列表
-    document.querySelectorAll('.article-list').forEach(el => el.classList.remove('active'));
-    
-    // 2. 显示目标列表 [核心修改：加上 -section 后缀]
-    const target = document.getElementById(collectionId + '-section');
-    if (target) target.classList.add('active');
-
-    // 3. 切换按钮激活状态
-    document.querySelectorAll('.collection-btn').forEach(el => el.classList.remove('active'));
-    if (btnElement) btnElement.classList.add('active');
-}
-
-/**
- * 3.3 处理 URL 哈希跳转 (#data -> 自动打开对应 Tab)
- * 包含“强制回顶”逻辑，解决浏览器自动滚动导致的布局错位
- */
-function handleHashNavigation() {
-    const hash = window.location.hash.substring(1);
-    if (!hash) return;
-
-    // 查找对应按钮
-    const targetBtn = document.querySelector(`button[onclick*="'${hash}'"]`);
-    if (targetBtn) {
-        showCollection(hash, targetBtn);
-    }
-}
-
-
-/* ------------------------------------------------------------
-   4. 代码高亮系统 (Code Highlighting)
-   ------------------------------------------------------------ */
-
-/**
- * 4.1 动态加载 Prism.js (按需加载，不浪费流量)
- */
-/* ------------------------------------------------------------
-   4. 代码高亮系统 (Code Highlighting)
-   ------------------------------------------------------------ */
-
-/**
- * 4.1 动态加载 Prism.js (增强版：修复路径问题 + 自动去缩进)
- */
-function loadPrismHighlighter() {
-    // 1. 检查是否有代码块
-    const codeBlocks = document.querySelectorAll('pre code');
-    if (codeBlocks.length === 0) return;
-
-    // --- [新增] 预处理：去除 HTML 源码缩进带来的多余空格 ---
-    codeBlocks.forEach(code => {
-        // 获取原始文本
-        let text = code.textContent;
-        // 1. 去掉首尾空行
-        text = text.replace(/^\n+|\n+$/g, '');
-        // 2. 计算最小缩进量
-        const lines = text.split('\n');
-        const indent = lines.reduce((min, line) => {
-            if (line.trim().length === 0) return min; // 跳过空行
-            const spaces = line.match(/^ */)[0].length;
-            return spaces < min ? spaces : min;
-        }, Infinity);
-        // 3. 每一行都切掉这个缩进
-        if (indent > 0 && indent !== Infinity) {
-            text = lines.map(line => line.substring(indent)).join('\n');
-        }
-        code.textContent = text;
-    });
-    // -------------------------------------------------------
-
-    const cdnBase = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0';
-    const cssUrl = `${cdnBase}/themes/prism-tomorrow.min.css`;
-    const coreUrl = `${cdnBase}/prism.min.js`;
-    const loaderUrl = `${cdnBase}/plugins/autoloader/prism-autoloader.min.js`;
-
-    // 2. 加载 CSS
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = cssUrl;
-    document.head.appendChild(link);
-
-    // 3. 辅助函数：串行加载 JS
-    const loadScript = (url) => new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = url;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.body.appendChild(script);
-    });
-
-    // 4. 按顺序加载：核心 -> 自动识别插件 -> [关键修复] 配置路径
-    loadScript(coreUrl)
-        .then(() => loadScript(loaderUrl))
-        .then(() => {
-            // [关键修复] 显式告诉 Autoloader 去哪里下载语言包
-            // 解决 "Loading..." 失败或不显示颜色的核心
-            if (window.Prism && window.Prism.plugins && window.Prism.plugins.autoloader) {
-                window.Prism.plugins.autoloader.languages_path = `${cdnBase}/components/`;
-            }
-            
-            // 强制触发一次全局高亮
-            window.Prism.highlightAll();
-        })
-        .catch(err => console.error("Prism load failed:", err));
-}
-
-/**
- * 4.2 代码块增强 (添加 Mac 风格顶部栏)
- */
-function enhanceCodeBlocks() {
-    document.querySelectorAll('pre code').forEach(code => {
-        const pre = code.parentElement;
-        // 防止重复处理
-        if (pre.parentElement.classList.contains('code-wrapper')) return;
-
-        // 提取语言名称
-        let langName = 'TEXT';
-        const langClass = Array.from(code.classList).find(c => c.startsWith('language-'));
-        if (langClass) langName = langClass.replace('language-', '').toUpperCase();
-
-        // 1. 创建容器
-        const wrapper = document.createElement('div');
-        wrapper.className = 'code-wrapper';
-
-        // 2. 创建顶部栏
-        const header = document.createElement('div');
-        header.className = 'code-header';
-
-        // 左侧：语言标签
-        const langLabel = document.createElement('span');
-        langLabel.className = 'lang-label';
-        langLabel.innerText = langName;
-
-        // 右侧：复制按钮
-        const copyBtn = document.createElement('button');
-        copyBtn.className = 'copy-code-btn';
-        copyBtn.innerHTML = '<i class="far fa-copy"></i>';
-        copyBtn.onclick = () => copyCode(pre.innerText, copyBtn);
-
-        header.appendChild(langLabel);
-        header.appendChild(copyBtn);
-
-        // 3. 组装 DOM
-        pre.parentNode.insertBefore(wrapper, pre);
-        wrapper.appendChild(header);
-        wrapper.appendChild(pre);
-    });
-}
-
-/* ------------------------------------------------------------
-   表格响应式增强 (自动添加滚动容器)
-   ------------------------------------------------------------ */
 function makeTablesResponsive() {
-    const tables = document.querySelectorAll('.content table');
-    tables.forEach(table => {
+    document.querySelectorAll('.content table').forEach(table => {
         if (table.parentElement.classList.contains('table-wrapper')) return;
         const wrapper = document.createElement('div');
         wrapper.className = 'table-wrapper';
@@ -289,104 +77,126 @@ function makeTablesResponsive() {
     });
 }
 
+function autoFillArticleInfo() {
+    const container = document.querySelector('.article-container');
+    if (!container) return;
+    const getMeta = (n) => document.querySelector(`meta[name="${n}"]`)?.content;
+    const [collId, collTitle, pPath, pTitle, date] = [getMeta('collection'), getMeta('collection-title'), getMeta('parent-path'), getMeta('parent-title'), getMeta('date')];
+    if (!collId || !pPath || !date) return;
+
+    const h1 = container.querySelector('h1');
+    if (h1) {
+        h1.insertAdjacentHTML('beforebegin', `<a href="${pPath}#${collId}" class="back-link"><i class="fas fa-arrow-left"></i> 返回 ${pTitle} / ${collTitle}</a>`);
+        h1.insertAdjacentHTML('afterend', `<div class="meta"><span><i class="far fa-calendar"></i> ${date}</span><span style="margin-left:20px"><i class="fas fa-folder"></i> ${collTitle}</span></div>`);
+    }
+}
+
 /* ------------------------------------------------------------
-   自动渲染文章列表 (基于 build_index.py 生成的数据)
+   4. 导航逻辑
    ------------------------------------------------------------ */
-   /* ------------------------------------------------------------
-   自动渲染文章列表 (适配幽灵 ID)
+function showCollection(collectionId, btnElement) {
+    document.querySelectorAll('.article-list').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById(collectionId + '-section');
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.collection-btn').forEach(el => el.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
+}
+
+function handleHashNavigation() {
+    const hash = window.location.hash.substring(1);
+    if (!hash) return;
+    const targetBtn = document.querySelector(`button[onclick*="'${hash}'"]`);
+    if (targetBtn) showCollection(hash, targetBtn);
+}
+
+/* ------------------------------------------------------------
+   5. 内容渲染 (卡片与最新文章)
    ------------------------------------------------------------ */
+
+/* [修复] 找回丢失的 renderArticleCards 函数 */
 function renderArticleCards() {
     if (!window.ARTICLE_DATABASE || !Array.isArray(window.ARTICLE_DATABASE)) return;
-    if (!document.body.classList.contains('category-page')) return;
-
+    
     window.ARTICLE_DATABASE.forEach(article => {
-        // [核心修改] 数据库里存的是 "alphafold"，但 HTML 里是 "alphafold-section"
+        // 寻找带 -section 后缀的容器
         const container = document.getElementById(article.collection + '-section');
-
         if (!container) return;
 
-        const linkPath = getRelativePath(article.path);
-        const cardHtml = `
-            <a href="${linkPath}" class="article-item">
+        // 生成简单卡片
+        const html = `
+            <a href="${getRelativePath(article.path)}" class="article-item">
                 <div class="article-info">
                     <h4>${article.title}</h4>
                     <p>${article.summary}</p>
                 </div>
                 <span class="article-date">${article.date}</span>
-            </a>
-        `;
-        container.insertAdjacentHTML('beforeend', cardHtml);
+            </a>`;
+        container.insertAdjacentHTML('beforeend', html);
+    });
+}
+
+/* 渲染首页最新文章 (灰色标签版) */
+function renderLatestArticles() {
+    const container = document.getElementById('latest-articles-list');
+    if (!container) return;
+
+    if (!window.ARTICLE_DATABASE) { container.innerHTML = '<p style="text-align:center;color:#999">暂无数据</p>'; return; }
+    
+    // 文章显示个数/数目
+    const latest = [...window.ARTICLE_DATABASE].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
+    
+    const html = latest.map(article => {
+        let sectionName = '动态'; 
+        let iconClass = 'fas fa-newspaper'; 
+
+        if (article.path.includes('dry_lab')) { sectionName = '干实验'; iconClass = 'fas fa-code'; } 
+        else if (article.path.includes('wet_lab')) { sectionName = '湿实验'; iconClass = 'fas fa-flask'; } 
+        else if (article.path.includes('resources')) { sectionName = '资源站'; iconClass = 'fas fa-book'; } 
+        else if (article.path.includes('about')) { sectionName = '关于我'; iconClass = 'fas fa-user'; }
+
+        return `
+            <a href="${article.path}" class="article-item">
+                <div class="article-info">
+                    <span class="article-tag"><i class="${iconClass}"></i> ${sectionName}</span>
+                    <h4>${article.title}</h4>
+                    <p>${article.summary}</p>
+                </div>
+                <span class="article-date">${article.date}</span>
+            </a>`;
+    }).join('');
+    container.innerHTML = html;
+}
+
+/* ------------------------------------------------------------
+   6. 代码高亮与增强
+   ------------------------------------------------------------ */
+function loadPrismHighlighter() {
+    const codeBlocks = document.querySelectorAll('pre code');
+    if (codeBlocks.length === 0) return;
+    const cdn = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0';
+    const link = document.createElement('link'); link.rel='stylesheet'; link.href=`${cdn}/themes/prism-tomorrow.min.css`; document.head.appendChild(link);
+    const script = document.createElement('script'); script.src=`${cdn}/prism.min.js`; 
+    script.onload = () => {
+        const auto = document.createElement('script'); auto.src=`${cdn}/plugins/autoloader/prism-autoloader.min.js`;
+        auto.onload = () => window.Prism.highlightAll();
+        document.body.appendChild(auto);
+    };
+    document.body.appendChild(script);
+}
+
+function enhanceCodeBlocks() {
+    document.querySelectorAll('pre code').forEach(code => {
+        const pre = code.parentElement;
+        if (pre.parentElement.classList.contains('code-wrapper')) return;
+        const lang = (Array.from(code.classList).find(c => c.startsWith('language-')) || 'TEXT').replace('language-', '').toUpperCase();
+        const wrap = document.createElement('div'); wrap.className = 'code-wrapper';
+        wrap.innerHTML = `<div class="code-header"><span class="lang-label">${lang}</span><button class="copy-code-btn" onclick="copyCode(this.parentElement.nextElementSibling.innerText, this)"><i class="far fa-copy"></i></button></div>`;
+        pre.parentNode.insertBefore(wrap, pre); wrap.appendChild(pre);
     });
 }
 
 /* ------------------------------------------------------------
-   文章页自动化 (自动生成返回链接、日期、分类标签)
-   ------------------------------------------------------------ */
-function autoFillArticleInfo() {
-    // 1. 只在文章详情页执行 (检查是否有 article-container)
-    const container = document.querySelector('.article-container');
-    if (!container) return;
-
-    // 2. 读取 Meta 配置
-    const getMeta = (name) => document.querySelector(`meta[name="${name}"]`)?.content;
-
-    const collectionId = getMeta('collection');         // e.g. "data"
-    const collectionTitle = getMeta('collection-title');// e.g. "数据挖掘"
-    const parentPath = getMeta('parent-path');          // e.g. "../../dry_lab_index.html"
-    const parentTitle = getMeta('parent-title');        // e.g. "干实验"
-    const date = getMeta('date');                       // e.g. "2025-11-28"
-
-    // 如果关键信息缺失，则不执行
-    if (!collectionId || !parentPath || !date) return;
-
-    // 3. 生成“返回链接” HTML
-    // 逻辑：<a href="{父路径}#{集合ID}" ...> 返回 {父标题} / {集合标题} </a>
-    const backLinkHtml = `
-        <a href="${parentPath}#${collectionId}" class="back-link">
-            <i class="fas fa-arrow-left"></i> 返回 ${parentTitle} / ${collectionTitle}
-        </a>
-    `;
-
-    // 4. 生成“元信息栏” HTML
-    const metaHtml = `
-        <div class="meta">
-            <span><i class="far fa-calendar"></i> ${date}</span>
-            <span style="margin-left: 20px;">
-                <i class="fas fa-folder"></i> ${collectionTitle}
-            </span>
-        </div>
-    `;
-
-    // 5. 插入到页面指定位置
-    const h1 = container.querySelector('h1');
-    if (h1) {
-        // 在 H1 之前插入返回链接
-        h1.insertAdjacentHTML('beforebegin', backLinkHtml);
-        // 在 H1 之后插入元信息
-        h1.insertAdjacentHTML('afterend', metaHtml);
-    }
-}
-
-/**
- * 辅助函数：根据当前页面层级，修正链接路径
- * 简单粗暴版：假设数据库里的 path 是 "articles/wet_lab/..."
- * 如果我们在 "articles/wet_lab/index.html"，需要加 "../../" 吗？
- * 为了稳定性，建议 Python 脚本生成时直接生成 "/articles/..." (根路径)
- * 或者在这里简单处理：
- */
-function getRelativePath(dbPath) {
-    // 如果你在本地预览 (file://)，根路径 / 可能会失效
-    // 建议：让 build_index.py 生成的路径以 "/" 开头，例如 "/articles/..."
-    // 如果部署在 GitHub Pages (https://user.github.io/repo/), 可能需要加仓库名
-    // 这里暂时直接返回，如果链接打不开，我们需要调整 Python 脚本
-    
-    // 临时方案：假设二级页面都在 articles/xxx/ 目录下，引用 articles/yyy/
-    // 需要回退两层
-    return '../../' + dbPath; 
-}
-
-/* ------------------------------------------------------------
-   3.3 目录生成 (修复跳转状态不同步 BUG 版)
+   7. 目录生成 (TOC) - [高级版：防抖 + 智能高亮 + 整体淡入]
    ------------------------------------------------------------ */
 function generateTOC() {
     const container = document.querySelector('.article-container');
@@ -394,6 +204,7 @@ function generateTOC() {
     if (!container || !content) return;
 
     const headers = content.querySelectorAll('h2, h3');
+    // 如果标题太少，不生成目录，直接显示文章
     if (headers.length < 2) {
         container.style.opacity = '1'; 
         return;
@@ -413,53 +224,41 @@ function generateTOC() {
 
     const list = sidebar.querySelector('#toc-list');
     
-    // 辅助函数：安全的滚动侧边栏
+    // 侧边栏滚动辅助函数
     const scrollSidebar = (link) => {
         const card = document.querySelector('.toc-card');
         if (!card) return;
-        
-        // 只有当卡片设置了 position: relative 时，offsetTop 才是准确的相对值
         const linkTop = link.offsetTop; 
-        const linkHeight = link.offsetHeight;
         const cardHeight = card.clientHeight;
         const scrollTop = card.scrollTop;
-
-        // 简单的可视区域检测：如果跑出去了，就滚回来
-        // 留出 60px 的上下余量，体验更好
         if (linkTop < scrollTop + 20 || linkTop > scrollTop + cardHeight - 20) {
             card.scrollTo({ top: linkTop - 60, behavior: 'smooth' });
         }
     };
 
+    // 生成列表
     headers.forEach((h, i) => {
         if (!h.id) h.id = 'sec-' + i;
         const li = document.createElement('li');
         if (h.tagName === 'H3') li.className = 'toc-sub-item';
         
-        // 创建链接
         const link = document.createElement('a');
         link.href = `#${h.id}`;
         link.className = 'toc-link';
         link.dataset.target = h.id;
         link.textContent = h.textContent;
 
-        // [点击事件优化]
+        // 点击事件 (带锁，防止乱跳)
         link.onclick = (e) => {
             e.preventDefault();
-            isClicking = true; // 上锁
+            isClicking = true; 
 
-            // 1. UI 立即响应
             document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
             
-            // 2. 侧边栏立即跟随滚动 (修复点击后目录不跟过去的问题)
             scrollSidebar(link);
-
-            // 3. 页面平滑滚动
             document.getElementById(h.id).scrollIntoView({ behavior: 'smooth' });
 
-            // 4. 延长锁的时间，确保滚动完全停止
-            // 如果连续点击，会重置定时器
             if (window.clickTimer) clearTimeout(window.clickTimer);
             window.clickTimer = setTimeout(() => { isClicking = false; }, 1000);
         };
@@ -468,30 +267,25 @@ function generateTOC() {
         list.appendChild(li);
     });
 
+    // 触发整体淡入动画
     void wrapper.offsetWidth;
     wrapper.classList.add('loaded');
 
-    // --- 滚动监听修复 ---
-    
+    // --- 滚动监听 (智能版) ---
     let isClicking = false;
     const visibleHeaders = new Set();
 
     const observer = new IntersectionObserver(entries => {
-        // [核心修复] 第一步：始终更新数据模型！
-        // 无论是否在点击，都要记录谁进来了、谁出去了
+        // 1. 始终更新可见集合
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                visibleHeaders.add(entry.target.id);
-            } else {
-                visibleHeaders.delete(entry.target.id);
-            }
+            if (entry.isIntersecting) visibleHeaders.add(entry.target.id);
+            else visibleHeaders.delete(entry.target.id);
         });
 
-        // [核心修复] 第二步：只拦截 UI 更新
-        // 如果正在点击跳转，数据已经记下来了，但不要乱改高亮
+        // 2. 如果正在点击，暂停 UI 更新
         if (isClicking) return;
 
-        // 仲裁逻辑：找 DOM 顺序最靠前的可见标题
+        // 3. 仲裁：优先选择 DOM 顺序最靠前的可见标题
         let activeId = null;
         for (const header of headers) {
             if (visibleHeaders.has(header.id)) {
@@ -504,49 +298,35 @@ function generateTOC() {
             document.querySelectorAll('.toc-link').forEach(l => {
                 const isActive = l.dataset.target === activeId;
                 l.classList.toggle('active', isActive);
-                
-                if (isActive) {
-                    scrollSidebar(l);
-                }
+                if (isActive) scrollSidebar(l);
             });
         }
-
     }, { rootMargin: '0px 0px -80% 0px', threshold: 0 });
 
     headers.forEach(h => observer.observe(h));
 }
 
 /* ------------------------------------------------------------
-   5. 初始化入口 (找回 async/await)
+   8. 初始化入口
    ------------------------------------------------------------ */
-// [重要] 加上 async
 window.addEventListener('DOMContentLoaded', async () => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     
-    if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual';
-    }
-
-    // 1. [必须] 先等待底栏加载，撑开页面底部
     await loadFooter();
 
-    // 2. [必须] 再渲染文章卡片，撑开页面中部
-    renderArticleCards(); 
-
-    // 3. 加载其他装饰
-    enhanceCodeBlocks();    
+    // 优先渲染内容
+    if (document.body.classList.contains('category-page')) {
+        renderArticleCards(); // 现在这个函数存在了，二级页面会正常显示
+        handleHashNavigation();
+    }
+    renderLatestArticles();   
+    
+    // 装饰性功能
+    enhanceCodeBlocks();      
     loadPrismHighlighter(); 
     makeTablesResponsive();
     
-    // 渲染文章详情页的头部信息
+    // 文章页逻辑 (TOC 和 信息栏)
     autoFillArticleInfo();
-    // 目录
     generateTOC();
-
-    // 4. [最后] 处理 Tab 切换
-    // 此时 HTML 里的 ID 是 xxx-section，浏览器不会自动跳
-    // JS 会根据 URL hash 手动把对应的 Tab 显示出来 (active)
-    // 用户看到的界面就是：页面在顶部，对应的 Tab 内容已显示。完美！
-    if (document.body.classList.contains('category-page')) {
-        handleHashNavigation();
-    }
 });

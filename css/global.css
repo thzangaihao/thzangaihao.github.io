@@ -166,7 +166,7 @@ nav .nav-links i { margin-right: 5px; }
 .list-header h2 { margin: 0; font-size: 1.8rem; }
 .list-header p { color: #666; margin: 5px 0 0 0; }
 
-.article-item { background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; display: flex; justify-content: space-between; align-items: center; }
+.article-item { background: white; padding: 2.0rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; display: flex; justify-content: space-between; align-items: center; }
 .article-item:hover { transform: translateX(5px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-left: 3px solid var(--accent-color); }
 .article-info h4 { margin: 0 0 5px 0; font-size: 1.1rem; }
 .article-info p { margin: 0; font-size: 0.85rem; color: #888; }
@@ -242,29 +242,29 @@ a[onclick*="copyToClipboard"] { cursor: copy !important; position: relative; }
 
 
 /* ============================================================
-   6. 文章双栏布局与目录 (Article Layout & TOC) - [无闪动版]
+   6. 文章双栏布局与目录 (Article Layout & TOC) - [动画修复版]
    ============================================================ */
 
-/* --- 6.1 布局容器 (Wrapper) --- */
+/* --- 6.1 布局容器 (Flex Wrapper) --- */
 .article-layout-wrapper {
     display: flex;
     justify-content: center;
     align-items: flex-start;
     gap: 0; 
-    max-width: 1300px;
+    max-width: 1250px;
     margin: 2rem auto;
     padding: 0 1.5rem;
 
-    /* 初始状态：透明 + 向下偏移 (准备上浮) */
+    /* [核心] 初始状态：透明 + 稍微下沉 */
     opacity: 0;
     transform: translateY(30px);
     
-    /* 所有的显示变化都通过这个 transition 平滑过渡 */
+    /* 过渡效果：JS 添加 .loaded 类时触发 */
     transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), 
                 transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* 当 JS 添加 .loaded 类时，整体优雅浮现 */
+/* [核心] JS 添加此类后，页面才会浮现 */
 .article-layout-wrapper.loaded {
     opacity: 1;
     transform: translateY(0);
@@ -276,52 +276,76 @@ a[onclick*="copyToClipboard"] { cursor: copy !important; position: relative; }
     flex: 1;
     width: 0;
     max-width: 100%;
-    /* 在 Wrapper 里时，强制显示 (透明度由 Wrapper 控制) */
+    /* 强制不透明，显示权交给 wrapper */
     opacity: 1 !important; 
-    animation: none !important; /* 禁止它自己乱动 */
+    transition: none; 
 }
 
-/* 默认样式 (JS运行前) */
+/* 默认样式 (JS运行前/无目录时) */
 .article-container {
     background: white; padding: 4rem; border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     max-width: 900px;  
     margin: 2rem auto; 
     
-    /* [核心] 默认隐藏！防止第一次闪现 */
-    /* JS 会负责把它变回来，或者包裹它变回来 */
+    /* [核心] 默认透明！防止页面加载瞬间闪烁 */
     opacity: 0; 
     transition: opacity 0.3s ease;
 }
 
 /* --- 6.3 侧边栏容器 (右侧) --- */
 .article-sidebar {
-    width: 280px; 
-    margin-left: 2.5rem;
-    flex-shrink: 0;
-    position: sticky;
-    top: 100px;
-    overflow: hidden; 
+    width: 280px;            
+    margin-left: 2.5rem;     
+    flex-shrink: 0;          
+    position: sticky;        
+    top: 100px;              
 }
 
-/* --- 6.4 目录卡片 (保留你喜欢的卡片风格) --- */
+/* --- 6.4 目录卡片 (TOC Card) --- */
 .toc-card {
-    position: relative;
-
-    background: white; border-radius: 12px; padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); border: 1px solid #f0f0f0;
-    max-height: calc(100vh - 120px); overflow-y: auto; scrollbar-width: none;
-    min-width: 250px; 
+    position: relative; /* 确保 offsetTop 计算准确 */
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    scrollbar-width: none;
+    min-width: 250px; /* 防止文字换行 */
 }
 .toc-card::-webkit-scrollbar { display: none; }
-.toc-card h3 { margin: 0 0 1.2rem 0; font-size: 1rem; color: var(--primary-color); border-bottom: 2px solid #f5f5f5; padding-bottom: 0.8rem; display: flex; align-items: center; gap: 8px; }
+
+.toc-card h3 {
+    margin: 0 0 1.2rem 0;
+    font-size: 1rem;
+    color: var(--primary-color);
+    border-bottom: 2px solid #f5f5f5;
+    padding-bottom: 0.8rem;
+    display: flex; align-items: center; gap: 8px;
+}
+
 .toc-card ul { list-style: none; padding: 0; margin: 0; }
 .toc-card li { margin-bottom: 6px; }
 
-.toc-link { display: block; font-size: 0.9rem; color: #666; padding: 6px 10px; border-radius: 6px; transition: all 0.2s; text-decoration: none; line-height: 1.4; border-left: 3px solid transparent; }
+.toc-link {
+    display: block; font-size: 0.9rem; color: #666;
+    padding: 6px 10px; border-radius: 6px;
+    transition: all 0.2s; text-decoration: none;
+    line-height: 1.4; border-left: 3px solid transparent;
+}
+
 .toc-sub-item .toc-link { padding-left: 20px; font-size: 0.85rem; color: #888; }
+
 .toc-link:hover { background-color: #f8f9fa; color: var(--accent-color); }
-.toc-link.active { background-color: rgba(52, 152, 219, 0.08); color: var(--accent-color); font-weight: 600; border-left-color: var(--accent-color); }
+
+.toc-link.active {
+    background-color: rgba(52, 152, 219, 0.08);
+    color: var(--accent-color);
+    font-weight: 600;
+    border-left-color: var(--accent-color);
+}
 
 /* ============================================================
    7. 响应式适配 (Responsive)
@@ -417,4 +441,134 @@ a[onclick*="copyToClipboard"] { cursor: copy !important; position: relative; }
 .toc-card li {
     opacity: 0; /* 默认隐藏 */
     animation: slideInRight 0.4s ease-out forwards;
+}
+
+/* 在 global.css 中添加 */
+
+/* 通用 SVG 图标样式 (支持随文字变色) */
+.svg-icon {
+    display: inline-block;
+    width: 20px;             /* 控制图标大小 */
+    height: 20px;
+    vertical-align: middle;  /* 垂直居中 */
+    margin-right: 8px;       /* 图标和文字的间距 */
+    
+    /* 核心魔法：背景色使用当前字体颜色 */
+    background-color: currentColor; 
+    
+    /* 将 SVG 设为遮罩 */
+    -webkit-mask-image: var(--svg-url);
+    mask-image: var(--svg-url);
+    
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+
+/* ============================================================
+   [最终修改] 栏目分类标签 (静止灰色版 - 无悬浮效果)
+   ============================================================ */
+
+.article-tag {
+    display: inline-flex;       /* 让图标和文字垂直居中 */
+    align-items: center;
+    gap: 6px;                   /* 图标与文字间距 */
+    
+    background-color: #f2f3f5;  /* 灰色底色 */
+    color: #555;                /* 深灰色文字 */
+    
+    font-size: 0.75rem;         /* 小号字体 */
+    padding: 4px 8px;           /* 内边距 */
+    border-radius: 4px;         /* 圆角 */
+    margin-bottom: 8px;         /* 与标题的间距 */
+    
+    font-weight: normal;        /* 正常粗细 */
+    line-height: 1;             /* 防止高度过高 */
+}
+
+/* 图标颜色 */
+.article-tag i {
+    color: #777;
+    font-size: 0.75rem;
+}
+
+/* ============================================================
+   [最终修正版] 首页仪表盘布局 (Dashboard Layout)
+   修复问题：
+   1. 标题吸顶时不再有透明缝隙
+   2. 内容不会穿过圆角
+   3. 滚动条不遮挡内容
+   ============================================================ */
+
+/* 仅在电脑端生效 (> 850px) */
+@media (min-width: 851px) {
+    
+    /* 1. 首页容器锁定高度 */
+    .home-page .container {
+        height: 640px; 
+        overflow: hidden;    
+        align-items: flex-start;
+    }
+
+    /* 2. 左栏保持原样 (不动) */
+    .home-page .left-col {
+        position: relative;
+    }
+
+    /* 3. 右栏 (滚动区) */
+    .home-page .right-col {
+        height: 565pt;
+    }
+
+    /* [核心修改] 右栏卡片容器 */
+    .home-page .right-col .category-card {
+        height: 100%;
+        margin-bottom: 0;
+        overflow-y: auto;   /* 开启滚动 */
+        
+        /* 关键步骤A：清空父容器 Padding，让标题能抵到最边缘 */
+        padding: 0 !important; 
+        
+        /* 滚动条美化 */
+        scrollbar-width: thin;
+        scrollbar-color: #ddd transparent;
+    }
+
+    /* [核心修改] 右栏标题 (吸顶头) */
+    .home-page .right-col .category-card h3 {
+        /* 1. 定位 */
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        
+        /* 2. 关键步骤B：补回内边距，撑开空间 */
+        margin: 0;
+        padding: 1.2rem 1.5rem; 
+        
+        /* 3. 视觉修饰：白色不透明背景 + 顶部圆角 */
+        background-color: #ffffff;
+        border-radius: 12px 12px 0 0; /* 完美贴合卡片圆角 */
+        
+        /* 4. 分割线与阴影 */
+        border-bottom: 1px solid #f0f0f0;
+        /* box-shadow: 0 4px 8px rgba(0,0,0,0.02); 微弱阴影，增加层次 */
+    }
+
+    /* [核心修改] 右栏内容列表 */
+    /* 关键步骤C：给内容单独加 Padding，防止贴边 */
+    .home-page .right-col .category-card #latest-articles-list {
+        padding: 1.5rem; 
+        padding-top: 1rem; /* 稍微离标题近一点 */
+    }
+
+    /* 4. Chrome/Safari 滚动条样式 */
+    .home-page .right-col .category-card::-webkit-scrollbar { width: 6px; }
+    .home-page .right-col .category-card::-webkit-scrollbar-track { background: transparent; }
+    .home-page .right-col .category-card::-webkit-scrollbar-thumb { background-color: #ddd; border-radius: 3px; }
+    .home-page .right-col .category-card::-webkit-scrollbar-thumb:hover { background-color: var(--accent-color); }
 }

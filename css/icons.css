@@ -15,34 +15,7 @@
     --icon-active:  url('../img/icons/alphafold/alphafold_2.png');
 }
 
-/* 2. 转录组分析 (RNA-seq) - 假设你也想用图片而非 FontAwesome */
-/* 如果暂时没有图片，可以不写，或者写 fallback 逻辑 */
-.icon-rnaseq {
-    /* 预留位置 */
-}
-
-/* 3. 分子对接 (Docking) */
-.icon-docking {
-    --icon-default: url('../img/icons/docking_0.png'); 
-    --icon-hover:   url('../img/icons/docking_1.png'); 
-    --icon-active:  url('../img/icons/docking_2.png');
-}
-
-
-/* ------------------------------------------------------------
-   [标签] 湿实验 (Wet Lab)
-   ------------------------------------------------------------ */
-
-/* 1. PCR 实验 */
-.icon-pcr {
-    --icon-default: url('../img/icons/pcr_0.png'); 
-    --icon-hover:   url('../img/icons/pcr_1.png'); 
-    --icon-active:  url('../img/icons/pcr_2.png');
-}
-
-/* 2. 载体构建 */
-.icon-vector {
-    --icon-default: url('../img/icons/vector_0.png'); 
-    --icon-hover:   url('../img/icons/vector_1.png'); 
-    --icon-active:  url('../img/icons/vector_2.png');
+/* 2. 算法图标 */
+.icon-algorithm {
+    --svg-url: url('../img/icons/font_awesome/algorithm.svg');
 }

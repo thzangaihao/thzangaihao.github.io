@@ -83,7 +83,7 @@ articles.sort(key=lambda x: x['title'])
 
 # 生成 JS 文件
 js_content = f"""// 自动生成的文件，请勿手动修改
-// 生成时间: {time.strftime("%Y/%m/%d_%H:%M%S", time.localtime(time.time()))}
+// 生成时间: {time.strftime("%Y/%m/%d_%H:%M:%S", time.localtime(time.time()))}
 // 文章总数: {len(articles)}
 
 window.ARTICLE_DATABASE = {json.dumps(articles, ensure_ascii=False, indent=4)};
