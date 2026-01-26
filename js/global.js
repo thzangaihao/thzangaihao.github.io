@@ -67,13 +67,42 @@ function loadFooter() {
         .catch(err => console.error('Footer Error:', err));
 }
 
+/* ------------------------------------------------------------
+   3.2 表格响应式增强 (自动提取标题到外部)
+   ------------------------------------------------------------ */
 function makeTablesResponsive() {
     document.querySelectorAll('.content table').forEach(table => {
+        // 防止重复处理
         if (table.parentElement.classList.contains('table-wrapper')) return;
+
+        // 1. 创建圆角滚动容器
         const wrapper = document.createElement('div');
         wrapper.className = 'table-wrapper';
+        
+        // 2. [核心升级] 检查并提取表格标题
+        const caption = table.querySelector('caption');
+        let externalCaption = null;
+        
+        if (caption) {
+            // 创建一个外部的 div 来装标题
+            externalCaption = document.createElement('div');
+            externalCaption.className = 'table-bottom-caption'; // 新的样式类名
+            externalCaption.innerHTML = caption.innerHTML;      // 复制内容
+            
+            // 从表格里移除原标题 (防止重复显示)
+            table.removeChild(caption); 
+        }
+
+        // 3. 组装 DOM
+        // 先把 wrapper 插到 table 前面
         table.parentNode.insertBefore(wrapper, table);
+        // 把 table 移入 wrapper
         wrapper.appendChild(table);
+        
+        // 4. [核心升级] 把提取出来的标题插到 wrapper 后面
+        if (externalCaption) {
+            wrapper.parentNode.insertBefore(externalCaption, wrapper.nextSibling);
+        }
     });
 }
 
