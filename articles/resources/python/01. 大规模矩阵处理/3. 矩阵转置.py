@@ -85,13 +85,13 @@ def main():
     file_list = find_file('.tsv')
     df = pd.DataFrame(pd.read_csv(choose_file(file_list=file_list), sep='\t'))
     df.set_index('gene_id', inplace=True)
-    transfile_obj = transpose_dataframe(df=df)
+    tranEile_obj = transpose_dataframe(df=df)
     print('='*50)
-    print(f'已成功转置: \n{transfile_obj}')
+    print(f'已成功转置: \n{tranEile_obj}')
     response = make_sure()
     if response == True:
         # 保存到TSV文件
         save_name = input(f'请输入保存文件名: \n')
-        save_dataframe(select_df=transfile_obj, save_name=f'{save_name} transpose_matrix.tsv')
+        save_dataframe(select_df=tranEile_obj, save_name=f'{save_name} transpose_matrix.tsv')
 
 main()

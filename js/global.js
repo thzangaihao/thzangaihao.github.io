@@ -68,44 +68,67 @@ function loadFooter() {
 }
 
 /* ------------------------------------------------------------
-   3.2 表格响应式增强 (自动提取标题到外部)
+   3.2 表格响应式增强 (带换行开关 + 外部标题)
    ------------------------------------------------------------ */
 function makeTablesResponsive() {
     document.querySelectorAll('.content table').forEach(table => {
         // 防止重复处理
-        if (table.parentElement.classList.contains('table-wrapper')) return;
+        if (table.closest('.table-outer-container')) return;
 
-        // 1. 创建圆角滚动容器
-        const wrapper = document.createElement('div');
-        wrapper.className = 'table-wrapper';
+        // 1. 创建最外层容器 (用于定位按钮)
+        const outerContainer = document.createElement('div');
+        outerContainer.className = 'table-outer-container';
+
+        // 2. 创建滚动容器 (原本的 wrapper)
+        const scrollWrapper = document.createElement('div');
+        scrollWrapper.className = 'table-wrapper';
+
+        // 3. 创建“自动换行”开关按钮
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = 'table-toggle-btn';
+        toggleBtn.innerHTML = '<i class="fas fa-align-left"></i> 自动换行';
+        toggleBtn.title = '点击切换表格换行模式';
         
-        // 2. [核心升级] 检查并提取表格标题
+        // 按钮点击事件
+        toggleBtn.onclick = () => {
+            table.classList.toggle('force-wrap');
+            const isWrapped = table.classList.contains('force-wrap');
+            
+            // 更新按钮状态和图标
+            if (isWrapped) {
+                toggleBtn.innerHTML = '<i class="fas fa-compress"></i> 恢复不换行';
+                toggleBtn.classList.add('active');
+            } else {
+                toggleBtn.innerHTML = '<i class="fas fa-align-left"></i> 自动换行';
+                toggleBtn.classList.remove('active');
+            }
+        };
+
+        // 4. 提取标题逻辑 (保持不变)
         const caption = table.querySelector('caption');
         let externalCaption = null;
-        
         if (caption) {
-            // 创建一个外部的 div 来装标题
             externalCaption = document.createElement('div');
-            externalCaption.className = 'table-bottom-caption'; // 新的样式类名
-            externalCaption.innerHTML = caption.innerHTML;      // 复制内容
-            
-            // 从表格里移除原标题 (防止重复显示)
+            externalCaption.className = 'table-bottom-caption';
+            externalCaption.innerHTML = caption.innerHTML;
             table.removeChild(caption); 
         }
 
-        // 3. 组装 DOM
-        // 先把 wrapper 插到 table 前面
-        table.parentNode.insertBefore(wrapper, table);
-        // 把 table 移入 wrapper
-        wrapper.appendChild(table);
+        // 5. 组装 DOM
+        // 插入外层容器
+        table.parentNode.insertBefore(outerContainer, table);
         
-        // 4. [核心升级] 把提取出来的标题插到 wrapper 后面
+        // 组装内部结构
+        outerContainer.appendChild(toggleBtn);    // 放按钮
+        outerContainer.appendChild(scrollWrapper);// 放滚动区
+        scrollWrapper.appendChild(table);         // 放表格
+
+        // 插入底部标题
         if (externalCaption) {
-            wrapper.parentNode.insertBefore(externalCaption, wrapper.nextSibling);
+            outerContainer.parentNode.insertBefore(externalCaption, outerContainer.nextSibling);
         }
     });
 }
-
 function autoFillArticleInfo() {
     const container = document.querySelector('.article-container');
     if (!container) return;
@@ -213,14 +236,84 @@ function loadPrismHighlighter() {
     document.body.appendChild(script);
 }
 
+/* ------------------------------------------------------------
+   6.2 代码块增强 (顶部栏 + 自动折叠)
+   ------------------------------------------------------------ */
 function enhanceCodeBlocks() {
+    // ============================================================
+    // [参数配置] 代码块折叠阈值
+    // 超过此高度 (单位: px) 时自动折叠
+    // 360px 大约相当于 15-18 行代码，可根据需要调整
+    // ============================================================
+    const CODE_MAX_HEIGHT = 360; 
+
     document.querySelectorAll('pre code').forEach(code => {
         const pre = code.parentElement;
         if (pre.parentElement.classList.contains('code-wrapper')) return;
-        const lang = (Array.from(code.classList).find(c => c.startsWith('language-')) || 'TEXT').replace('language-', '').toUpperCase();
-        const wrap = document.createElement('div'); wrap.className = 'code-wrapper';
-        wrap.innerHTML = `<div class="code-header"><span class="lang-label">${lang}</span><button class="copy-code-btn" onclick="copyCode(this.parentElement.nextElementSibling.innerText, this)"><i class="far fa-copy"></i></button></div>`;
-        pre.parentNode.insertBefore(wrap, pre); wrap.appendChild(pre);
+
+        // 1. 获取语言
+        let langName = 'TEXT';
+        const langClass = Array.from(code.classList).find(c => c.startsWith('language-'));
+        if (langClass) langName = langClass.replace('language-', '').toUpperCase();
+
+        // 2. 创建容器
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-wrapper';
+
+        // 3. 创建顶部 Header
+        const header = document.createElement('div');
+        header.className = 'code-header';
+        
+        // 组装 Header 内容 (语言标签 + 复制按钮)
+        header.innerHTML = `
+            <span class="lang-label">${langName}</span>
+            <button class="copy-code-btn" onclick="copyCode(this.parentElement.nextElementSibling.innerText, this)">
+                <i class="far fa-copy"></i>
+            </button>
+        `;
+
+        // 4. 组装 DOM 结构
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(header);
+        wrapper.appendChild(pre);
+
+        // 5. [核心升级] 自动折叠逻辑
+        // 获取实际代码高度
+        const actualHeight = pre.offsetHeight;
+        
+        if (actualHeight > CODE_MAX_HEIGHT) {
+            // 添加折叠标记类
+            wrapper.classList.add('collapsed');
+            pre.style.maxHeight = CODE_MAX_HEIGHT + 'px'; // 设置初始高度限制
+            
+            // 创建“展开/收起”按钮
+            const expandBtn = document.createElement('div');
+            expandBtn.className = 'code-expand-btn';
+            expandBtn.innerHTML = '<i class="fas fa-chevron-down"></i> 显示全部代码';
+            
+            // 点击事件
+            expandBtn.onclick = () => {
+                const isCollapsed = wrapper.classList.contains('collapsed');
+                
+                if (isCollapsed) {
+                    // 动作：展开
+                    wrapper.classList.remove('collapsed');
+                    pre.style.maxHeight = 'none'; // 移除高度限制
+                    expandBtn.innerHTML = '<i class="fas fa-chevron-up"></i> 收起代码';
+                } else {
+                    // 动作：折叠
+                    wrapper.classList.add('collapsed');
+                    pre.style.maxHeight = CODE_MAX_HEIGHT + 'px';
+                    expandBtn.innerHTML = '<i class="fas fa-chevron-down"></i> 显示全部代码';
+                    
+                    // 贴心体验：如果收起时页面位置太靠下，自动滚回代码块顶部
+                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            };
+            
+            // 将按钮添加到容器底部
+            wrapper.appendChild(expandBtn);
+        }
     });
 }
 

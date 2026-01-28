@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/01/24_21:4801
-// 文章总数: 19
+// 生成时间: 2026/01/28_17:53:00
+// 文章总数: 21
 
 window.ARTICLE_DATABASE = [
     {
@@ -88,6 +88,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/dry_lab/docking/02. AutoDock Vina 自动化/02. AutoDock Vina 自动化.html"
     },
     {
+        "title": "02. GWAS 分析基础",
+        "collection": "gwas",
+        "date": "2026-01-28",
+        "summary": "变异数据结构，分析依赖软件",
+        "path": "articles/dry_lab/gwas/02. GWAS 分析基础/02. GWAS 分析基础.html"
+    },
+    {
         "title": "02. 热图",
         "collection": "figure",
         "date": "2026-01-22",
@@ -107,6 +114,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-21",
         "summary": "AlphaFold 任务自动化",
         "path": "articles/resources/python/03. AlphaFold系列/03. AlphaFold系列.html"
+    },
+    {
+        "title": "03. SV-GWAS",
+        "collection": "gwas",
+        "date": "2026-01-28",
+        "summary": "分析结构变异对性状的影响",
+        "path": "articles/dry_lab/gwas/03. SV-GWAS/03. SV-GWAS.html"
     },
     {
         "title": "03. 火山图",

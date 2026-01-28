@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<title>02. GWAS 分析基础 - 海钊知识港</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<meta name="collection" content="gwas"> 
+		<meta name="collection-title" content="GWAS">
+		<meta name="parent-path" content="../../dry_lab_index.html">
+		<meta name="parent-title" content="干实验">
+		<meta name="date" content="2026-01-28">
+		<meta name="description" content="变异数据结构，分析依赖软件">
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+		<link rel="stylesheet" href="../../../../css/global.css">
+		
+		<script>window.footerPath = '../../../../footer.html';</script>
+		<script src="../../../../js/global.js"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+
+	<body class="article-page">
+		<nav>
+			<div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+			<div class="nav-links">
+				<a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+				<a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+				<a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+				<a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+			</div>
+		</nav>
+
+		<div class="article-container">
+			<h1>02. GWAS 分析基础</h1>
+			
+			<div class="content">
+				<h2>前言</h2>
+				<p>最基础的 GWAS 分析必须包括两个文件：表型记录文件和变异文件。</p>
+				<h2>1. 表型记录文件</h2>
+				<p>我们先用任何一个矩阵记录文件记录所有个体 ID 和对应的表型数据，表型数据我们先以非量子化的数据为例进行分析。而对于后面关联性分析时，我们需要生成新的分析标准表型文件存储格式文件。</p>
+				<pre><code class="language-tsv">
+ID  	 表型_1	 表型_2	 表型_3
+0001	    2.3	    1.2	    9.7
+0002	    3.4	    2.1	    8.5
+0003	    1.9	    3.1	    9.2
+0004	    2.7	    2.6	    7.6
+				</code></pre>
+				<h2>2. 变异记录文件</h2>
+				<p>根据生物学知识，我们一般将变异分析分为以下几种并以不同的 tag 在如<code>.vcf</code>文件中记录：</p>
+				<ol>
+					<li>插入缺失突变 (InDel)：插入或丢失一个或几个碱基。我们一般称为InDel (insert and deletion)。</li>
+					<li>染色体结构变异 (SV)：指具有大型序列结构发生变化的变异，例如片段丢失 (DEL, Deletion)，片段倒位 (INV, Inversion)，染色体内易位 (ITX, Intrachromosomal Translocation)。</li>
+					<li>单碱基突变 (SNP)：单碱基突变，造成单核苷酸多态性 (single-nucleotide polymorphism, SNP)。</li>
+				</ol>
+				<h3>2.1 SV 变异数据结构</h3>
+				<p>这是常见的<code>.vcf</code>文件结构：</p>
+				<pre><code class="language-vcf">
+#CHROM	 POS    	 ID         	 REF	 ALT  	 QUAL	 FILTER 	 INFO                                                                                                          	 FORMAT                                 	 E11
+Chr01 	  621846	 INV00000001	 A  	 <INV>	   65	 LowQual	 IMPRECISE;SVTYPE=INV;SVMETHOD=EMBL.DELLYv1.1.5;END=16354162;PE=2;MAPQ=37;CT=5to5;CIPOS=-330,330;CIEND=-330,330	 GT:GL:GQ:FT:RCL:RC:RCR:RDCN:DR:DV:RR:RV	 0/1:-2.28559,0,-67.7864:23:PASS:29061:653625:281669:4:12:2:0:0
+Chr01 	  942286	 INV00000003	 T  	 <INV>	   69	 PASS   	 IMPRECISE;SVTYPE=INV;SVMETHOD=EMBL.DELLYv1.1.5;END=21708380;PE=3;MAPQ=22;CT=5to5;CIPOS=-340,340;CIEND=-340,340	 GT:GL:GQ:FT:RCL:RC:RCR:RDCN:DR:DV:RR:RV	 0/1:-4.79279,0,-21.8997:48:PASS:43472:811636:460432:3:4:3:0:0
+Chr01 	 1249660	 INV00000004	 C  	 <INV>	   97	 LowQual	 IMPRECISE;SVTYPE=INV;SVMETHOD=EMBL.DELLYv1.1.5;END=6365311;PE=2;MAPQ=54;CT=3to3;CIPOS=-272,272;CIEND=-272,272 	 GT:GL:GQ:FT:RCL:RC:RCR:RDCN:DR:DV:RR:RV	 0/1:-7.89382,0,-22.1938:79:PASS:58078:230681:109678:3:4:2:0:0					
+				</code></pre>
+				<p>DELLY 对 SV 变异的<code>.vcf</code>数据结构记录如下：</p>
+				<table>
+					<caption>
+						<strong>表 1.</strong> Delly vcf 数据结构
+					</caption>
+					<tr>
+						<th>CHROM</th>
+						<td>基础定位与标识</td>
+						<td>变异所在的染色体名称。</td>
+					</tr>
+					<tr>
+						<th>POS</th>
+						<td>基础定位与标识</td>
+						<td>变异起始的基因组坐标。对于缺失（DEL），这是断裂点的第一个碱基位置。</td>
+					</tr>
+					<tr>
+						<th>ID</th>
+						<td>基础定位与标识</td>
+						<td>该变异的唯一编号（如 DEL00000000）。Delly 会根据变异类型（DEL, INV, DUP, BND）自动编号。具体变异类型见下表2。</td>
+					</tr>
+					<tr>
+						<th>REF</th>
+						<td>基础定位与标识</td>
+						<td>参考基因组在该位置的碱基。在 SV 分析中，这通常只是一个“占位符”碱基。</td>
+					</tr>
+					<tr>
+						<th>ALT</th>
+						<td>基础定位与标识</td>
+						<td>变异类型。Delly 使用尖括号表示，如 &lt;DEL&gt; (缺失)、&lt;INV&gt; (倒位)、&lt;DUP&gt; (重复)。如果是易位，会看到复杂的断点描述符如 [Chr01:17165443[A。</td>
+					</tr>
+					<tr>
+						<th>QUAL</th>
+						<td>质量统计</td>
+						<td>变异的质量分数。数值越高，说明 Delly 越有把握这个变异是真的。</td>
+					</tr>
+					<tr>
+						<th>FILTER</th>
+						<td>质量统计</td>
+						<td>过滤状态：PASS: 所有的质控指标都达标；LowQual: 质量较低，可能由于支持变异的测序 Read 数量太少。</td>
+					</tr>
+					<tr>
+						<th>INFO</th>
+						<td>变异描述栏</td>
+						<td>这一栏包含了描述这个 SV 特征的“键值对”。Delly 常用的标签如下表3。</td>
+					</tr>
+					<tr>
+						<th>FORMAT</th>
+						<td>变异描述栏</td>
+						<td>和 E11 要放在一起看,FORMAT 定义了数据的“字典”，而 E11 则是具体的“数值”。具体键值对看下表4。</td>
+					</tr>
+					<tr>
+						<th>E11</th>
+						<td>变异描述栏</td>
+						<td>和 FORMAT要放在一起看,FORMAT 定义了数据的“字典”，而 E11 则是具体的“数值”。具体键值对看下表4。</td>
+					</tr>
+				</table>
+				<p>在这里我们对由 DELLY 软件分析的 SV 变异类型进行总结：</p>
+				<table>
+					<caption>
+						<strong>表 2.</strong> Delly 结构变异分类表
+					</caption>
+					<thead>
+						<tr>
+							<th>简写 (ID/ALT)</th>
+							<th>全称</th>
+							<th>变异描述</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>DEL</td>
+							<td>Deletion (缺失)</td>
+							<td>基因组丢掉了一段序列。</td>
+						</tr>
+						<tr>
+							<td>INV</td>
+							<td>Inversion (倒位)</td>
+							<td>基因组的一段序列原地掉了个头。</td>
+						</tr>
+						<tr>
+							<td>DUP</td>
+							<td>Duplication (重复)</td>
+							<td>基因组的一段序列多出了一份（通常是串联重复）。</td>
+						</tr>
+						<tr>
+							<td>INS</td>
+							<td>Insertion (插入)</td>
+							<td>在某个位置新插入了一段序列（Delly 识别较难，通常是短序列）。</td>
+						</tr>
+						<tr>
+							<td>BND</td>
+							<td>Breakend (易位/断点)</td>
+							<td>两段不相邻的序列连在了一起，常代表跨染色体易位。</td>
+						</tr>
+					</tbody>
+				</table>
+				<p>对变异描述栏 INFO SV 特征的常见键值对进行总结：</p>
+				<table>
+					<caption>
+						<strong>表 3.</strong> 变异描述栏 (INFO)
+					</caption>
+					<thead>
+						<tr>
+							<th>标签 (Tag)</th>
+							<th>含义说明</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>SVTYPE/SVMETHOD</td>
+							<td>变异类型（如 DEL 表示缺失）。</td>
+						</tr>
+						<tr>
+							<td>END</td>
+							<td>变异的终止位置。可以通过 $END - POS$ 计算变异的跨度。</td>
+						</tr>
+						<tr>
+							<td>PRECISE</td>
+							<td>精确断点。如果出现这个词，说明 Delly 通过 Split-reads 找到了准确的碱基断裂位置。</td>
+						</tr>
+						<tr>
+							<td>IMPRECISE</td>
+							<td>模糊断点。说明仅通过成对序列（Paired-end）推测，断点是一个范围。</td>
+						</tr>
+						<tr>
+							<td>PE / SR</td>
+							<td>分别代表支持该变异的 Paired-end (成对序列) 和 Split-read (劈裂序列) 的数量。</td>
+						</tr>
+						<tr>
+							<td>CT</td>
+							<td>连接方向（Connection Type），如 3to5，用于描述染色体片段是如何重新连接的。</td>
+						</tr>
+					</tbody>
+				</table>
+				<p>对常见样本基因型栏 (FORMAT & E11) 键值对进行总结：</p>
+				<table>
+						<caption>
+							<strong>表 4.</strong> 样本基因型栏 (FORMAT & E11)
+						</caption>
+					<thead>
+						<tr>
+							<th>键</th>
+							<th>键意义</th>
+							<th>值及值意义</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>GT</td>
+							<td>基因型 (Genotype)</td>
+							<td>0/0、0/1、1/1分别表示此变异二倍体中与参考基因组一致、杂合变异（一条染色体正常，一条有变异）、纯合变异（两条染色体都有变异）。</td>
+						</tr>
+						<tr>
+							<td>GQ</td>
+							<td>基因型判定的质量 (Genotype Quality)</td>
+							<td>基因型判定的质量，反映了样本在该位点判定的准确性。</td>
+						</tr>
+						<tr>
+							<td>DR</td>
+							<td>(Reference)</td>
+							<td>支持参考基因组的 Read 数量。</td>
+						</tr>
+						<tr>
+							<td>DV</td>
+							<td>(Variant)</td>
+							<td>支持变异的 Read 数量。如果 $DV \gg DR$，说明这个变异在该样本中很真实。</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>2.2 InDel 变异数据结构</h3>
+				还没做过，先放着。
+				<h3>2.3 SNP 变异数据结构</h3>
+				同上。
+				<h2>3. 依赖软件</h2>
+				<p>首先别忘记设置镜像源，不然下载慢到你怀疑人生：</p>
+				<pre><code class="language-bash">
+# 添加清华镜像源的各个通道
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/
+
+# 设置安装时显示通道地址（方便确认是否从镜像站下载）
+conda config --set show_channel_urls yes
+				</code></pre>
+				<p>本次分析共用到以下软件，请先确定是否以及安装：</p>
+				<pre><code class="language-bash">
+which bcftools
+which plink
+which gemma
+which tassel
+				</code></pre>
+				<p>以下是各个软件作用总结，注意时效性：</p>
+				<table>
+					<caption>
+						<strong>表 ?.</strong> 软件及功能总结
+					</caption>
+					<thead>
+						<tr>
+							<th>软件</th>
+							<th>作用</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>bcftools</td>
+							<td>基础处理工具，合并 大量样本的 VCF 文件。</td>
+						</tr>
+						<tr>
+							<td>plink</td>
+							<td>遗传学质控工具，用于剔除低质量位点和 PCA 分析。</td>
+						</tr>
+						<tr>
+							<td>gemma</td>
+							<td>高效混合线性模型 (LMM)。当追求计算速度和准确性时，GEMMA 是比 TASSEL 更专业的命令行工具，非常适合处理大规模数据。</td>
+						</tr>
+						<tr>
+							<td>tassel</td>
+							<td>关联分析 (MLM/FarmCPU)。水稻研究中最常用的 GWAS 软件，界面友好且支持多种线性模型。它既有图形界面，也可以在命令行运行。</td>
+						</tr>
+					</tbody>
+				</table>
+				<p>记着使用 conda 进行下载：</p>
+				<pre><code class="language-bash">
+conda install bcftools -y
+conda install plink -y
+conda install gemma -y
+conda install tassel -y
+				</code></pre>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+			</div>
+		</div>
+
+		<div id="footer-placeholder"></div>
+	</body>
+</html>

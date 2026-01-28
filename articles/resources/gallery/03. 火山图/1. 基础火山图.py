@@ -159,7 +159,7 @@ def create_volcano_plot(deseq_df, padj_threshold=0.05, log2fc_threshold=1,
     
     # 在图上添加统计信息
     stats_text = f'Up-regulated: {up_regulated}\nDown-regulated: {down_regulated}\nFDR only: {fdr_only}\nFC only: {fc_only}'
-    ax.text(0.02, 0.98, stats_text, transform=ax.transAxes, 
+    ax.text(0.02, 0.98, stats_text, tranEorm=ax.transAxes, 
             verticalalignment='top', fontsize=10,
             bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
     
