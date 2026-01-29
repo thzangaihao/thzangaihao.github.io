@@ -290,9 +290,29 @@ conda install plink -y
 conda install gemma -y
 conda install tassel -y
 				</code></pre>
-				<p></p>
-				<p></p>
-				<p></p>
+				<h2>4. 合并矩阵原理</h2>
+				<p>VCF 文件为了节省空间，默认只记录有变异的位点。合并的过程就是把所有样本的位点进行并集处理，并把缺失的信息补全。</p>
+				<p>例如我们对这两个原始<code>.vcf</code>矩阵进行合并：</p>
+				<pre><code class="language-vcf">
+# 样本1 (E1)
+染色体	 位置 (POS)	 类型 (ALT)	 基因型 (GT)
+Chr01 	 1000		 DEL       	 1/1
+Chr01 	 2000		 INV       	 0/1
+				</code></pre>
+				<pre><code class="language-vcf">
+# 样本2 (E2)
+染色体	 位置 (POS)	 类型 (ALT)	 基因型 (GT)
+Chr01 	 1000		 DEL       	 1/1
+Chr01 	 3000		 DUP       	 1/1
+				</code></pre>
+				<p>合并后：</p>
+				<pre><code class="language-vcf">
+# 合并
+染色体	 位置 (POS)	 类型 (ALT)	 E1 	 E2
+Chr01 	    1000	 DEL       	 1/1	 1/1
+Chr01 	    2000	 INV       	 0/1	 0/0
+Chr01 	    3000	 DUP       	 0/0	 1/1
+				</code></pre>
 				<p></p>
 				<p></p>
 				<p></p>

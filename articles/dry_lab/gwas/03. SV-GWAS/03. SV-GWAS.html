@@ -114,6 +114,7 @@ THREADS = 16
 # BCFtools 可执行命令 (如果需要指定路径请修改这里)
 BCFTOOLS_EXEC = "bcftools"
 				</code></pre>
+				<blockquote>如果在后续合并时没有加 -0 参数，软件可能会把补齐的地方填成 $./.$。这代表“不确定这里有没有变异”。但在 SV 分析中，我们通常假设“没检测到就是没有”，所以强制补成 $0/0$。</blockquote>
 				<pre><code class="language-bash">
 (gwas_fix) [thz@localhost SV_GWAS]$ python 02_vcf合并.py
 === VCF.GZ 批量合并工具 (优化版) ===
@@ -139,8 +140,22 @@ BCFTOOLS_EXEC = "bcftools"
 结果文件: /home/thz/SV_GWAS/02_Merged_Results/Merged_Population.vcf.gz
 正在为结果文件建立索引...
 				</code></pre>
+				<p>合并后可以使用命令查看表头及数据前几行：</p>
+				<pre><code class="language-bash">
+# 查看表头前 50 行
+bcftools view -h Merged_Population.vcf.gz | head -n 50
+
+# 只查看变异位点（不含表头）前 10 行
+bcftools view -H Merged_Population.vcf.gz | head -n 10
+				</code></pre>
+				<blockquote>打印变异位点后，你会发现大部分变异位点只在一个或者几个样本中出现，我们称为低频率变异，在后续我们会通过质控对这种变异位点进行剔除。</blockquote>
 				<h2>3. 位点质控与过滤</h2>
 				<p>剔除低频率变异 (默认阈值$MAF < 0.05$)，这些变异不具有普遍性，即使对性状有直接关系得出来的的结论也无法有信服力。我们的核心目的是：找到具有普遍存在的变异类型，并计算这个变异与表型的关联性/独立性。</p>
+				<ol>
+					我们默认过滤条件如下：
+					<li>剔除标记为 LowQual 的低质量变异。</li>
+					<li>剔除频率小于 0.05 低频率变异的</li>
+				</ol>
 				<p>使用交互式脚本进行作业：</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -162,9 +177,9 @@ BCFTOOLS_EXEC = "bcftools"
 OUTPUT_DIR_NAME = "03_QC_Filtered"
 
 # 过滤条件 (使用 bcftools 表达式)
-# 示例: 'MAF > 0.05' (保留次等位基因频率大于 5% 的位点)
-# 如果需要多重条件，可用 && 连接，如 'MAF > 0.05 && F_MISSING < 0.1'
-FILTER_EXPRESSION = 'MAF > 0.05'
+# 修改点: 增加了 FILTER="PASS" 条件
+# 含义: 保留 (FILTER列为PASS) 并且 (次等位基因频率 > 0.05) 的位点
+FILTER_EXPRESSION = 'FILTER="PASS" && MAF > 0.05'
 
 # 线程数
 THREADS = 16
@@ -202,6 +217,15 @@ BCFTOOLS_EXEC = "bcftools"
 [成功] 输出至: /home/thz/SV_GWAS/03_QC_Filtered/Merged_Population_filtered.vcf.gz
 正在建立索引...
 				</code></pre>
+				<p>现在可以使用命令检查表头及数据前几行：</p>
+				<pre><code class="language-bash">
+# 查看表头前 50 行
+bcftools view -h Merged_Population_filtered.vcf.gz | head -n 50
+
+# 只查看变异位点（不含表头）前 10 行
+bcftools view -H Merged_Population_filtered.vcf.gz | head -n 10
+				</code></pre>
+				<blockquote>质控后你会发现记录的变异位点会在大部分（取决于你设定的阈值）样品中出现。</blockquote>
 				<h2>4. PLINK 格式转换</h2>
 				<p>大多数 GWAS 软件（包括 GEMMA 和 TASSEL）在处理大规模矩阵时，更喜欢二进制的 PLINK 格式（<code>.bed</code>, <code>.bim</code>, <code>.fam</code>）。</p>
 				<p>使用交互式脚本进行作业：</p>
@@ -342,6 +366,18 @@ E17	 27.35	  9.8 	  2.7
 
 [成功] 文件已保存至: /home/thz/SV_GWAS/性状数据表_cleaned.tsv
 				</code></pre>
+				<blockquote>如果发生大量样本丢失，请运行检测脚本诊断表型数据和基因型数据的 ID 对应：</blockquote>
+				<div class="download-card">
+					<div class="download-info">
+						<i class="fas fa-file-code"></i> <div class="file-details">
+							<h5>05_1_测试</h5>
+							<span>文件格式：.py | 大小：8.7 KB</span>
+						</div>
+					</div>
+					<a href="./05_1_测试.py" download class="download-btn">
+						<i class="fas fa-cloud-download-alt"></i>
+					</a>
+				</div>
 				<h2>6. 标准表型数据表自动化生成</h2>
 				<p>将TSV拆分成多个符合GEMMA 输入的性状数据表文件，以列头性状作为文件命名。</p>
 				<p>对脚本相关参数进行调节并执行：</p>

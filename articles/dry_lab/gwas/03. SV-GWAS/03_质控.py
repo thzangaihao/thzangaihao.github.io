@@ -14,8 +14,8 @@ import shutil
 OUTPUT_DIR_NAME = "03_QC_Filtered"
 
 # 过滤条件 (使用 bcftools 表达式)
-# 示例: 'MAF > 0.05' (保留次等位基因频率大于 5% 的位点)
-# 如果需要多重条件，可用 && 连接，如 'MAF > 0.05 && F_MISSING < 0.1'
+# 保留 (FILTER列为PASS) 并且 (次等位基因频率 > 0.05) 的位点
+# FILTER_EXPRESSION = 'FILTER="PASS" && MAF > 0.05'
 FILTER_EXPRESSION = 'MAF > 0.05'
 
 # 线程数
@@ -148,14 +148,14 @@ def run_filtering(file_list):
 # ==============================================================================
 def main():
     print("==============================================")
-    print("   Step 3: VCF/BCF 质控与过滤工具")
+    print("   Step 3: VCF/BCF 质控与过滤工具 ")
     print("==============================================")
     
     # 1. 查找
     files = find_files(['vcf.gz', 'bcf'])
     
     # 2. 选择
-    selected = choose_file(files, "待过滤文件 (VCF/BCF)")
+    selected = choose_file(files, "待过滤文件 (建议选择 02 文件夹中的合并结果)")
     if not selected: return
 
     # 3. 确认与执行
