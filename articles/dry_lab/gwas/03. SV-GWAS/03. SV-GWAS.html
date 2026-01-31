@@ -563,11 +563,70 @@ Reading Files ...
 所有结果文件已存放于: /home/thz/SV_GWAS/07_GWAS_Results
 ==================================================
 				</code></pre>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
+				<h2>8. 阈值位点筛选</h2>
+				<p>通过脚本根据阈值筛选出具有显著性的位点，获得位点具体信息。</p>
+				<div class="download-card">
+					<div class="download-info">
+						<i class="fas fa-file-code"></i> <div class="file-details">
+							<h5>08_结果筛选</h5>
+							<span>文件格式：.py | 大小：7.5 KB</span>
+						</div>
+					</div>
+					<a href="./08_结果筛选.py" download class="download-btn">
+						<i class="fas fa-cloud-download-alt"></i>
+					</a>
+				</div>
+				<h2>9. 结果可视化</h2>
+				<p>使用脚本自动绘制曼哈顿图和 QQ 图。</p>
+				<div class="download-card">
+					<div class="download-info">
+						<i class="fas fa-file-code"></i> <div class="file-details">
+							<h5>09_曼哈顿图</h5>
+							<span>文件格式：.py | 大小：9.0 KB</span>
+						</div>
+					</div>
+					<a href="./09_曼哈顿图.py" download class="download-btn">
+						<i class="fas fa-cloud-download-alt"></i>
+					</a>
+				</div>
+				<h2>10. Kinship 矩阵构建</h2>
+				<p>如果群体有较大的亲缘关系，导致普通的 LM 分析出现曼哈顿图“爆炸”（某条染色体大量超阈值），QQ 图起飞（膨胀），则应该升级统计模型从 LM 到 LMM 模型。我们先利用基因型文件构建 Kinship 矩阵来量化各样本间亲缘关系。</p>
+				<div class="download-card">
+					<div class="download-info">
+						<i class="fas fa-file-code"></i> <div class="file-details">
+							<h5>10_Kinship 矩阵计算</h5>
+							<span>文件格式：.py | 大小：6.8 KB</span>
+						</div>
+					</div>
+					<a href="./10_Kinship 矩阵计算.py" download class="download-btn">
+						<i class="fas fa-cloud-download-alt"></i>
+					</a>
+				</div>
+				<h2>11. LMM 混合线性模型</h2>
+				<div class="download-card">
+					<div class="download-info">
+						<i class="fas fa-file-code"></i> <div class="file-details">
+							<h5>11_LMM 混合线性模型</h5>
+							<span>文件格式：.py | 大小：7.2 KB</span>
+						</div>
+					</div>
+					<a href="./11_LMM 混合线性模型.py" download class="download-btn">
+						<i class="fas fa-cloud-download-alt"></i>
+					</a>
+				</div>
+				<h2>12. Kinship 可视化</h2>
+				<p>如果某些样本聚集在一起形成一个明显的深色方阵，说明它们是一个亚群。如果背景中有很多零散的深色点，说明样本之间存在普遍的近亲关系或者复杂的杂交历史。</p>				
+				<div class="download-card">
+					<div class="download-info">
+						<i class="fas fa-file-code"></i> <div class="file-details">
+							<h5>12_Kinship 可视化</h5>
+							<span>文件格式：.py | 大小：6.1 KB</span>
+						</div>
+					</div>
+					<a href="./12_Kinship 可视化.py" download class="download-btn">
+						<i class="fas fa-cloud-download-alt"></i>
+					</a>
+				</div>
 				<p></p>
 				<p></p>
 				<p></p>
