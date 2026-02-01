@@ -603,6 +603,7 @@ Reading Files ...
 					</a>
 				</div>
 				<h2>11. LMM 混合线性模型</h2>
+				<p>进行混合线性模型进行计算。</p>
 				<div class="download-card">
 					<div class="download-info">
 						<i class="fas fa-file-code"></i> <div class="file-details">
@@ -614,8 +615,9 @@ Reading Files ...
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
+				<blockquote>后续对输出的<code>.assoc.txt</code>再进行第 8 步和第 9 步。绘制 QQ 图和曼哈顿图，筛选阈值点。</blockquote>
 				<h2>12. Kinship 可视化</h2>
-				<p>如果某些样本聚集在一起形成一个明显的深色方阵，说明它们是一个亚群。如果背景中有很多零散的深色点，说明样本之间存在普遍的近亲关系或者复杂的杂交历史。</p>				
+				<p>亲缘关系矩阵可视化，如果某些样本聚集在一起形成一个明显的深色方阵，说明它们是一个亚群。如果背景中有很多零散的深色点，说明样本之间存在普遍的近亲关系或者复杂的杂交历史。</p>				
 				<div class="download-card">
 					<div class="download-info">
 						<i class="fas fa-file-code"></i> <div class="file-details">
@@ -627,7 +629,32 @@ Reading Files ...
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<p></p>
+				<h2>13. 位点溯源</h2>
+				<p>对第 8 步筛选出来的位点在合并的 <code>vcf</code> 里面查找，给出变异具体信息。</p>
+				<div class="download-card">
+					<div class="download-info">
+						<i class="fas fa-file-code"></i> <div class="file-details">
+							<h5>13_位点溯源</h5>
+							<span>文件格式：.py | 大小：9.0 KB</span>
+						</div>
+					</div>
+					<a href="./13_位点溯源.py" download class="download-btn">
+						<i class="fas fa-cloud-download-alt"></i>
+					</a>
+				</div> 
+				<h2>14. IGV 可视化</h2>
+				<p>将第 13 步的详细文件转换为可以供 IGV 可视化的 <code>.gff3</code>文件。</p>
+				<div class="download-card">
+					<div class="download-info">
+						<i class="fas fa-file-code"></i> <div class="file-details">
+							<h5>14_IGV 可视化</h5>
+							<span>文件格式：.py | 大小：6.0 KB</span>
+						</div>
+					</div>
+					<a href="./14_IGV 可视化.py" download class="download-btn">
+						<i class="fas fa-cloud-download-alt"></i>
+					</a>
+				</div> 
 				<p></p>
 				<p></p>
 				<p></p>

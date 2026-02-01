@@ -677,7 +677,10 @@ a[onclick*="copyToClipboard"] { cursor: copy !important; position: relative; }
 /* 2. 代码区域 (pre) 的过渡效果 */
 .code-wrapper pre {
     transition: max-height 0.4s ease-in-out; /* 丝滑的展开/收起动画 */
-    overflow: hidden; /* 折叠时隐藏溢出内容 */
+    
+    /* [核心修复] 分离 X 轴和 Y 轴的溢出控制 */
+    overflow-y: hidden; /* 垂直方向：隐藏溢出 (实现折叠效果) */
+    overflow-x: auto;   /* 水平方向：自动 (保留左右滚动条) */
 }
 
 /* 3. 折叠状态下的渐变遮罩 (Shadow Mask) */

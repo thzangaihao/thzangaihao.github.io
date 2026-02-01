@@ -13,7 +13,7 @@ import pandas as pd
 # 常用标准:
 #   - 严谨 (Bonferroni): 0.05 / 变异总数 (例如 1e-6)
 #   - 宽松 (初筛): 1e-4 或 1e-5
-P_VALUE_THRESHOLD = 1e-6
+P_VALUE_THRESHOLD = 1e-5
 
 # 输出目录名称
 OUTPUT_DIR_NAME = "08_Significant_Results"
