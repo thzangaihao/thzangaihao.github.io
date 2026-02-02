@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/01/28_17:53:00
-// 文章总数: 21
+// 生成时间: 2026/02/02_15:07:24
+// 文章总数: 22
 
 window.ARTICLE_DATABASE = [
     {
@@ -142,6 +142,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-21",
         "summary": "Vina 刚性对接自动化",
         "path": "articles/resources/python/04. 分子对接系列/04. 分子对接系列.html"
+    },
+    {
+        "title": "04. 连续性性状关联性分析",
+        "collection": "gwas",
+        "date": "2026-02-02",
+        "summary": "连续型性状的直线回归",
+        "path": "articles/dry_lab/gwas/04. 连续性性状关联性分析/04. 连续性性状关联性分析.html"
     },
     {
         "title": "05. 生物文件处理",

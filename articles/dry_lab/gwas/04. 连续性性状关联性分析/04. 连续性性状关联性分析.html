@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<title>04. 连续性性状关联性分析 - 海钊知识港</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<meta name="collection" content="gwas"> 
+		<meta name="collection-title" content="GWAS">
+		<meta name="parent-path" content="../../dry_lab_index.html">
+		<meta name="parent-title" content="干实验">
+		<meta name="date" content="2026-02-02">
+		<meta name="description" content="连续型性状的直线回归">
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+		<link rel="stylesheet" href="../../../../css/global.css">
+		
+		<script>window.footerPath = '../../../../footer.html';</script>
+		<script src="../../../../js/global.js"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+
+	<body class="article-page">
+		<nav>
+			<div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+			<div class="nav-links">
+				<a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+				<a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+				<a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+				<a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+			</div>
+		</nav>
+
+		<div class="article-container">
+			<h1>04. 连续性性状关联性分析</h1>
+			
+			<div class="content">
+				<h2>前言</h2>
+				<p>在第一节，我们讨论了离散型性状的独立性检验和相关性分析。但是在对于非连续变量的检验中，我们需要另一套方法进行分析，针对连续型性状（如身高、体重、血压、产量等）的最基础分析模型确实就是直线回归。</p>
+				<h2>1. 数学原理</h2>
+				<p>我们来考虑一个最简单的函数 $y = f(x)$，在物理界和化学界中，只要知道一个变量的值就可以准确的计算出另外变量的值。但是这种例子在生物界中存在极少，因此我们考虑的是进行拟合，在一定程度上说明一个变量和另一个变量存在着一定关系。</p>
+				<p>在我们分析的 GWAS 中，自变量我们就分为有或没有该变异位点，对于多倍体来讲，我们记$X$为相较于参考的野生型基因组，拥有这个变异的染色体有几条。对于二倍体来讲，$X \in \{0, 1, 2\}$，而对应的连续型表型，我们记为 $Y$。</p>
+				<p>我们的核心目的是建立直线回归方程：</p>
+				<p>$$\widehat{y} = a+bx$$</p>
+				<p>先不考虑生物的这种不确定性，我们要得到拟合度最好的直线，则观测值与回归估计值的离差平方和应该最小：</p>
+				<p>$$Q =  \sum_{1}^{n} (y - \widehat{y} )^{2} = \sum_{1}^{n} (y - a -bx )^{2}$$</p>
+				<p>为了得到最小的 $Q$，我们需要找到最合适的 $a$ 和 $b$ 。根据极值原理，使 $Q$ 对 $a$ 和 $b$ 的一阶偏导数为 0 即可：</p>
+				<p>$$\frac{\partial Q}{\partial a} = -2 \sum (y-a-bx) = 0$$</p>
+				<p>$$\frac{\partial Q}{\partial b} = -2 \sum (y-a-bx) = 0$$</p>
+				<p>整理得：</p>
+				<p>$$
+					\begin{cases}
+					an + b\sum x = \sum y \\
+					a\sum x + b\sum x^{2} = \sum xy
+					\end{cases}
+					$$</p>
+				<p>解方程组，得：</p>
+				<p>$$a = \bar{y} - b\bar{x} $$</p>
+				<p>$$b = \frac{\sum xy - \frac{\sum x\sum y}{n} }{\sum x^{2} - \frac{(\sum x)^2}{n} } = \frac{\sum (x-\bar{x} )(y-\bar{y} )}{\sum (x-\bar{x} )^{2} } = \frac{SP}{SS_{x} } $$</p>
+				<blockquote>$SP = SS_{xy}$</blockquote>
+				<p>在生物学中，考虑到统计的随机误差，我们可以把观测值拆分为三部分：$y$ 的总体平均数 $\mu _{y} $，因 $x$ 引起 $y$ 的变异 $\beta (x - \mu _{x} )$ 及 $y$ 的随机误差 $\varepsilon $。因此，直线回归数学模型为：</p>
+				<p>$$y = \mu _{y} + \beta (x - \mu _{x} ) + \varepsilon $$</p>
+				<p>或写为：</p>
+				<p>$$y = \alpha  + \beta x + \varepsilon $$</p>
+				<p>如果为样本数据，则为：</p>
+				<p>$$y = \bar{y} + b(x - \bar{x} ) + e$$</p>
+				<p>或写为：</p>
+				<p>$$y = a + bx + e$$</p>
+				<p>其中，$a$、$b$、$e$ 为 $\alpha$、$\beta$、$\varepsilon$ 的估计值。</p>
+				<h2>2. 例子</h2>
+				<p>假设我们研究某个基因位点对植物高度（性状 $Y$）的影响。我们随机抽取了 5 株样本，植株为二倍体，原位点为 AA。</p>
+				<table>
+					<thead>
+						<tr>
+							<th>编号</th>
+							<th>基因型</th>
+							<th>自变量 $X$ (效应等位基因数)</th>
+							<th>性状 $Y$ (高度 cm)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>1</td>
+							<td>AA</td>
+							<td>0</td>
+							<td>10</td>
+						</tr>
+						<tr>
+							<td>2</td>
+							<td>AT</td>
+							<td>1</td>
+							<td>12</td>
+						</tr>
+						<tr>
+							<td>3</td>
+							<td>AA</td>
+							<td>0</td>
+							<td>11</td>
+						</tr>
+						<tr>
+							<td>4</td>
+							<td>TT</td>
+							<td>2</td>
+							<td>15</td>
+						</tr>
+						<tr>
+							<td>5</td>
+							<td>AT</td>
+							<td>1</td>
+							<td>12</td>
+						</tr>
+					</tbody>
+				</table>
+				<p>我们的目标是建立回归方程，和上述有记号上的区别：</p>
+				<p>$$Y = \beta_0 + \beta_1 X + \epsilon$$</p>
+				<p>其中 $\beta_1$ 就是该位点的效应值。</p>
+				<h3>2.1 线性回归</h3>
+				<h4>1. 计算均值</h4>
+				<p>$$\bar{X} = \frac{0+1+0+2+1}{5} = 0.8$$</p>
+				<p>$$\bar{Y} = \frac{10+12+11+15+12}{5} = 12.0$$</p>
+				<h4>2. 计算离均差乘积和与平方和</h4>
+				<p>我们需要这两个值来计算斜率 $\beta_1$。</p>
+				<table>
+					<thead>
+						<tr>
+							<th>$X$</th>
+							<th>$Y$</th>
+							<th>$(X-\bar{X})$</th>
+							<th>$(Y-\bar{Y})$</th>
+							<th>$(X-\bar{X})(Y-\bar{Y})$</th>
+							<th>$(X-\bar{X})^2$</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>0</td>
+							<td>10</td>
+							<td>-0.8</td>
+							<td>-2.0</td>
+							<td>1.6</td>
+							<td>0.64</td>
+						</tr>
+						<tr>
+							<td>1</td>
+							<td>12</td>
+							<td>0.2</td>
+							<td>0.0</td>
+							<td>0.0</td>
+							<td>0.04</td>
+						</tr>
+						<tr>
+							<td>0</td>
+							<td>11</td>
+							<td>-0.8</td>
+							<td>-1.0</td>
+							<td>0.8</td>
+							<td>0.64</td>
+						</tr>
+						<tr>
+							<td>2</td>
+							<td>15</td>
+							<td>1.2</td>
+							<td>3.0</td>
+							<td>3.6</td>
+							<td>1.44</td>
+						</tr>
+						<tr>
+							<td>1</td>
+							<td>12</td>
+							<td>0.2</td>
+							<td>0.0</td>
+							<td>0.0</td>
+							<td>0.04</td>
+						</tr>
+						<tr>
+							<td>总计</td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td>$SS_{xy} = 6.0$</td>
+							<td>$SS_{xx} = 2.8$</td>
+						</tr>
+					</tbody>
+				</table>
+				<h4>3. 计算回归系数</h4>
+				<p>斜率 $\beta_1$:</p>
+				<p>$$\beta_1 = \frac{SS_{xy}}{SS_{xx}} = \frac{6.0}{2.8} \approx 2.14$$</p>
+				<p>这意味着：每增加一个效应等位基因，高度平均增加 2.14 cm。</p>
+				<p>截距 $\beta_0$:</p>
+				<p>$$\beta_0 = \bar{Y} - \beta_1 \bar{X} = 12.0 - (2.14 \times 0.8) \approx 10.29$$</p>
+				<h4>4. 结论</h4>
+				<p>我们得到的回归方程是：</p>
+				<p>$$\hat{Y} = 10.29 + 2.14X$$</p>
+				<h3>2.2 假设检验</h3>
+				<p>我们可以使用 F检验 或 t检验 进行假设检验，两者检验结果完全一致，因为：</p>
+				<p>$$t^{2} = (\frac{b}{s_{b} } )^{2} = \frac{b^{2} }{\frac{s_{y/x}^{2} }{SS_{x} } } = \frac{b^{2}SS_{x}}{s_{y/x}^{2}}  = \frac{U}{\frac{Q}{n-2} }  = F$$</p>
+				<h4>1. 设定假设</h4>
+				<p>零假设 ($H_0$): $\beta_1 = 0$（该位点对性状没有影响），结果是由统计误差引起的。</p>
+				<p>备择假设 ($H_1$): $\beta_1 \neq 0$（该位点对性状有显著影响）。</p>
+				<h4>2. 计算残差平方和 ($RSS$)</h4>
+				<p>我们需要看看模型预测值 $\hat{Y}$ 与实际观测值 $Y$ 之间的差距有多大。</p>
+				<p>根据之前的方程 $\hat{Y} = 10.29 + 2.14X$：</p>
+				<p>当 $X=0$, $\hat{Y} \approx 10.29$</p>
+				<p>当 $X=1$, $\hat{Y} \approx 12.43$</p>
+				<p>当 $X=2$, $\hat{Y} \approx 14.57$</p>
+				<table>
+					<thead>
+						<tr>
+							<th>样本</th>
+							<th>实际 $Y$</th>
+							<th>预测 $\hat{Y}$</th>
+							<th>残差 $(Y - \hat{Y})$</th>
+							<th>残差平方 $(Y - \hat{Y})^2$</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>1 ($X=0$)</td>
+							<td>10</td>
+							<td>10.29</td>
+							<td>-0.29</td>
+							<td>0.084 </td>
+						</tr>
+						<tr>
+							<td>2 ($X=1$)</td>
+							<td>12</td>
+							<td>12.43</td>
+							<td>-0.43</td>
+							<td>0.185 </td>
+						</tr>
+						<tr>
+							<td>3 ($X=0$)</td>
+							<td>11</td>
+							<td>10.29</td>
+							<td>0.71</td>
+							<td>0.504 </td>
+						</tr>
+						<tr>
+							<td>4 ($X=2$)</td>
+							<td>15</td>
+							<td>14.57</td>
+							<td>0.43</td>
+							<td>0.185 </td>
+						</tr>
+						<tr>
+							<td>5 ($X=1$)</td>
+							<td>12</td>
+							<td>12.43</td>
+							<td>-0.43</td>
+							<td>0.185 </td>
+						</tr>
+						<tr>
+							<td>总和</td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td>$RSS \approx 1.143$</td>
+						</tr>
+					</tbody>
+				</table>
+				<h4>3. 计算标准误 ($SE$)</h4>
+				<p>我们要算出斜率估计值的不确定性。首先计算均方误差 ($MSE$)，自由度 $df = n - 2$（这里 $n=5$）：</p>
+				<p>$$MSE = \frac{RSS}{n-2} = \frac{1.143}{3} \approx 0.381$$</p>
+				<p>接着计算斜率 $\beta_1$ 的标准误：</p>
+				<p>$$SE(\beta_1) = \sqrt{\frac{MSE}{SS_{xx}}} = \sqrt{\frac{0.381}{2.8}} \approx \sqrt{0.136} \approx 0.369$$</p>
+				<h4>4. 计算 $t$ 统计量</h4>
+				<p>$t$ 值表示我们的效应值（2.14）是其标准误的多少倍：</p>
+				<p>$$t = \frac{\beta_1 - 0}{SE(\beta_1)} = \frac{2.14}{0.369} \approx 5.80$$</p>
+				<h4>5. 得出 P 值</h4>
+				<p>现在，我们需要在 自由度 $df=3$ 的 $t$ 分布表中查找 $t = 5.80$ 对应的概率。</p>
+				<p>查表发现，对于 $df=3$，当 $t=5.84$ 时，双侧检验的 $P$ 值为 0.01。</p>
+				<p>$5.80 < 5.84$，在 0.01 的置信水平上不认为显著，接受 $H_0$，该位点对性状没有影响。</p>
+				<p>但是实际上，我们会精确的算出每一个 $P$ 值，制作为散点图，即曼哈顿图。</p>
+				<p> $t$ 分布的概率密度函数公式：</p>
+				<p>$$f(t, \nu) = \frac{\Gamma(\frac{\nu+1}{2})}{\sqrt{\nu\pi}\Gamma(\frac{\nu}{2})} \left(1 + \frac{t^2}{\nu}\right)^{-\frac{\nu+1}{2}}$$</p>
+				<blockquote>$t$ 分布的函数形式比较复杂，它由威廉·戈塞（笔名 Student）提出</blockquote>
+				<p>对其积分即可：</p>
+				<p>$$P_{single} = \int_{5.80}^{+\infty} \frac{\Gamma(2)}{\sqrt{3\pi}\Gamma(1.5)} \left(1 + \frac{t^2}{3}\right)^{-2} \, dt$$</p>
+				<blockquote>这个积分很难通过初等函数直接得出精确解，通常采用数值积分辛普森法则或高斯求积法进行无限逼近。</blockquote>
+				<p>在实际的 GWAS 中，计算机会对基因组上的数百万个 SNP 重复上述过程。</p>
+				<blockquote>注意： 在真实科研中，我们还要加入“协变量”（如主成分 PC、年龄、性别等）来排除干扰，那时模型就变成了多元线性回归，公式会复杂一些，但原理是一致的。</blockquote>
+				<h2>3. LM 和 LMM</h2>
+				<p>我们之前所做的一切都是普通线性模型 (General linear model, LM)。但是 LM 有一个致命的假设：样本之间是独立同分布的。但在真实的生物群体中，个体之间往往存在亲缘关系（比如兄弟姐妹、同族群个体），这种关系会导致性状的相似，如果你把这部分相似性全部归功于某个变异位点，就会产生大量的假阳性。</p>
+				<p>因此我们会对考虑引入参数来修订这种亲缘关系或者其它的变化：</p>
+				<p>$$Y = X\beta + Zg + \epsilon$$</p>
+				<p>$X\beta$ (固定效应): 包括我们要检测的变异带来的效应，以及性别、年龄等。</p>
+				<p>$Zg$ (随机效应): 这里的 $g$ 代表个体的加性遗传效应。它假设除了我们正在测的那个变异位点效应之外，全基因组的其他成千上万个位点也在微弱地影响性状。</p>
+				<p>$Z$: 是一个关系矩阵（通常是单位矩阵），将随机效应与个体对应起来。</p>
+				<h3>3.1 Kinship 矩阵</h3>
+				<p>Kinship 矩阵（通常记作 $K$）描述了样本两两之间的遗传相似度。</p>
+				<p>它是怎么算出来的？</p>
+				<p>假设有 $n$ 个样本，$m$ 个变异位点。那么可以建立一个巨大的矩阵 $M$（$n \times m$），里面的数值是 $\{0, 1, 2\}$。
+					计算 Kinship 的最基本思想是计算样本间的协方差。一个简化版的计算公式（VanRaden 方法）如下：</p>
+				<p>$$K = \frac{ZZ^T}{2\sum p_i(1-p_i)}$$</p>
+				<p>其中 $Z$ 是经过频率矫正后的基因型矩阵。</p>
+				<p>直观理解：</p>
+				<p>如果样本 A 和样本 B 在几乎所有位点上的基因型都一样，那么 $K_{AB}$ 的值就很高（接近 1，像同卵双胞胎）。</p>
+				<p>如果样本 A 和样本 B 完全没亲戚关系，那么 $K_{AB}$ 接近 0。</p>
+				<h3>3.2 Kinship 与 LMM</h3>
+				<p>在 LMM 的 GWAS 流程中，计算分为两个部分：</p>
+				<h4>1. 方差分量估计</h4>
+				<h4>2. 模型变换与检验</h4>
+				<p>具体流程过于复杂，在此省略。</p>
+				<h3>3.3 LM 与 LMM 比较</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>特性</th>
+							<th>普通线性模型 (LM)</th>
+							<th>混合线性模型 (LMM)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>样本假设</td>
+							<td>必须互相独立</td>
+							<td>允许有亲缘关系、家族结构</td>
+						</tr>
+						<tr>
+							<td>结果准确性</td>
+							<td>容易受到群体结构干扰，假阳性多</td>
+							<td>有效矫正群体结构，结果更可靠</td>
+						</tr>
+					</tbody>
+				</table>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+				<p></p>
+			</div>
+		</div>
+
+		<div id="footer-placeholder"></div>
+	</body>
+</html>

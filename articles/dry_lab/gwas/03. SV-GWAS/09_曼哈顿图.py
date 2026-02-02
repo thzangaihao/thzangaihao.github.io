@@ -15,7 +15,7 @@ OUTPUT_DIR_NAME = "09_Manhattan_Plots"
 FIG_DPI = 300
 
 # ==============================================================================
-# 1. Cite2 交互逻辑 (升级为多选版)
+# 1. 辅助与交互逻辑
 # ==============================================================================
 def get_base_dir():
     return os.path.dirname(os.path.abspath(__file__))
@@ -27,7 +27,6 @@ def find_files(exts, path=None):
         if not ext.startswith('.'): ext = '.' + ext
         search_pattern = os.path.join(path, '**', f'*{ext}')
         files = glob.glob(search_pattern, recursive=True)
-        # 排除之前的输出目录，防止重复
         files = [f for f in files if OUTPUT_DIR_NAME not in f and "png" not in f]
         all_found.extend(files)
     return sorted(list(set(all_found)))
@@ -79,8 +78,35 @@ def choose_files(files, desc="文件"):
         except ValueError:
             print("输入错误。")
 
+def get_threshold_config():
+    """
+    交互式获取阈值配置
+    """
+    print("\n>>> 设置阈值线 (Threshold Line)")
+    print(" 1. 自动 Bonferroni 矫正 (0.05 / SNP数量) [默认]")
+    print(" 2. 自定义 P-value (例如 1e-5)")
+    print(" 3. 不显示阈值线")
+    
+    choice = input(" 请输入选项 (1/2/3): ").strip()
+    
+    if choice == '2':
+        while True:
+            try:
+                val_str = input(" 请输入 P-value (如 1e-5): ").strip()
+                val = float(val_str)
+                if 0 < val < 1:
+                    return {'type': 'fixed', 'val': val}
+                print(" 数值必须在 0 到 1 之间。")
+            except ValueError:
+                print(" 输入格式错误，请输入浮点数。")
+    elif choice == '3':
+        return {'type': 'none'}
+    else:
+        # 默认为 Bonferroni
+        return {'type': 'bonferroni', 'val': 0.05}
+
 def make_sure(action_name="执行操作"):
-    response = input(f"\n5. 确认{action_name}? (y/n): ").strip().lower()
+    response = input(f"\n6. 确认{action_name}? (y/n): ").strip().lower()
     return response in ['y', 'yes']
 
 # ==============================================================================
@@ -90,6 +116,10 @@ def make_sure(action_name="执行操作"):
 def draw_qq(p_values, base_name, output_dir):
     """绘制 QQ 图"""
     print("   -> 正在绘制 QQ 图...")
+    # 移除无效值
+    p_values = p_values.dropna()
+    p_values = p_values[p_values > 0]
+    
     p_observed = -np.log10(np.sort(p_values))
     n = len(p_values)
     p_expected = -np.log10(np.arange(1, n + 1) / (n + 1))
@@ -97,10 +127,12 @@ def draw_qq(p_values, base_name, output_dir):
     fig, ax = plt.subplots(figsize=(6, 6))
     ax.scatter(p_expected, p_observed, s=10, color='blue', alpha=0.5)
     
+    # 动态调整坐标轴范围
     max_val = max(np.max(p_expected), np.max(p_observed))
     if pd.isna(max_val) or np.isinf(max_val): max_val = 10
+    limit = max_val * 1.05
         
-    ax.plot([0, max_val], [0, max_val], color='red', linestyle='--')
+    ax.plot([0, limit], [0, limit], color='red', linestyle='--')
     
     ax.set_xlabel('Expected $-log_{10}(P)$')
     ax.set_ylabel('Observed $-log_{10}(P)$')
@@ -109,12 +141,11 @@ def draw_qq(p_values, base_name, output_dir):
     output_path = os.path.join(output_dir, f"{base_name}.qq.png")
     plt.tight_layout()
     plt.savefig(output_path, dpi=FIG_DPI)
-    plt.close(fig) # 关闭画布释放内存
+    plt.close(fig)
     print(f"      已保存: {os.path.basename(output_path)}")
 
-def draw_manhattan(file_path, output_dir):
+def draw_manhattan(file_path, output_dir, threshold_config):
     base_name = os.path.splitext(os.path.basename(file_path))[0]
-    # 如果文件名是 .assoc.txt，去掉双重后缀
     if base_name.endswith('.assoc'): base_name = base_name[:-6]
     
     print(f"\n--- 正在处理: {base_name} ---")
@@ -128,34 +159,28 @@ def draw_manhattan(file_path, output_dir):
         print(f"   [错误] 读取失败: {e}")
         return
 
-    # 数据预处理 (防报错)
     df = df.loc[:, ~df.columns.duplicated()]
-    
     required_cols = ['chr', 'ps', 'p_wald']
     for col in required_cols:
         if col not in df.columns:
             print(f"   [跳过] 文件缺少列 {col}，可能不是结果文件。")
             return
 
-    # 清洗 P 值
     df = df.dropna(subset=['p_wald'])
-    df = df[df['p_wald'] > 0] # 避免 log(0)
+    df = df[df['p_wald'] > 0]
     df['minuslog10p'] = -np.log10(df['p_wald'])
 
     if df.empty:
         print("   [错误] 有效数据为空。")
         return
 
-    # 清洗染色体 (兼容 Chr1 和 1)
     df['chr_raw'] = df['chr'].astype(str).str.extract(r'(\d+)')
     df['chr_no'] = pd.to_numeric(df['chr_raw'], errors='coerce')
     df = df.dropna(subset=['chr_no', 'ps'])
     df['chr_no'] = df['chr_no'].astype(int)
     
-    # 排序
     df = df.sort_values(['chr_no', 'ps'])
     
-    # 计算坐标
     print("   [2/3] 计算曼哈顿坐标...")
     chr_len = df.groupby('chr_no')['ps'].max()
     chr_offset = chr_len.cumsum().shift(1).fillna(0)
@@ -167,7 +192,6 @@ def draw_manhattan(file_path, output_dir):
         print("   [错误] 坐标计算异常。")
         return
 
-    # 绘图
     print("   [3/3] 绘制曼哈顿图...")
     fig, ax = plt.subplots(figsize=(14, 6))
     
@@ -189,14 +213,37 @@ def draw_manhattan(file_path, output_dir):
     ax.set_xlabel('Chromosome')
     ax.set_ylabel(r'$-log_{10}(P)$')
     
-    # 阈值线 (Bonferroni)
-    threshold = -np.log10(0.05 / len(df))
-    ax.axhline(threshold, color='red', linestyle='--', linewidth=1)
-    ax.text(0, threshold + 0.2, f'Threshold', color='red', fontsize=8)
-    
-    ax.set_title(f'Manhattan Plot: {base_name}', fontsize=14)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
+    ax.set_title(f'Manhattan Plot: {base_name}', fontsize=14)
+
+    # =======================================================
+    # 新增逻辑：根据配置和实际数据决定是否画线
+    # =======================================================
+    threshold_val = None
+    threshold_label = ""
+    
+    if threshold_config['type'] == 'bonferroni':
+        # 计算动态 Bonferroni
+        threshold_val = -np.log10(threshold_config['val'] / len(df))
+        threshold_label = 'Bonferroni'
+    elif threshold_config['type'] == 'fixed':
+        # 固定值
+        threshold_val = -np.log10(threshold_config['val'])
+        threshold_label = f'P={threshold_config["val"]}'
+        
+    if threshold_val is not None:
+        max_log_p = df['minuslog10p'].max()
+        # 只有当最大值超过阈值时才画线
+        if max_log_p >= threshold_val:
+            ax.axhline(threshold_val, color='red', linestyle='--', linewidth=1)
+            # 标签位置微调
+            ax.text(0, threshold_val, f' {threshold_label}', 
+                    color='red', fontsize=8, va='bottom', ha='left')
+            print(f"      [阈值] 绘制线条于 -log10(p) = {threshold_val:.2f}")
+        else:
+            print(f"      [阈值] 数据最大值 ({max_log_p:.2f}) 未超过阈值 ({threshold_val:.2f})，隐藏线条。")
+    # =======================================================
     
     output_png = os.path.join(output_dir, f"{base_name}.manhattan.png")
     plt.tight_layout()
@@ -204,7 +251,6 @@ def draw_manhattan(file_path, output_dir):
     plt.close(fig)
     print(f"      已保存: {os.path.basename(output_png)}")
     
-    # 顺便画 QQ 图
     draw_qq(df['p_wald'], base_name, output_dir)
 
 # ==============================================================================
@@ -212,7 +258,7 @@ def draw_manhattan(file_path, output_dir):
 # ==============================================================================
 def main():
     print("==============================================")
-    print("   Step 9: 批量曼哈顿图绘制工具")
+    print("   Step 9: 批量曼哈顿图绘制工具 (升级版)")
     print("==============================================")
     
     # 1. 查找结果文件
@@ -230,12 +276,16 @@ def main():
         os.makedirs(output_dir)
         print(f"\n[系统] 创建图片保存目录: {output_dir}")
 
-    # 4. 执行绘图
+    # 4. 获取阈值设置 (新增步骤)
+    threshold_config = get_threshold_config()
+
+    # 5. 执行绘图
     if make_sure("开始批量绘图"):
         print(f"\n--- 开始处理 {len(selected_files)} 个文件 ---")
         for i, f in enumerate(selected_files, 1):
             print(f"\n>>> 任务 [{i}/{len(selected_files)}]")
-            draw_manhattan(f, output_dir)
+            # 将配置传入绘图函数
+            draw_manhattan(f, output_dir, threshold_config)
             
         print("\n" + "="*50)
         print("所有图片已生成完毕！")
