@@ -16,7 +16,7 @@ import pandas as pd
 P_VALUE_THRESHOLD = 1e-5
 
 # 输出目录名称
-OUTPUT_DIR_NAME = "08_Significant_Results"
+OUTPUT_DIR_NAME = "11_Significant_Results"
 
 # ==============================================================================
 # 1. Cite2 交互逻辑模块 (内置)
@@ -171,7 +171,7 @@ def extract_significant_sites(file_list):
 # ==============================================================================
 def main():
     print("==============================================")
-    print("   Step 8: 显著变异位点筛选工具 (GWAS Miner)")
+    print("   Step 11: 显著变异位点筛选工具 (GWAS Miner)")
     print("==============================================")
     print(f"当前筛选阈值: P < {P_VALUE_THRESHOLD}")
     print("提示: 如需修改阈值，请用文本编辑器打开本脚本修改第 16 行。")

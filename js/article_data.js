@@ -1,5 +1,5 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/02/03_14:51:53
+// 生成时间: 2026/02/03_17:13:37
 // 文章总数: 23
 
 window.ARTICLE_DATABASE = [
@@ -102,11 +102,11 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/python/02. 转录组分析系列/02. 转录组分析系列.html"
     },
     {
-        "title": "02. 连续性性状关联性分析",
+        "title": "02. 连续型性状 LM LMM 分析模型",
         "collection": "gwas",
         "date": "2026-02-02",
         "summary": "连续型性状的直线回归",
-        "path": "articles/dry_lab/gwas/02. 连续性性状关联性分析/02. 连续性性状关联性分析.html"
+        "path": "articles/dry_lab/gwas/02. 连续型性状 LM LMM 分析模型/02. 连续型性状 LM LMM 分析模型.html"
     },
     {
         "title": "03. AlphaFold系列",
@@ -153,7 +153,7 @@ window.ARTICLE_DATABASE = [
     {
         "title": "05. SV-GWAS LMM",
         "collection": "gwas",
-        "date": "2026-01-28",
+        "date": "2026-02-03",
         "summary": "分析结构变异对性状的影响",
         "path": "articles/dry_lab/gwas/05. SV-GWAS LMM/05. SV-GWAS LMM.html"
     },

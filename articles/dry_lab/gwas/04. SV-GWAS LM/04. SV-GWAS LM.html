@@ -36,7 +36,7 @@
 			
 			<div class="content">
 				<h2>前言</h2>
-				<p>这篇文章详细的介绍了如何从<code>.delly.vcf</code>到最终每个变异位点的关联性。</p>
+				<p>这篇文章详细的介绍了如何从<code>.delly.vcf</code>到最终每个变异位点的关联性。使用最基础的 LM 普通线性模型。</p>
 				<h2>1. vcf 提取与整理</h2>
 				<p>将散落在各个子文件夹中的<code>.vcf.gz</code>文件进行提取并汇总到<code>01_Raw_VCFs</code>文件夹中。</p>
 				<blockquote>注意，因为压缩包形式具有存储和读取的优势，我们提取并存储的是<code>.vcf.gz</code>和其索引。</blockquote>
@@ -576,111 +576,45 @@ Reading Files ...
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>9. 结果可视化</h2>
-				<p>使用脚本自动绘制曼哈顿图和 QQ 图。</p>
+				<h2>9. 结果筛选</h2>
+				<p>对设定阈值以上的的变异位点进行筛选输出。</p>
 				<div class="download-card">
 					<div class="download-info">
 						<i class="fas fa-file-code"></i> <div class="file-details">
-							<h5>09_曼哈顿图</h5>
-							<span>文件格式：.py | 大小：9.0 KB</span>
+							<h5>09_结果筛选</h5>
+							<span>文件格式：.py | 大小：7.5 KB</span>
 						</div>
 					</div>
-					<a href="./09_曼哈顿图.py" download class="download-btn">
+					<a href="./09_结果筛选.py" download class="download-btn">
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>10. Kinship 矩阵构建</h2>
-				<p>如果群体有较大的亲缘关系，导致普通的 LM 分析出现曼哈顿图“爆炸”（某条染色体大量超阈值），QQ 图起飞（膨胀），则应该升级统计模型从 LM 到 LMM 模型。我们先利用基因型文件构建 Kinship 矩阵来量化各样本间亲缘关系。</p>
+				<h2>10. 位点溯源</h2>
+				<p>对上一步分析出来的位点进行溯源分析，进行基因定位等工作。</p>
 				<div class="download-card">
 					<div class="download-info">
 						<i class="fas fa-file-code"></i> <div class="file-details">
-							<h5>10_Kinship 矩阵计算</h5>
-							<span>文件格式：.py | 大小：6.8 KB</span>
+							<h5>10_位点溯源</h5>
+							<span>文件格式：.py | 大小：7.1 KB</span>
 						</div>
 					</div>
-					<a href="./10_Kinship 矩阵计算.py" download class="download-btn">
+					<a href="./10_位点溯源.py" download class="download-btn">
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>11. LMM 混合线性模型</h2>
-				<p>进行混合线性模型进行计算。</p>
+				<h2>11. 可视化</h2>
+				<p>绘制曼哈顿图和 QQ 图。</p>
 				<div class="download-card">
 					<div class="download-info">
 						<i class="fas fa-file-code"></i> <div class="file-details">
-							<h5>11_LMM 混合线性模型</h5>
-							<span>文件格式：.py | 大小：7.2 KB</span>
+							<h5>11_可视化</h5>
+							<span>文件格式：.py | 大小：11.0 KB</span>
 						</div>
 					</div>
-					<a href="./11_LMM 混合线性模型.py" download class="download-btn">
+					<a href="./11_可视化.py" download class="download-btn">
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<blockquote>后续对输出的<code>.assoc.txt</code>再进行第 8 步和第 9 步。绘制 QQ 图和曼哈顿图，筛选阈值点。</blockquote>
-				<h2>12. Kinship 可视化</h2>
-				<p>亲缘关系矩阵可视化，如果某些样本聚集在一起形成一个明显的深色方阵，说明它们是一个亚群。如果背景中有很多零散的深色点，说明样本之间存在普遍的近亲关系或者复杂的杂交历史。</p>				
-				<div class="download-card">
-					<div class="download-info">
-						<i class="fas fa-file-code"></i> <div class="file-details">
-							<h5>12_Kinship 可视化</h5>
-							<span>文件格式：.py | 大小：6.1 KB</span>
-						</div>
-					</div>
-					<a href="./12_Kinship 可视化.py" download class="download-btn">
-						<i class="fas fa-cloud-download-alt"></i>
-					</a>
-				</div>
-				<h2>13. 位点溯源</h2>
-				<p>对第 8 步筛选出来的位点在合并的 <code>vcf</code> 里面查找，给出变异具体信息。</p>
-				<div class="download-card">
-					<div class="download-info">
-						<i class="fas fa-file-code"></i> <div class="file-details">
-							<h5>13_位点溯源</h5>
-							<span>文件格式：.py | 大小：9.0 KB</span>
-						</div>
-					</div>
-					<a href="./13_位点溯源.py" download class="download-btn">
-						<i class="fas fa-cloud-download-alt"></i>
-					</a>
-				</div> 
-				<h2>14. IGV 可视化</h2>
-				<p>将第 13 步的详细文件转换为可以供 IGV 可视化的 <code>.gff3</code>文件。</p>
-				<div class="download-card">
-					<div class="download-info">
-						<i class="fas fa-file-code"></i> <div class="file-details">
-							<h5>14_IGV 可视化</h5>
-							<span>文件格式：.py | 大小：6.0 KB</span>
-						</div>
-					</div>
-					<a href="./14_IGV 可视化.py" download class="download-btn">
-						<i class="fas fa-cloud-download-alt"></i>
-					</a>
-				</div>
-				<h2>15. 主成分分析</h2>
-				<p>看样品被分为哪些亚群。</p>
-				<div class="download-card">
-					<div class="download-info">
-						<i class="fas fa-file-code"></i> <div class="file-details">
-							<h5>15_PCA</h5>
-							<span>文件格式：.py | 大小：6.1 KB</span>
-						</div>
-					</div>
-					<a href="./15_PCA.py" download class="download-btn">
-						<i class="fas fa-cloud-download-alt"></i>
-					</a>
-				</div>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
-				<p></p>
 			</div>
 		</div>
 

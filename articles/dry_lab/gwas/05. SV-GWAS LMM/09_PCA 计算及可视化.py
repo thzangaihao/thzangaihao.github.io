@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # ================= 0. 核心配置 =================
-OUTPUT_DIR_NAME = "15_PCA"
+OUTPUT_DIR_NAME = "09_PCA"
 PLINK_EXEC = "plink"  # 请确保 plink 已安装并在环境变量中
 PCA_COMPONENTS = 10   # 计算多少个 PC
 COVAR_PCS = 3         # 选多少个 PC 放入 GEMMA 协变量文件
@@ -141,7 +141,7 @@ def run_pca_pipeline(fam_path):
 # ================= 主函数 =================
 def main():
     print("==============================================")
-    print("   Step 15: 主成分分析 (PCA) & 协变量准备")
+    print("   Step 09: 主成分分析 (PCA) & 协变量准备")
     print("==============================================")
     
     # 1. 选择 PLINK 文件 (.fam)
