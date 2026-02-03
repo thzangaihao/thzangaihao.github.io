@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/02/02_15:07:24
-// 文章总数: 22
+// 生成时间: 2026/02/03_14:51:53
+// 文章总数: 23
 
 window.ARTICLE_DATABASE = [
     {
@@ -88,13 +88,6 @@ window.ARTICLE_DATABASE = [
         "path": "articles/dry_lab/docking/02. AutoDock Vina 自动化/02. AutoDock Vina 自动化.html"
     },
     {
-        "title": "02. GWAS 分析基础",
-        "collection": "gwas",
-        "date": "2026-01-28",
-        "summary": "变异数据结构，分析依赖软件",
-        "path": "articles/dry_lab/gwas/02. GWAS 分析基础/02. GWAS 分析基础.html"
-    },
-    {
         "title": "02. 热图",
         "collection": "figure",
         "date": "2026-01-22",
@@ -109,6 +102,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/python/02. 转录组分析系列/02. 转录组分析系列.html"
     },
     {
+        "title": "02. 连续性性状关联性分析",
+        "collection": "gwas",
+        "date": "2026-02-02",
+        "summary": "连续型性状的直线回归",
+        "path": "articles/dry_lab/gwas/02. 连续性性状关联性分析/02. 连续性性状关联性分析.html"
+    },
+    {
         "title": "03. AlphaFold系列",
         "collection": "python",
         "date": "2026-01-21",
@@ -116,11 +116,11 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/python/03. AlphaFold系列/03. AlphaFold系列.html"
     },
     {
-        "title": "03. SV-GWAS",
+        "title": "03. GWAS 分析基础",
         "collection": "gwas",
         "date": "2026-01-28",
-        "summary": "分析结构变异对性状的影响",
-        "path": "articles/dry_lab/gwas/03. SV-GWAS/03. SV-GWAS.html"
+        "summary": "变异数据结构，分析依赖软件",
+        "path": "articles/dry_lab/gwas/03. GWAS 分析基础/03. GWAS 分析基础.html"
     },
     {
         "title": "03. 火山图",
@@ -137,6 +137,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/dry_lab/alphafold/03. 输出数据/03. 输出数据.html"
     },
     {
+        "title": "04. SV-GWAS LM",
+        "collection": "gwas",
+        "date": "2026-01-28",
+        "summary": "分析结构变异对性状的影响",
+        "path": "articles/dry_lab/gwas/04. SV-GWAS LM/04. SV-GWAS LM.html"
+    },
+    {
         "title": "04. 分子对接系列",
         "collection": "python",
         "date": "2026-01-21",
@@ -144,11 +151,11 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/python/04. 分子对接系列/04. 分子对接系列.html"
     },
     {
-        "title": "04. 连续性性状关联性分析",
+        "title": "05. SV-GWAS LMM",
         "collection": "gwas",
-        "date": "2026-02-02",
-        "summary": "连续型性状的直线回归",
-        "path": "articles/dry_lab/gwas/04. 连续性性状关联性分析/04. 连续性性状关联性分析.html"
+        "date": "2026-01-28",
+        "summary": "分析结构变异对性状的影响",
+        "path": "articles/dry_lab/gwas/05. SV-GWAS LMM/05. SV-GWAS LMM.html"
     },
     {
         "title": "05. 生物文件处理",
