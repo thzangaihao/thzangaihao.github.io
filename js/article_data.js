@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/02/03_17:13:37
-// 文章总数: 23
+// 生成时间: 2026/03/09_19:10:31
+// 文章总数: 24
 
 window.ARTICLE_DATABASE = [
     {
@@ -23,6 +23,13 @@ window.ARTICLE_DATABASE = [
         "date": "2025-12-17",
         "summary": "通过可视化图形界面从0到1进行分子对接",
         "path": "articles/dry_lab/docking/01. AutoDock Vina 基本使用/01. AutoDock Vina 基本使用.html"
+    },
+    {
+        "title": "01. Kraken 2 自建库及鉴定",
+        "collection": "classification",
+        "date": "2026-03-09",
+        "summary": "Kraken 2 寻找亲缘关系最近的物种。",
+        "path": "articles/dry_lab/classification/01. Kraken2 物种鉴定/01. Kraken2 物种鉴定.html"
     },
     {
         "title": "01. Pymol常用指令汇总",

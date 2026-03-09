@@ -19,3 +19,8 @@
 .icon-algorithm {
     --svg-url: url('../img/icons/font_awesome/algorithm.svg');
 }
+
+/* 3. 分类鉴定图标 */
+.linktree-brands-solid-full {
+    --svg-url: url('../img/icons/font_awesome/linktree-brands-solid-full.svg');
+}

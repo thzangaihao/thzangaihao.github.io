@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>01. Kraken 2 自建库及鉴定 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="classification"> 
+        <meta name="collection-title" content="分类鉴定">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-03-09">
+        <meta name="description" content="Kraken 2 寻找亲缘关系最近的物种。">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>01. Kraken 2 自建库及鉴定</h1>
+            
+            <div class="content">
+                <h2>1. 输入输出与目的</h2>
+                <p>在我们获得一个新的菌株，或者其它的新的物种，我们总想着看一下它在我们分类数据库里面具体的位置和其它种的亲缘关系。对于部分真菌等，ITS 序列鉴定是常用的一个方法，但是从在 ITS 序列收集难度高，鉴别困难，不能有效且准确的区分和鉴定物种。对此，我们可以考虑全测序进行判断，在较低的测序深度，测序数据未组装，参考基因组无组装到高层级的情况下，我们可以考虑使用 Kraken 2 进行物种的鉴定。</p>
+                <p>在 Kraken 2 中，我们只需准备好全测序的读段<code>.fastq</code>文件和相关数据库即可输出鉴定物种和参考物种之间亲缘关系的大小。在没有数据库支持下，我们也可以通过已有物种的<code>.fasta</code>序列进行自建库来个性化并提高鉴定精度。</p>
+                <p>在开始前，请运行以下命令来查找服务器上是否已经安装相关软件和文件：</p>
+                <pre><code class="language-bash">
+# 查找二进制文件路径：            
+which kraken2
+which bracken
+
+# 检查软件版本：
+kraken2 --version
+bracken -v
+
+# 如果你使用 Conda 管理环境：
+conda list | grep -E "kraken2|bracken"
+                </code></pre>
+                <h2>2. 数据库</h2>
+                <p>我们可以下载 Kraken 2 的官方数据库，但是如果你觉得太大不好下载时或有其它需求，我们可以考虑自建库，在这里我们以 NCBI 下载下来的<code>.fna</code>文件（就是<code>.fasta</code>文件）为例进行精确化自建库。</p>
+                <p>Kraken2 的数据库不是单个文件，而是一个包含多个特定后缀文件的目录。一个完整的 Kraken2 数据库目录中必须包含以下三个核心文件：<code>hash.k2d</code>、<code>opts.k2d</code>、<code>taxo.k2d</code>。</p>
+                <blockquote>注意，Kraken 2 的数据库有多个版本，确保数据库覆盖你所鉴定的物种。</blockquote>
+                <h3>2.1 下载分类信息</h3>
+                <p>Kraken2 需要知道每个序列属于哪个分类层级（Taxonomy）。即使自建库只用很小一部分基因组，也需要下载 NCBI 的分类树。</p>
+                <pre><code class="language-bash">
+# 1. 创建数据库文件夹
+mkdir Custom_DB
+
+# 2. 下载分类学信息
+kraken2-build --download-taxonomy --db Custom_DB
+                </code></pre>
+                <p>当然你也可以直接下载 NCBI 的分类数据库库，移动到 Custom_DB 的 taxonomy文件夹下，只要包含以下文件：</p>
+                <pre><code class="language-bash">
+(base) [thz@localhost taxonomy]$ tree
+.
+├── citations.dmp
+├── delnodes.dmp
+├── division.dmp
+├── gc.prt
+├── gencode.dmp
+├── images.dmp
+├── merged.dmp
+├── names.dmp
+├── nodes.dmp
+├── prelim_map.txt
+└── readme.txt
+                </code></pre>
+
+                <h3>2.2 将基因组添加到 Library</h3>
+                <p>我们需要逐个将<code>.fasta</code>文件加入数据库的库文件夹中。为了效率，建议使用 Shell 循环处理。</p>
+                <blockquote>注意：Kraken2 默认通过 Fasta 标题中的 Accession Number（如<code>>GCA_026259275.1</code>）来识别物种。如果你下载的文件保留了 NCBI 的原始标题，可直接运行：</blockquote>
+                <pre><code class="language-bash">
+# 假设基因组文件都在当前目录下
+for file in *.fasta; do
+    kraken2-build --add-to-library "$file" --db Custom_DB
+done
+                </code></pre>
+                <blockquote>如果 Fasta 标题被修改过（没有 NCBI 编号），需要额外准备一个<code>.map</code>文件，将序列 ID 对应到 TaxID。</blockquote>
+
+                <h3>2.3 正式构建索引</h3>
+                <p>这是最耗算力的一步。它会根据添加的序列构建 K-mer 索引。</p>
+                <p>构建完成后，会生成<code>hash.k2d</code>、<code>opts.k2d</code>、<code>taxo.k2d</code>。其中<code>hash.k2d</code>为主要文件，应该比较大，如果只有几 kb，说明构建了一个空壳，需要排查错误。</p>
+
+                <h2>3. Kraken 2 鉴定</h2>
+                <p>下载并运行交互式脚本：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>Kraken 2</h5>
+                                <span>文件格式：.py | 大小：9.1 KB</span>
+                            </div>
+                        </div>
+                        <a href="./Kraken 2.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+
+                <h2>4. Kraken 输出及可视化</h2>
+                <p>Kraken2 的报告是以 Tab（制表符） 分割的 6 列数据，每一列代表的含义如下：</p>
+                <ol>
+                    <li>第一列 (Percentage)：分配给该物种（或该分类层级）的 Reads 占总 Reads 的百分比。</li>
+                    <li>第二列 (Reads Covered)：分配给该层级及该层级以下所有子分类的总 Reads 数量。</li>
+                    <li>第三列 (Direct Reads)：直接分配给该特定层级，而无法继续细分到更低层级的 Reads 数量。</li>
+                    <li>第四列 (Rank Code)：分类级别代码。常见的有：U (未分类), R (根), D (域), K (界), P (门), C (纲), O (目), F (科), G (属), S (种)。</li>
+                    <li>第五列 (TaxID)：NCBI 官方的物种分类编号。</li>
+                    <li>第六列 (Name)：带有缩进的物种科学名称（缩进代表层级深度）。</li>
+                </ol>
+                <p>对输出的<code>._report.txt</code>进行可视化绘图：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>Kraken 可视化</h5>
+                                <span>文件格式：.py | 大小：6.1 KB</span>
+                            </div>
+                        </div>
+                        <a href="./Kraken 可视化.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
