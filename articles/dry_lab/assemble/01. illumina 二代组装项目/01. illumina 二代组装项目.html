@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>01. illumina 二代组装项目 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="assemble"> 
+        <meta name="collection-title" content="基因组组装">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-03-10">
+        <meta name="description" content="fastp清洗、spades组装、quast质控真菌组装流程化。">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>01. illumina 二代组装项目</h1>
+            
+            <div class="content">
+                <h2>1. 前言</h2>
+                <p>这篇博客适用于由 illumina 二代测序平台产生的短读段数据在无参考证据文件时的从头组装（de novo组装）。因为组装流程已经被脚本高度自动化，这篇文章简单讲一下具体流程，环境搭建等，并解读软件的输出报告和意义。简单言之，我们是将公司给我们的<code>.fastq</code>文件组装出<code>.fasta</code>文件。</p>
+
+                <h2>2. 环境搭建与软件安装</h2>
+                <p>创建并激活专属 Conda 环境：</p>
+                <pre><code class="language-bash">
+# 1. 创建基于 Python 3.10 的新环境
+conda create -n assembly_env python=3.10 -y
+
+# 2. 激活刚刚创建的环境
+conda activate assembly_env
+                </code></pre>
+                <p>安装核心软件，这三个软件都托管在生物信息学的专属频道 bioconda 上。为了解决依赖问题，我们同时指定<code>conda-forge</code>频道。</p>
+                <pre><code class="language-bash">
+conda install -c bioconda -c conda-forge fastp spades quast -y
+                </code></pre>
+                <p>fastp 用于数据的质控。你应该在收到公司递交的文件后看一眼质控报告，但无论如何，我们自己再洗一遍数据是最稳妥的做法，洗数据已经包含到流程里面了。fastp 进行接头修剪、低质量序列剔除，并生成 HTML 质控报告，查收并确定质量过关。</p>
+                <p>spades 专门针对单细胞和中小型基因组（如细菌、真菌）优化的 De novo 组装器。脚本中开启<code?>--fungal</code>模式会专门针对真菌的重复序列进行优化。</p>
+                <p>quast 用于组装后的质控，会报道各种指标，例如 N50，我们会面后讲如何查看这些指标。</p>
+                <p>使用以下命令查看命令查看版本并验证安装：</p>
+                <pre><code class="language-bash">
+fastp --version
+spades.py --version
+quast.py --version
+                </code></pre>
+                <h2>3. 正式组装</h2>
+                <p>运行以下交互式脚本，进行组装，组装时间较长，单个样本在 40MB 大小下，32 核心 32GB RAM 大概需要 1h。</p>
+                <p>该脚本为批量串行版，支持多样本排队依次组装。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>De novo 组装 (SPAdes)</h5>
+                                <span>文件格式：.py | 大小：8.1 KB</span>
+                            </div>
+                        </div>
+                        <a href="./De novo 组装 (SPAdes).py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                
+                <h2>4. 结果解读</h2>
+                <p>后面有时间再写。</p>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

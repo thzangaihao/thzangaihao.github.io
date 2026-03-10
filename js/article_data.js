@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/03/09_19:56:08
-// 文章总数: 24
+// 生成时间: 2026/03/10_22:20:46
+// 文章总数: 25
 
 window.ARTICLE_DATABASE = [
     {
@@ -37,6 +37,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-20",
         "summary": "如何使你的图变得专业好看？",
         "path": "articles/dry_lab/pymol/01. Pymol常用指令汇总/01. Pymol常用指令汇总.html"
+    },
+    {
+        "title": "01. illumina 二代组装项目",
+        "collection": "assemble",
+        "date": "2026-03-10",
+        "summary": "fastp清洗、spades组装、quast质控真菌组装流程化。",
+        "path": "articles/dry_lab/assemble/01. illumina 二代组装项目/01. illumina 二代组装项目.html"
     },
     {
         "title": "01. 全基因组关联分析基础原理",
