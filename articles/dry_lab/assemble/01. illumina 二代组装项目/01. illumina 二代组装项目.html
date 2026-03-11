@@ -76,7 +76,25 @@ quast.py --version
                     </div>
                 
                 <h2>4. 结果解读</h2>
-                <p>后面有时间再写。</p>
+                <p>我们输出的文件一般可以分为三份：</p>
+                <ol>
+                    <li>由 fastp 生成的干净的<code>.fastq</code>数据和<code>.html</code>质控报告。</li>
+                    <li>由 SPAdes 生成中间计算过程文件，存放在<code>spades_run/</code>目录下。里的大多数文件是中间计算过程（如 K21, K33 等代表不同 K-mer 的尝试），平时基本不用管。其中根目录下的<code>_ref_draft.fasta</code>文件是从中复制出来的最终草图。</li>
+                    <li><code>quast_report/</code>目录下存放的是 quast 对组装结果的质量报告，核心关注<code>quast_report/report.html</code>网页式汇总报告。</li>
+                </ol>
+                <pre><code class="language-bash">
+.
+├── _clean_R1.fq.gz
+├── _clean_R2.fq.gz
+├── _fastp.html
+├── _ref_draft.fasta
+├── quast_report
+│   ├── report.html
+│   └── ......
+└── spades_run
+    ├── scaffolds.fasta
+    └── ......
+                </code></pre>
             </div>
         </div>
 
