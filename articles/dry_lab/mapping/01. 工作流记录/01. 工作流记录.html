@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>01. 工作流记录 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="mapping"> 
+        <meta name="collection-title" content="基因定位">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-03-12">
+        <meta name="description" content="低样本量，重测序，紫外诱变关键位点的定位。">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>01. 工作流记录</h1>
+            
+            <div class="content">
+                <h2>1. 前言</h2>
+                <p>这篇文章主要记录了一次项目中的位点筛查的流程和对分析脚本的备份，笔者认为这套流程的可复现性低，我们有更好的方案对其进行分析，例如 GWAS，QTL 定位。本流程只是对已有的测序数据进行竭力挖掘。</p>
+                <h2>2. 数据准备</h2>
+                <p>在分析之前，我已经对样本进行了 Kraken2 鉴定，寻找到了样本的近缘种，且近缘种在数据库中已经有完备的基因组信息<code>.fasta</code>和基因组基因注释信息<code>.gtf</code>。对所有样本的重测序<code>.fastq</code>已经使用 bowtie2 做了自组装基因组草图<code>.fasta</code>定位，生成了<code>.bam</code>文件。现在需要筛查到最有可能影响耐盐性状的基因变异位点。</p>
+                <h2>3. 变异筛查</h2>
+                <p>我们主要对 SNP 和 SV 两种变异进行筛查，生成<coed>.vcf</coed>文件。其原理也很简单，就是看<code>.bam</code>哪里和我们的对照组（参考基因组）不一样，把不一样的地方记录下来，生成<code>.vcf</code>文件。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>变异筛查</h5>
+                                <span>文件格式：.py | 大小：6.5 KB</span>
+                            </div>
+                        </div>
+                        <a href="./变异筛查.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <p>结果会把 SV 变异和 SNP 变异分开存放在两个<code>.vcf</code>文件中。</p>
+                <h2>4. Liftoff_映射</h2>
+                <p>因为我们样本量较低，出现两个一模一样的变异概率很小，因此在这里我们采取以下策略：如果多个样本发生的变异不同，但是都处于一个基因内部，那我们就认为这个基因对该性状有着较大的影响，这些变异位点都是高潜力变异位点。</p>
+                <p>我是通过重测序直接组装出来的草图，没有基因注释文件，我可以通过 AUGUSTUS 进行无证据基因预测，但是比较麻烦且没有转录组，蛋白组等数据做证据支撑，因此结果不太可靠（其实就是 AUGUSTUS 太麻烦了而且截至这篇文章我还没有写它的脚本和博客）。</p>
+                <p>在这里，我们使用 Liftoff 对数据库中已有的基因组和基因注释进行映射，这里就要用到之前 Kraken2 鉴定的结果了，我们要选择亲缘关系最近的物种做映射的原材料。我的两株样本没有比较全的基因组信息，但是它们仍然处于一个属，拿其它种也可以做映射，因此我就选择了这个属内比较权威，完整的比较高的一个基因组信息去统一做的映射。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>Liftoff_映射</h5>
+                                <span>文件格式：.py | 大小：5.4 KB</span>
+                            </div>
+                        </div>
+                        <a href="./Liftoff_映射.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <p>最后会生成<code>.gff3</code>映射预测后的基因注释文件。</p>
+                <h2>5. 重点变异筛查</h2>
+                <p>正如前文所讲，在低样本量下，我们是以基因的变化去分析变异位点的，而 snpeff 就是综合这个策略去进行重要变异位点的筛查的。使用 snpeff 需要物种基因组数据库的支持，我们首先要将我们自己的基因组及注释文件生成可供 snpeff 分析的标准数据库模式，再进行 snpeff 分析。使用以下脚本同时进行建库和分析。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>auto_snpeff</h5>
+                                <span>文件格式：.py | 大小：8.0 KB</span>
+                            </div>
+                        </div>
+                        <a href="./auto_snpeff.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <p>最终我们把影响基因改变的那些变异位点筛选出来了。</p>
+                <h2>6. 联合分析</h2>
+                <p>在之前我们都是对但每个样本的高潜力位点进行分析，得到的高潜力位点都是对基因有着较大的改变的位点，我们此时需要跨样本进行联合分析取交集，得到决定木霉的关键耐盐基因。使用以下脚本进行分析：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>find_core_genes</h5>
+                                <span>文件格式：.py | 大小：6.3 KB</span>
+                            </div>
+                        </div>
+                        <a href="./find_core_genes.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                    
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

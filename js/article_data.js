@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/03/10_22:20:46
-// 文章总数: 25
+// 生成时间: 2026/03/12_19:50:41
+// 文章总数: 26
 
 window.ARTICLE_DATABASE = [
     {
@@ -65,6 +65,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-21",
         "summary": "处理 Excel 无法处理的大型矩阵文件",
         "path": "articles/resources/python/01. 大规模矩阵处理/01. 大规模矩阵处理.html"
+    },
+    {
+        "title": "01. 工作流记录",
+        "collection": "mapping",
+        "date": "2026-03-12",
+        "summary": "低样本量，重测序，紫外诱变关键位点的定位。",
+        "path": "articles/dry_lab/mapping/01. 工作流记录/01. 工作流记录.html"
     },
     {
         "title": "01. 条形图",
