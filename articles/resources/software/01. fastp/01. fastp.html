@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>01. fastp - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="software"> 
+        <meta name="collection-title" content="软件">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-03-13">
+        <meta name="description" content="数据清洗，质控。">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>01. fastp</h1>
+            
+            <div class="content">
+                <h2>1. 简介</h2>
+                <p>对于测序下机的读段数据，常常包含测序芯片接头，还有好多低质量的短读段，我们需要对齐进行识别并去除，我们传统使用 FASTQC 等软件进行质控，使用 cutadapt 软件去除接头，使用 Trimmomatic 等软件进行剪裁，然后使用一些自已开发的脚本进行过滤。在这里我们介绍使用 fastp， 它有着集成，快速，高效特点，最后还会生成一份漂亮的<code>.html</code>质检报告。</p>
+
+                <h2>2. 环境搭建及软件安装</h2>
+                <pre><code class="language-bash">
+# 1. 创建名为 fastp_env 的环境，并指定 python 版本（建议 3.9+）
+conda create -n fastp_env python=3.10 -y
+
+# 2. 激活环境
+conda activate fastp_env
+
+# 3. 安装 fastp
+conda install fastp -y
+
+# 4. 验证安装
+fastp --version
+                </code></pre>
+
+                <h2>3. fastq 清洗</h2>
+                使用以下交互式脚本进行文件清洗：
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>fastp_batch_clean</h5>
+                                <span>文件格式：.py | 大小：7.9 KB</span>
+                            </div>
+                        </div>
+                        <a href="./fastp_batch_clean.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

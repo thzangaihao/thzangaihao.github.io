@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/03/12_19:50:41
-// 文章总数: 26
+// 生成时间: 2026/03/13_15:11:29
+// 文章总数: 27
 
 window.ARTICLE_DATABASE = [
     {
@@ -37,6 +37,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-20",
         "summary": "如何使你的图变得专业好看？",
         "path": "articles/dry_lab/pymol/01. Pymol常用指令汇总/01. Pymol常用指令汇总.html"
+    },
+    {
+        "title": "01. fastp",
+        "collection": "software",
+        "date": "2026-03-13",
+        "summary": "数据清洗，质控。",
+        "path": "articles/resources/software/01. fastp/01. fastp.html"
     },
     {
         "title": "01. illumina 二代组装项目",

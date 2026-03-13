@@ -28,14 +28,21 @@
             <aside class="left-col">
                 <div class="collection-menu">
                     <h3><i class="fas fa-folder"></i> 集合列表</h3>
+
                     <button class="collection-btn active" onclick="showCollection('python', this)">
                         <i class="fa-brands fa-python"></i> Python 自动化
                     </button>
+
                     <button class="collection-btn" onclick="showCollection('plasmid', this)">
                         <i class="fa-solid fa-circle-notch fa-rotate-by" style="--fa-rotate-angle: 45deg;"></i> 质粒库
                     </button>
+
                     <button class="collection-btn" onclick="showCollection('figure', this)">
                         <i class="fa-solid fa-images"></i> 图廊
+                    </button>
+
+                    <button class="collection-btn" onclick="showCollection('software', this)">
+                        <i class="fa-solid fa-terminal"></i> 软件
                     </button>
                 </div>
             </aside>
@@ -59,6 +66,13 @@
                     <div class="list-header">
                         <h2>图廊</h2>
                         <p>科研用图绘制及模板</p>
+                    </div>
+                </div>
+
+                <div id="software-section" class="article-list">
+                    <div class="list-header">
+                        <h2>软件</h2>
+                        <p>常用软件及运行脚本</p>
                     </div>
                 </div>
             </section>

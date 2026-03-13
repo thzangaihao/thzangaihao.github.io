@@ -114,7 +114,7 @@ def run_intersection_analysis():
     # 准备报告内容
     report_lines = []
     report_lines.append("="*50)
-    report_lines.append(" 🏆 候选耐盐关键基因排行榜 🏆")
+    report_lines.append(" 候选耐盐关键基因")
     report_lines.append(f" 分析时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     report_lines.append(f" 参与分析的样本数: {total_samples}")
     report_lines.append("="*50)
@@ -129,8 +129,8 @@ def run_intersection_analysis():
             found_core_genes = True
             hit_ratio = f"{hit_count}/{total_samples}"
             
-            stars = "⭐" * int((hit_count / total_samples) * 5)
-            if hit_count == total_samples: stars = "🌟🌟🌟🌟🌟 (完美交集)"
+            stars = "*" * int((hit_count / total_samples) * 5)
+            if hit_count == total_samples: stars = "*****"
             
             report_lines.append(f"\n[{stars}] 基因名称: {gene} (命中样本数: {hit_ratio})")
             
@@ -140,8 +140,7 @@ def run_intersection_analysis():
                     report_lines.append(f"  │    └── {d}")
                     
     if not found_core_genes:
-        report_lines.append("\n⚠️ 遗憾：在选中的样本中，没有发现任何一个基因发生过共有的破坏性突变。")
-        report_lines.append("💡 建议：可能耐盐机制是多基因途径，或者样本间存在表型差异，建议放宽阈值检查 MODERATE 突变。")
+        report_lines.append("\n⚠️ 在选中的样本中，没有发现任何一个基因发生过共有的破坏性突变。")
     else:
         report_lines.append("\n" + "="*50)
         report_lines.append("💡 下一步湿实验建议：")
@@ -154,11 +153,11 @@ def run_intersection_analysis():
             print(line)
             f.write(line + "\n")
 
-    print(f"\n🎉 分析完成！完整的候选基因报告已永久保存至: ")
+    print(f"\n分析完成！完整的候选基因报告已永久保存至: ")
     print(f"📂 {report_file}")
 
 if __name__ == "__main__":
     try:
         run_intersection_analysis()
     except KeyboardInterrupt:
-        print("\n🛑 用户强制退出。")
+        print("\n用户强制退出。")
