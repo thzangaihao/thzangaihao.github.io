@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/03/13_15:11:29
-// 文章总数: 27
+// 生成时间: 2026/03/15_17:51:52
+// 文章总数: 29
 
 window.ARTICLE_DATABASE = [
     {
@@ -116,6 +116,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/dry_lab/docking/02. AutoDock Vina 自动化/02. AutoDock Vina 自动化.html"
     },
     {
+        "title": "02. interproscan",
+        "collection": "software",
+        "date": "2026-03-15",
+        "summary": "根据蛋白的结构域去预测功能。",
+        "path": "articles/resources/software/02. interproscan/02. interproscan.html"
+    },
+    {
         "title": "02. 热图",
         "collection": "figure",
         "date": "2026-01-22",
@@ -149,6 +156,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-28",
         "summary": "变异数据结构，分析依赖软件",
         "path": "articles/dry_lab/gwas/03. GWAS 分析基础/03. GWAS 分析基础.html"
+    },
+    {
+        "title": "03. gffread",
+        "collection": "software",
+        "date": "2026-03-15",
+        "summary": "基因注释文件的操作。",
+        "path": "articles/resources/software/03. gffread/03. gffread.html"
     },
     {
         "title": "03. 火山图",

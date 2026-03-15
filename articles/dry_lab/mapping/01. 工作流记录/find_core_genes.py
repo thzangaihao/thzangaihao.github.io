@@ -84,7 +84,7 @@ def run_intersection_analysis():
     print(" 🎯 核心靶标基因联合分析系统 (Venn Intersection)")
     print("="*50)
     
-    vcf_list = glob.glob(os.path.join(base_dir, "**", "*_HIGH_MODERATE.vcf"), recursive=True)
+    vcf_list = glob.glob(os.path.join(base_dir, "**", "*.vcf"), recursive=True)
     selected_vcfs = interactive_select(vcf_list, "待联合分析的提纯变异文件 (.vcf)")
     
     if len(selected_vcfs) < 2:

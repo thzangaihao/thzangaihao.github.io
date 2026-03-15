@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>03. gffread - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="software"> 
+        <meta name="collection-title" content="软件">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-03-15">
+        <meta name="description" content="基因注释文件的操作。">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>03. gffread</h1>
+            
+            <div class="content">
+                <h2>1. 简介</h2>
+                <p>gffread 用于对基因组注释文件的操作，例如格式转换，序列提取等等，在这篇博客中记录了几种常见使用方法和便携脚本。</p>
+
+                <h2>2. 环境搭建及软件安装</h2>
+                <pre><code class="language-bash">
+# 1. 创建名为 gffread_env 的环境，并指定 python 版本（建议 3.9+）
+conda create -n gffread_env python=3.10 -y
+
+# 2. 激活环境
+conda activate gffread_env
+
+# 3. 安装 IPRSCAN
+conda install gffread -y
+
+# 4. 验证安装
+gffread --version
+                </code></pre>
+
+                <h2>3. 常见用法</h2>
+                <h3>3.1 根据基因提取蛋白质序列</h3>
+                <p>我们需要准备基因组<code>.fasta</code>文件，基因组<code>.gtf</code>注释文件（或其它相关注释文件例如<code>.gff</code>、<code>.gff3</code>），以及你要提取的基因名称列表的<code>.tsv</code>文件。gffread 会根据这些文件提取你指定的基因的蛋白质序列，生成<code>.faa</code>蛋白序列文件。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>gffread</h5>
+                                <span>文件格式：.py | 大小：5.3 KB</span>
+                            </div>
+                        </div>
+                        <a href="./gffread.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                    <blockquote>脚本中使用参数<code>-y</code>输出蛋白序列。</blockquote>
+                    <pre><code class="language-python">
+# -y 提取蛋白序列
+cmd = f"gffread '{gff_file}' -g '{ref_fasta}' -y '{temp_all_faa}'"
+subprocess.run(cmd, shell=True, check=True)
+                    </code></pre>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

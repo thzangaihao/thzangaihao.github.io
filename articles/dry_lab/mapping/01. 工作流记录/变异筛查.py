@@ -9,9 +9,9 @@ from datetime import datetime
 import concurrent.futures
 
 '''
-诱变突变检测
+诱变突变检测 (全样本版)
 功能：自动化执行 SNP/Indel (bcftools) 与 SV (Delly) 检测。
-特性：底层工具多线程加速 + 样本级并发处理，极大缩短分析时间。
+特性：取消了对 CK 样本的屏蔽，可用于提取背景噪音。
 '''
 
 def get_base_dir():
@@ -111,9 +111,8 @@ def run_pipeline():
     if not selected_refs: return
     ref_fasta = selected_refs[0]
 
-    # 2. 选择待检测的 BAM 文件
+    # 2. 选择待检测的 BAM 文件 (已解除对 CK 的屏蔽)
     bam_list = glob.glob(os.path.join(base_dir, "**", "*.bam"), recursive=True)
-    bam_list = [b for b in bam_list if 'CK' not in os.path.basename(b).upper()]
     selected_bams = interactive_select(bam_list, "待检测 BAM 样本")
     if not selected_bams: return
 
@@ -133,15 +132,12 @@ def run_pipeline():
     # 6. 启动多线程并发池
     print(f"\n🔥 启动多线程引擎: 同时处理 {max_workers} 个样本，单样本分配 {threads_per_task} 核...")
     
-    # 使用 ThreadPoolExecutor 并发执行任务
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # 提交所有任务到线程池
         futures = [executor.submit(process_single_bam, bam, ref_fasta, out_root, qual_th, dp_th, threads_per_task) for bam in selected_bams]
         
-        # 等待并获取结果
         for future in concurrent.futures.as_completed(futures):
             try:
-                future.result() # 捕获可能发生的异常
+                future.result() 
             except Exception as exc:
                 print(f"❌ 某个样本处理时发生错误: {exc}")
 

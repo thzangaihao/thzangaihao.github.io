@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>02. interproscan - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="software"> 
+        <meta name="collection-title" content="软件">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-03-15">
+        <meta name="description" content="根据蛋白的结构域去预测功能。">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>02. interproscan</h1>
+            
+            <div class="content">
+                <h2>1. 简介</h2>
+                <p>InterProScan (IPRSCAN) 是一款根据蛋白结构域去预测蛋白功能的软件，我们只需要输入这个蛋白的氨基酸序列，软件就可以在多个维度对蛋白进行功能性预测，输出蛋白的功能性描述，GO 数据库中的 ID，也可以输出 Reactome 数据库中的 ID。同样，如果我们获得了一些未知功能的基因序列，我们可以对其使用 gffread 将其翻译为蛋白序列，再使用 IPRSCAN 对这个基因的功能进行预测。</p>
+
+                <h2>2. 环境搭建及软件安装</h2>
+                <p>IPRSCAN 的运行需要软件和数据库两部分构成，我们先来解决软件部分的安装：</p>
+                <h3>2.1 软件主体安装</h3>
+                <pre><code class="language-bash">
+# 1. 创建名为 interproscan_env 的环境，并指定 python 版本（建议 3.9+）
+conda create -n interproscan_env python=3.10 -y
+
+# 2. 激活环境
+conda activate interproscan_env
+
+# 3. 安装 IPRSCAN
+conda install interproscan -y
+
+# 4. 验证安装
+interproscan.sh --version
+                </code></pre>
+                <blockquote>你也可以进行外部安装，其主程序为<code>interproscan.sh</code>，你可以使用<code>./interproscan.sh  --version</code>来验证安装。</blockquote>
+
+                <h3>2.2 数据库主体</h3>
+                <p>IPRSCAN 分析需要依赖数据库，我们需要下载对应数据库并解压，数据库包含一套文件，将下载的数据库 data 文件夹放置在 InterProScan 的安装目录下，或者在 interproscan.properties 配置文件中指定 data.directory 的绝对路径。</p>
+
+
+                <h2>3. 预测</h2>
+                使用以下交互式脚本进行分析：
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>fastp_batch_clean</h5>
+                                <span>文件格式：.py | 大小：4.4 KB</span>
+                            </div>
+                        </div>
+                        <a href="./interproscan.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                
+                    <p>使用前记得在脚本里配置路径等。</p>
+                    <pre><code class="language-python">
+# === 配置区：请确保路径正确 ===
+IPRSCAN_PATH = "/home/thz/software/interproscan-5.76-107.0/interproscan.sh"
+                    </code></pre>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
