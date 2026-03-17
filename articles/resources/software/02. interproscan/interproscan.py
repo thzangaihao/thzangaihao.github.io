@@ -12,7 +12,7 @@ InterProScan 交互式运行工具
 '''
 
 # === 配置区：请确保路径正确 ===
-IPRSCAN_PATH = "/home/thz/software/interproscan-5.76-107.0/interproscan.sh"
+IPRSCAN_PATH = "/opt/biosoft/bioinfomatics_databases/interproscan-5.52-86.0/interproscan.sh"
 
 def get_base_dir():
     return os.path.dirname(os.path.abspath(__file__))

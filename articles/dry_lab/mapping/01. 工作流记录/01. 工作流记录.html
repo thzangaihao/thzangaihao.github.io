@@ -96,7 +96,98 @@
                             <i class="fas fa-cloud-download-alt"></i>
                         </a>
                     </div>
-                    
+                <p>联合分析后发现变异位点TMD全是假阳性，白分析了半天，下面做更宏观的分析。</p>
+                <h2>7. noncoding 变异分析</h2>
+                <p>既然基因上没分析出什么东西，那我们就看一下它的非编码区域，像上下游调控元件之类的。使用以下脚本进行搜索：</p>
+                <div class="download-card">
+                    <div class="download-info">
+                        <i class="fas fa-file-code"></i> <div class="file-details">
+                            <h5>find_regulatory_genes</h5>
+                            <span>文件格式：.py | 大小：6.7 KB</span>
+                        </div>
+                    </div>
+                    <a href="./find_regulatory_genes.py" download class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </a>
+                </div>
+                <p>还是没有什么东西，后续准备做个一个宏观分析。</p>
+                <h2>8. 变异基因汇总</h2>
+                <p>因为之前是使用<code>Liftoff</code>做的统一映射，所以我们可以把三个不同种类的菌株放到一起去记录所有的变异情况。既然这些样本并没有通过破坏同一个主效基因来获得耐盐性，那说明耐盐性是一个受到多个基因共同调节的复杂性状，我们可以通过富集分析来看那些变异了的基因都影响了木霉菌的那些生物学过程，这也是把所有样本的变异结果放到了一起去分析的理由。</p>
+                <p>使用以下脚本将所有的<code>.vcf</code>文件进行合并生成汇总后的<code>.tsv</code>列表集合，并手动去除那些明显假阳性的变异就结果。</p> 
+                <div class="download-card">
+                    <div class="download-info">
+                        <i class="fas fa-file-code"></i> <div class="file-details">
+                            <h5>extract_enrichment_genes</h5>
+                            <span>文件格式：.py | 大小：5.5 KB</span>
+                        </div>
+                    </div>
+                    <a href="./extract_enrichment_genes.py" download class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </a>
+                </div>
+                <p>同样使用以下脚本对非编码区段的变异进行汇总并手动剔除：</p>
+                <div class="download-card">
+                    <div class="download-info">
+                        <i class="fas fa-file-code"></i> <div class="file-details">
+                            <h5>extract_all_variants_final</h5>
+                            <span>文件格式：.py | 大小：5.7 KB</span>
+                        </div>
+                    </div>
+                    <a href="./extract_all_variants_final.py" download class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </a>
+                </div>
+                <h2>9. 功能性注释</h2>
+                <p>在后续，我又对第八步手工剔除的基因进行注释信息的搜寻，发现其在 NCBI 里大多数都是假设蛋白。没有办法，我使用 Imterproscan 根据他们的结构域对功能进行了预测，并生成 GO ID。相关软件脚本以及存放在资源站里面。使用到的软件有： Interproscan、gffread。</p>
+                <p>在得到功能性注释文件后，使用以下脚本生成最终汇总文件，该文件记录了这些变异基因的功能性注释，GO ID：</p>
+                <div class="download-card">
+                    <div class="download-info">
+                        <i class="fas fa-file-code"></i> <div class="file-details">
+                            <h5>merge_variant_functional</h5>
+                            <span>文件格式：.py | 大小：4.4 KB</span>
+                        </div>
+                    </div>
+                    <a href="./merge_variant_functional.py" download class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </a>
+                </div>
+                <h2>10. 富集分析</h2>
+                <p>使用以下临时脚本进行富集分析并绘图。</p>
+                <div class="download-card">
+                    <div class="download-info">
+                        <i class="fas fa-file-code"></i> <div class="file-details">
+                            <h5>plot_go_classification</h5>
+                            <span>文件格式：.py | 大小：6.3 KB</span>
+                        </div>
+                    </div>
+                    <a href="./plot_go_classification.py" download class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </a>
+                </div>
+                <p>对脚本进行了升级，根据第九步生成富集结果并对通路进行了变异基因的溯源，并将绘图功能进行了分离：</p>
+                <div class="download-card">
+                    <div class="download-info">
+                        <i class="fas fa-file-code"></i> <div class="file-details">
+                            <h5>generate_go_traceable_table</h5>
+                            <span>文件格式：.py | 大小：4.3 KB</span>
+                        </div>
+                    </div>
+                    <a href="./generate_go_traceable_table.py" download class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </a>
+                </div>
+                <p>以下是绘图脚本：</p>
+                <div class="download-card">
+                    <div class="download-info">
+                        <i class="fas fa-file-code"></i> <div class="file-details">
+                            <h5>plot_go_interactive</h5>
+                            <span>文件格式：.py | 大小：5.0 KB</span>
+                        </div>
+                    </div>
+                    <a href="./plot_go_interactive.py" download class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </a>
+                </div>
             </div>
         </div>
 
