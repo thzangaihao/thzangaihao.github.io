@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>01. 文章复用元素 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="wet"> 
+        <meta name="collection-title" content="关于此站">
+        <meta name="parent-path" content="../../about_index.html">
+        <meta name="parent-title" content="关于我">
+        <meta name="date" content="2026-03-21">
+        <meta name="description" content="网站文章复用元素归纳">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../about_index.html" class="active"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>01. 文章复用元素</h1>
+            <div class="content">
+                <h2>1. 站内超链接</h2>
+                    <a href="..\..\..\dry_lab\rnaseq\enrichment_analysis\enrichment_analysis.html" class="related-article" target="_blank">
+                        <div class="related-article-icon">
+                            <i class="fas fa-link"></i>
+                        </div>
+                        
+                        <div class="related-article-content">
+                            <div class="related-article-title">推荐阅读：01. 转录组分析系列：富集分析</div>
+                            <div class="related-article-desc">了解改变的基因具体影响了哪些生物学功能</div>
+                        </div>
+                        
+                        <div class="related-article-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                <h2>2. 代码框</h2>
+                    <pre><code class="language-python">
+print('代码框')
+                    </code></pre>
+                <h2>3. 表格</h2>
+                <h3>3.1 无底注表格</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>A</th>
+                                <th>B</th>
+                                <th>C</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>A1</td>
+                                <td>B1</td>
+                                <td>C1</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>A2</td>
+                                <td>B2</td>
+                                <td>C2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                <h3>3.2 有底注表格</h3>
+                    <table>
+                        <caption>
+                            <strong>表 1.</strong> 标注
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>A</th>
+                                <th>B</th>
+                                <th>C</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>A1</td>
+                                <td>B1</td>
+                                <td>C1</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>A2</td>
+                                <td>B2</td>
+                                <td>C2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                <h2>4. 注意框</h2>
+                    <blockquote>注意框</blockquote>
+                <h2>5. 代码符</h2>
+                    <code>代码符</code>
+                <h2>6. 下载卡片</h2>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>这篇博客</h5>
+                                <span>文件格式：.html | 大小：6.0 KB</span>
+                            </div>
+                        </div>
+                        <a href="./01. 文章复用元素.html" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <h2>7. 图片插入</h2>
+                <h3>7.1 无图片底注</h3>
+                    <img src="./气泡图示例图片.png" alt="没有图片底注" class="article-img">
+                <h3>7.2 有图片底注</h3>
+                    <figure>
+                        <img src="./气泡图示例图片.png" alt="有图片底注">
+                        
+                        <figcaption>
+                            <strong>图 1.</strong> 图片底注
+                        </figcaption>
+                    </figure>
+                <h2>8. 公式支持</h2>
+                    <p>$$\delta_1(j) = {P(x_1 j)} \times {P(y_1 k | x_1 j)}(i=1)$$</p>
+                <h2></h2>
+                <h2></h2>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

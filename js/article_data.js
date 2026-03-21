@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/03/21_16:21:56
-// 文章总数: 30
+// 生成时间: 2026/03/21_17:47:35
+// 文章总数: 32
 
 window.ARTICLE_DATABASE = [
     {
@@ -21,7 +21,7 @@ window.ARTICLE_DATABASE = [
         "title": "01. Kraken 2 自建库及鉴定",
         "collection": "classification",
         "date": "2026-03-09",
-        "summary": "Kraken 2 寻找亲缘关系最近的物种。",
+        "summary": "Kraken 2 寻找亲缘关系最近的物种",
         "path": "articles/dry_lab/classification/01. Kraken2 物种鉴定/01. Kraken2 物种鉴定.html"
     },
     {
@@ -42,7 +42,7 @@ window.ARTICLE_DATABASE = [
         "title": "01. illumina 二代组装项目",
         "collection": "assemble",
         "date": "2026-03-10",
-        "summary": "fastp清洗、spades组装、quast质控真菌组装流程化。",
+        "summary": "fastp清洗、spades组装、quast质控真菌组装流程化",
         "path": "articles/dry_lab/assemble/01. illumina 二代组装项目/01. illumina 二代组装项目.html"
     },
     {
@@ -70,8 +70,15 @@ window.ARTICLE_DATABASE = [
         "title": "01. 工作流记录",
         "collection": "mapping",
         "date": "2026-03-12",
-        "summary": "低样本量，重测序，紫外诱变关键位点的定位。",
+        "summary": "低样本量，重测序，紫外诱变关键位点的定位",
         "path": "articles/dry_lab/mapping/01. 工作流记录/01. 工作流记录.html"
+    },
+    {
+        "title": "01. 文章复用元素",
+        "collection": "wet",
+        "date": "2026-03-21",
+        "summary": "网站文章复用元素归纳",
+        "path": "articles/about/03. 关于此站/01. 文章复用元素/01. 文章复用元素.html"
     },
     {
         "title": "01. 条形图",
@@ -198,6 +205,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-02-03",
         "summary": "分析结构变异对性状的影响",
         "path": "articles/dry_lab/gwas/05. SV-GWAS LMM/05. SV-GWAS LMM.html"
+    },
+    {
+        "title": "05. 染色体层级图",
+        "collection": "figure",
+        "date": "2026-03-21",
+        "summary": "基因组的多层级展示图",
+        "path": "articles/resources/gallery/05. 染色体层级图/05. 染色体层级图.html"
     },
     {
         "title": "05. 生物文件处理",
