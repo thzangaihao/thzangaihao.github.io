@@ -164,8 +164,6 @@ function handleHashNavigation() {
 /* ------------------------------------------------------------
    5. 内容渲染 (卡片与最新文章)
    ------------------------------------------------------------ */
-
-/* [修复] 找回丢失的 renderArticleCards 函数 */
 function renderArticleCards() {
     if (!window.ARTICLE_DATABASE || !Array.isArray(window.ARTICLE_DATABASE)) return;
     
@@ -451,4 +449,43 @@ window.addEventListener('DOMContentLoaded', async () => {
     // 文章页逻辑 (TOC 和 信息栏)
     autoFillArticleInfo();
     generateTOC();
+
+    // 启动返回顶部按钮
+    initBackToTop();
 });
+
+/* ------------------------------------------------------------
+   [新增] 9. 返回顶部按钮 (Back to Top)
+   ------------------------------------------------------------ */
+function initBackToTop() {
+    // 1. 创建按钮 DOM
+    const btn = document.createElement('button');
+    btn.id = 'back-to-top-btn';
+    btn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    btn.title = '回到顶部';
+    
+    // 2. 将按钮添加到页面底部
+    document.body.appendChild(btn);
+
+    // 3. 监听滚动事件 (防抖处理，提升性能)
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        if (scrollTimeout) cancelAnimationFrame(scrollTimeout);
+        scrollTimeout = requestAnimationFrame(() => {
+            // 当页面向下滚动超过 300px 时显示按钮
+            if (window.scrollY > 300) {
+                btn.classList.add('show');
+            } else {
+                btn.classList.remove('show');
+            }
+        });
+    });
+
+    // 4. 点击事件：平滑滚动到页面最顶端
+    btn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}

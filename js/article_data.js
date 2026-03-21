@@ -1,15 +1,8 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/03/15_17:51:52
-// 文章总数: 29
+// 生成时间: 2026/03/21_16:21:56
+// 文章总数: 30
 
 window.ARTICLE_DATABASE = [
-    {
-        "title": "00. 图廊索引",
-        "collection": "figure",
-        "date": "2026-01-22",
-        "summary": "图片博物馆",
-        "path": "articles/resources/gallery/00. 图廊索引/00. 图廊索引.html"
-    },
     {
         "title": "01. AlphaFold3 在线版使用说明",
         "collection": "alphafold",
@@ -193,6 +186,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/python/04. 分子对接系列/04. 分子对接系列.html"
     },
     {
+        "title": "04. 富集分析图",
+        "collection": "figure",
+        "date": "2026-03-21",
+        "summary": "富集分析结果的可视化预览",
+        "path": "articles/resources/gallery/04. 气泡图/04. 富集分析图.html"
+    },
+    {
         "title": "05. SV-GWAS LMM",
         "collection": "gwas",
         "date": "2026-02-03",
@@ -205,5 +205,12 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-22",
         "summary": "生物信息文件格式转换，文件整合",
         "path": "articles/resources/python/05. 生物文件处理/05. 生物文件处理.html"
+    },
+    {
+        "title": "06. 交互式逻辑",
+        "collection": "python",
+        "date": "2026-03-21",
+        "summary": "更人性化的文件选取",
+        "path": "articles/resources/python/06. 交互式逻辑/06. 交互式逻辑.html"
     }
 ];

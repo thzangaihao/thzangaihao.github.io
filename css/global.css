@@ -724,3 +724,139 @@ a[onclick*="copyToClipboard"] { cursor: copy !important; position: relative; }
 .code-expand-btn i {
     margin-right: 6px;
 }
+
+/* ============================================================
+   [新增] 返回顶部按钮 (Back to Top) - 右下角明亮蓝版
+   ============================================================ */
+
+#back-to-top-btn {
+    position: fixed;
+    bottom: 40px;            /* 距离底部的高度 */
+    right: 40px;             /* 固定在右下角 */
+    
+    width: 48px;             
+    height: 48px;
+    border-radius: 50%;      
+    border: none;
+    
+    /* [修改] 默认底色改为 #3498db */
+    background-color: #3498db; 
+    color: #ffffff;          
+    font-size: 1.4rem;       
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    cursor: pointer;
+    /* [修改] 同色系发光阴影 (使用 #3498db 的 RGBA 值) */
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.35); 
+    z-index: 9999;           
+    
+    /* 初始状态：隐藏 + 往下沉一点 */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    
+    /* 丝滑过渡动画 */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* 当 JS 添加 .show 类时：浮现并归位 */
+#back-to-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* 鼠标悬停交互 */
+#back-to-top-btn:hover {
+    /* [修改] 悬停时颜色变深一点点 */
+    background-color: #2c3e50; 
+    transform: translateY(-5px);           
+    /* [修改] 阴影扩大变深 (使用 #2980b9 的 RGBA 值) */
+    box-shadow: 0 6px 18px rgba(52, 152, 219, 0.8); 
+}
+
+/* 移动端适配：屏幕变小时，保持在右下角 */
+@media (max-width: 850px) {
+    #back-to-top-btn {
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* ============================================================
+   文内关联文章链接卡片 (Related Article Link)
+   ============================================================ */
+
+.related-article {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    background: #ffffff;
+    
+    /* 边框设计：整体浅灰边框，左侧加粗使用主题强调色 */
+    border: 1px solid #e1e4e8;
+    border-left: 4px solid var(--accent-color); 
+    border-radius: 8px;
+    
+    padding: 12px 18px;
+    margin: 1.8rem 0; /* 与上下文正文保持呼吸感 */
+    
+    /* 动画与阴影：继承网站整体的悬浮反馈效果 */
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+/* 鼠标悬停时的浮动反馈 */
+.related-article:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    border-color: #d1d5da;
+}
+
+/* 左侧图标 */
+.related-article-icon {
+    font-size: 1.2rem;
+    color: var(--accent-color);
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+/* 中间文字内容区 */
+.related-article-content {
+    flex: 1; /* 撑满剩余空间 */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 关联文章标题 */
+.related-article-title {
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* 关联文章摘要/提示文字 */
+.related-article-desc {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin: 4px 0 0 0;
+}
+
+/* 右侧指示箭头 */
+.related-article-arrow {
+    color: #cccccc;
+    font-size: 1rem;
+    margin-left: 15px;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+/* 悬停时箭头向右微动并变色 */
+.related-article:hover .related-article-arrow {
+    transform: translateX(4px);
+    color: var(--accent-color);
+}
