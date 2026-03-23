@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>04. BUSCO - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="software"> 
+        <meta name="collection-title" content="软件">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-03-23">
+        <meta name="description" content="基因组装完整性评估">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>04. BUSCO</h1>
+            
+            <div class="content">
+                <h2>1. 简介</h2>
+                <p>BUSCO (Benchmarking Universal Single-Copy Orthologs) 通过比对单拷贝直系同源基因库，来量化组装的完整度。</p>
+
+                <p>BUSCO 的核心逻辑是：在一个给定的分类范围内（比如“真核生物”或“胚胎植物”），绝大多数物种都应该拥有且仅拥有一份特定的保守基因。如果你的组装结果里这些基因找得越全，说明组装质量越高。</p>
+
+                <h2>2. 环境搭建及软件安装</h2>
+                <pre><code class="language-bash">
+# 1. 创建并激活环境 (建议安装 v5.x 以上版本)
+conda create -n busco -c conda-forge -c bioconda busco=5.8.1
+conda activate busco
+
+# 2. 检查是否安装成功
+busco --version
+                </code></pre>
+
+                <h2>3. 用法</h2>
+                <p>使用以下脚本进行分析。注意，当数据库选择的太广时，你的结果可能看起来非常漂亮（比如 99% 完整），但其实是因为它只检查了最基础的一小部分基因。如果选择错，结果会非常难看（大量 Missing），因为两个物种的基因组成完全不同。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>BUSCO</h5>
+                                <span>文件格式：.py | 大小：5.0 KB</span>
+                            </div>
+                        </div>
+                        <a href="./BUSCO.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+
+                    <blockquote>如果你已下好数据库，建议开启<code>--offline</code>；若未下载，请去掉此行：</blockquote>
+                    <pre><code class="language-python">
+cmd = [
+    "busco",
+    "-i", file_path,
+    "-o", out_name,
+    "-l", lineage,
+    "-m", mode,
+    "-c", cpu,
+    "--offline"  # 如果你已下好数据库，建议开启；若未下载，请去掉此行
+]
+                    </code></pre>
+
+                <h2>4. 输出</h2>
+                <p>结果会输出很多文件，我们只需要关注 <code>short_summary.txt</code> 文件即可，其中 results 记录了分析结果：</p>
+                <pre><code class="language-txt">
+***** Results: *****
+
+C:98.8%[S:98.8%,D:0.1%],F:0.3%,M:0.9%,n:4494,E:3.3%	   
+4442	Complete BUSCOs (C)	(of which 148 contain internal stop codons)		   
+4438	Complete and single-copy BUSCOs (S)	   
+4	Complete and duplicated BUSCOs (D)	   
+13	Fragmented BUSCOs (F)			   
+39	Missing BUSCOs (M)			   
+4494	Total BUSCO groups searched	
+                </code></pre>
+                <ul>
+                    <li>C：98.8% (Complete): 代表在选择的数据库中的核心保守基因中，找齐了其中的 98.8%。</li>
+                    <li>S: 98.8% (Single-copy): 98.8% 基因都是单拷贝形式存在的。</li>
+                    <li>D: 0.1% (Duplicated): 有 0.1% 基因出现了重复。</li>
+                    <li>F: 0.3% (Fragmented): 有 0.3% 的基因是碎裂的（只找到了一部分）。</li>
+                    <li>M: 0.9% (Missing): 有 0.9% 基因完全没找到。</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

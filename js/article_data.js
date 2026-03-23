@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/03/21_19:19:24
-// 文章总数: 32
+// 生成时间: 2026/03/23_17:16:16
+// 文章总数: 33
 
 window.ARTICLE_DATABASE = [
     {
@@ -35,7 +35,7 @@ window.ARTICLE_DATABASE = [
         "title": "01. fastp",
         "collection": "software",
         "date": "2026-03-13",
-        "summary": "数据清洗，质控。",
+        "summary": "数据清洗，质控",
         "path": "articles/resources/software/01. fastp/01. fastp.html"
     },
     {
@@ -119,7 +119,7 @@ window.ARTICLE_DATABASE = [
         "title": "02. interproscan",
         "collection": "software",
         "date": "2026-03-15",
-        "summary": "根据蛋白的结构域去预测功能。",
+        "summary": "根据蛋白的结构域去预测功能",
         "path": "articles/resources/software/02. interproscan/02. interproscan.html"
     },
     {
@@ -161,7 +161,7 @@ window.ARTICLE_DATABASE = [
         "title": "03. gffread",
         "collection": "software",
         "date": "2026-03-15",
-        "summary": "基因注释文件的操作。",
+        "summary": "基因注释文件的操作",
         "path": "articles/resources/software/03. gffread/03. gffread.html"
     },
     {
@@ -177,6 +177,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-20",
         "summary": "PAE 矩阵、plDDT、pTM 与 ipTM 得分",
         "path": "articles/dry_lab/alphafold/03. 输出数据/03. 输出数据.html"
+    },
+    {
+        "title": "04. BUSCO",
+        "collection": "software",
+        "date": "2026-03-23",
+        "summary": "基因组装完整性评估",
+        "path": "articles/resources/software/04. BUSCO/04. BUSCO.html"
     },
     {
         "title": "04. SV-GWAS LM",
