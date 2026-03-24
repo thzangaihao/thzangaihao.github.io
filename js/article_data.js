@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/03/23_17:16:16
-// 文章总数: 33
+// 生成时间: 2026/03/23_22:03:32
+// 文章总数: 34
 
 window.ARTICLE_DATABASE = [
     {
@@ -114,6 +114,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-18",
         "summary": "通过 Python 脚本在 Linux 实现大规模对接任务",
         "path": "articles/dry_lab/docking/02. AutoDock Vina 自动化/02. AutoDock Vina 自动化.html"
+    },
+    {
+        "title": "02. OrthoFinder 建树",
+        "collection": "classification",
+        "date": "2026-03-23",
+        "summary": "系统发育基因组学高精度建树",
+        "path": "articles/dry_lab/classification/02. OrthoFinder 建树/02. OrthoFinder 建树.html"
     },
     {
         "title": "02. interproscan",

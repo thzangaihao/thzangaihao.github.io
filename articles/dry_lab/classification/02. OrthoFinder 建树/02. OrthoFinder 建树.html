@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>02. OrthoFinder 建树 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="classification"> 
+        <meta name="collection-title" content="分类鉴定">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-03-23">
+        <meta name="description" content="系统发育基因组学高精度建树">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>02. OrthoFinder 建树</h1>
+            
+            <div class="content">
+                <h2>1. 前言</h2>
+                <p>OrthoFinder系统发育基因组学高精度建树依赖物种的全基因组背景，与传统的基于单基因（如 18S rRNA 或 ITS）建树相比，利用全基因组数据建树能够提供更强的系统发育信号，显著提高进化树的分辨率和可靠性。</p>
+
+                <h2>2. 数据准备</h2>
+                <p>OrthoFinder 不直接吃基因组 FASTA（核苷酸序列），它需要的是蛋白质序列（Proteome, .faa 或 .pep）。因此，如果我们只有物种的基因组 <code>.fatsa</code> 文件，我们需要进行蛋白质预测与数据清洗。</p>
+
+                <h3>2.1 蛋白序列预测</h3>
+                <p>蛋白序列预测我们可以使用 funannotate，它整个了多个预测软件，但是为了建树，我们直接运行 Augustus 就行了。可以使用以下这个脚本进行交互式选择：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>Augustus蛋白预测</h5>
+                                <span>文件格式：.py | 大小：5.5 KB</span>
+                            </div>
+                        </div>
+                        <a href="./Augustus蛋白预测.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <blockquote>因为 Augustus 只支持单核单线程运行，所以这是一个过易并行脚本。当单核性能孱弱，样本基因组较大时，建议用 tmux 等工具挂起运行。</blockquote>
+                
+                <h3>2.2 蛋白数据清洗</h3>
+                <p>OrthoFinder 对数据格式要求很严格，必须是纯 <code>.fasta</code> 文件，不得包含注释和无义字符，而 Augustus 生成的文件内部包含大量无关信息，我们需要对其继续清洗：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>faa 清洗</h5>
+                                <span>文件格式：.py | 大小：2.2 KB</span>
+                            </div>
+                        </div>
+                        <a href="./faa清洗.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+
+                <h2>3. OrthoFinder</h2>
+                <h3>3.1 下载与安装</h3>
+                <p>使用 <code>conda</code> 进行安装：</p>
+                <pre><code class="language-bash">
+# 1. 创建环境
+conda create -n of3_env python=3.12
+
+# 2. 激活环境
+conda activate of3_env
+
+# 3. 下载安装 orthofinder
+conda install orthofinder
+
+# 4。 验证安装
+orthofinder --version
+                </code></pre>
+                <h3>3.2 使用</h3>
+                <p>OrthoFinder 不能在命令行里直接指定多个文件，而是必须指定一个包含了所有目标序列的文件夹，这个交互式脚本会自动创建一个干净的专属工作目录，把选中的蛋白序列复制进去，然后再启动 OrthoFinder。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>orthofinder</h5>
+                                <span>文件格式：.py | 大小：3.8 KB</span>
+                            </div>
+                        </div>
+                        <a href="./orthofinder.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <p>OrthoFinder 使用 Diamond 进行序列比对，这是一个及其费时间费算力的事情，你有 $n$ 个物种需要建库，那么它就要比对 $n^2$ 此，提交后没有报错你就可以去睡觉了。</p>
+
+                <p>MSA 法（Multiple Sequence Alignment，多序列比对法）建树计算极其复杂，但是作为严谨的建树方法，是高分文章的标准之一，我们会稍后系统性讨论各种建树方法的原理和意义。一般而言，除了 MSA 法，我们还有更快的 K-mer 距离法，距离矩阵法 (Neighbor-Joining, NJ)。</p>
+
+                <blockquote>如果你不开启 MSA 法建树（即命令行中不添加 <code>-M msa</code>参数），OrthoFinder 会直接利用 BLAST/Diamond 的比对得分，使用其开发的 STAG (Species Tree from All Genes) 算法。该算法会分析成千上万棵的基因树，寻找其中重复出现的拓扑结构，最后决定产生一棵最能代表全局的物种树。</blockquote>
+
+                <h3>3.3 内容输出</h3>
+                <p>我们只需要关注以下输出结果：</p>
+                <ul>
+                    <li>Species_Tree/SpeciesTree_rooted.txt ：这是 OrthoFinder 利用自带算法（STAG 算法结合 FastTree）初步构建好的带根物种树。它是标准的 Newick 树文本格式，可以直接导入绘图软件查看木霉菌的亲缘关系。</li>
+                    <li>MultipleSequenceAlignments/SpeciesTreeAlignment.fa：这是整个分析中最重要的矩阵文件！ OrthoFinder 把所有物种共有的单拷贝保守基因，无缝串联成了一条巨大的多肽序列。这是进行更高级、更严谨建树的原始数据。</li>
+                    <li>Comparative_Genomics_Statistics/：这个文件夹里包含了基因家族扩张、收缩、以及木霉属特有基因的统计表格，非常适合用来画条形图或者韦恩图丰富论文结果。</li>
+                </ul>
+                
+
+                
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
