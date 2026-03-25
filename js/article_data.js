@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/03/23_22:03:32
-// 文章总数: 34
+// 生成时间: 2026/03/25_22:30:13
+// 文章总数: 36
 
 window.ARTICLE_DATABASE = [
     {
@@ -130,6 +130,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/software/02. interproscan/02. interproscan.html"
     },
     {
+        "title": "02. 建树算法",
+        "collection": "algorithm",
+        "date": "2026-03-25",
+        "summary": "如何量化计算物种差异？",
+        "path": "articles/dry_lab/algorithm/02. 建树算法/02. 建树算法.html"
+    },
+    {
         "title": "02. 热图",
         "collection": "figure",
         "date": "2026-01-22",
@@ -212,6 +219,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-03-21",
         "summary": "富集分析结果的可视化预览",
         "path": "articles/resources/gallery/04. 气泡图/04. 富集分析图.html"
+    },
+    {
+        "title": "05. IQ TREE",
+        "collection": "software",
+        "date": "2026-03-25",
+        "summary": "最大似然法建树的极致代表",
+        "path": "articles/resources/software/05. IQ TREE/05. IQ TREE.html"
     },
     {
         "title": "05. SV-GWAS LMM",

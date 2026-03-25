@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>05. IQ TREE - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="software"> 
+        <meta name="collection-title" content="软件">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-03-25">
+        <meta name="description" content="最大似然法建树的极致代表">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>05. IQ TREE</h1>
+            
+            <div class="content">
+                <h2>1. 简介</h2>
+                <p>IQ-TREE 就是用来建树的，你可以理解它为 MEGA 软件的建树部分。虽然 MEGA 可以跑 NJ、ML、MP 等多种算法，但 IQ-TREE 专注于最大似然法 (Maximum Likelihood, ML)。它之所以在学术界（尤其是发高分文章时）地位极高，是因为它把 ML 建树做到了极致：</p>
+                <ul>
+                    <li>自动选样：它能自动测试成百上千种进化模型，选出最符合你那堆序列的一款。</li>
+                    <li>超快增强值：传统 MEGA 跑 1000 次 Bootstrap 可能要跑几天，IQ-TREE 的专利算法（Ultrafast Bootstrap）几分钟就能跑完，而且更准。</li>
+                    <li>深度搜索：它在寻找最优树时比 MEGA 更彻底，不容易陷入局部最优解。</li>
+                </ul>
+
+
+                <h2>2. 环境搭建及软件安装</h2>
+                <pre><code class="language-bash">
+# 1. 创建一个名为 phylogenomics 的新环境（专门用于高级建树）
+conda create -n phylogenomics -c bioconda iqtree
+
+# 2. 激活环境
+conda activate phylogenomics
+
+# 3. 验证安装（如果输出了版本号和帮助信息，就说明成功了）
+iqtree -h
+                </code></pre>
+
+                <h2>3. 用法</h2>
+                <h3>3.1 数据准备</h3>
+                <p></p>
+
+
+
+
+
+
+
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

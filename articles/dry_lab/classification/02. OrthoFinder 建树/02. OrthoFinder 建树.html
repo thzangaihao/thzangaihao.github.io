@@ -36,7 +36,9 @@
             
             <div class="content">
                 <h2>1. 前言</h2>
-                <p>OrthoFinder系统发育基因组学高精度建树依赖物种的全基因组背景，与传统的基于单基因（如 18S rRNA 或 ITS）建树相比，利用全基因组数据建树能够提供更强的系统发育信号，显著提高进化树的分辨率和可靠性。</p>
+                <p>OrthoFinder 系统发育基因组学高精度建树依赖物种的全基因组背景，与传统的基于单基因（如 18S rRNA 或 ITS）建树相比，利用全基因组数据建树能够提供更强的系统发育信号，显著提高进化树的分辨率和可靠性。</p>
+
+                <blockquote>如果你试图搞懂我们在搞什么东西而不是只是为了画出一棵树，你需要了解以下目的和算法：两个序列之间的比对算法（例如 NW全局比对算法、BLAST 快速比对算法）；建树算法（例如 UPGMA 算法、NJ 算法、贝叶斯算法、最大似然法、STAG 算法等）。</blockquote>
 
                 <h2>2. 数据准备</h2>
                 <p>OrthoFinder 不直接吃基因组 FASTA（核苷酸序列），它需要的是蛋白质序列（Proteome, .faa 或 .pep）。因此，如果我们只有物种的基因组 <code>.fatsa</code> 文件，我们需要进行蛋白质预测与数据清洗。</p>
@@ -108,10 +110,100 @@ orthofinder --version
                 <h3>3.3 内容输出</h3>
                 <p>我们只需要关注以下输出结果：</p>
                 <ul>
-                    <li>Species_Tree/SpeciesTree_rooted.txt ：这是 OrthoFinder 利用自带算法（STAG 算法结合 FastTree）初步构建好的带根物种树。它是标准的 Newick 树文本格式，可以直接导入绘图软件查看木霉菌的亲缘关系。</li>
-                    <li>MultipleSequenceAlignments/SpeciesTreeAlignment.fa：这是整个分析中最重要的矩阵文件！ OrthoFinder 把所有物种共有的单拷贝保守基因，无缝串联成了一条巨大的多肽序列。这是进行更高级、更严谨建树的原始数据。</li>
-                    <li>Comparative_Genomics_Statistics/：这个文件夹里包含了基因家族扩张、收缩、以及木霉属特有基因的统计表格，非常适合用来画条形图或者韦恩图丰富论文结果。</li>
+                    <li><code>Species_Tree/SpeciesTree_rooted.txt</code>：这是 OrthoFinder 利用自带算法（STAG 算法结合 FastTree）初步构建好的带根物种树。它是标准的 Newick 树文本格式，可以直接导入绘图软件查看木霉菌的亲缘关系。你可以使用 <a href="https://itol.embl.de/" target="_blank" style="color: #3498db;">https://itol.embl.de/</a> 直接预览你的树，并进行相对应的修改。
+                    </li>
+                    <li><code>MultipleSequenceAlignments/SpeciesTreeAlignment.fa</code>：这是整个分析中最重要的矩阵文件！ OrthoFinder 把所有物种共有的单拷贝保守基因，无缝串联成了一条巨大的多肽序列。这是进行更高级、更严谨建树的原始数据。</li>
+                    <li><code>Comparative_Genomics_Statistics/</code>：这个文件夹里包含了基因家族扩张、收缩、以及木霉属特有基因的统计表格，非常适合用来画条形图或者韦恩图丰富论文结果。</li>
                 </ul>
+
+                <h2>4. IQ-TREE ML 优化建树</h2>
+                    <p><code>Species_Tree/SpeciesTree_rooted.txt</code> 是由 FastTree 依赖 STAG 算法构建的初步结果。为了达到发表论文的严谨性，我们要利用 OrthoFinder 生成的超级矩阵 <code>MultipleSequenceAlignments/SpeciesTreeAlignment.fa</code> 跑一遍最大似然法 (ML) 建树。</p>
+
+                    <p>关于原理和你心中许多疑惑，在这片文章应该能解答一部分：</p>
+                        <a href="..\..\..\dry_lab\algorithm\02. 建树算法\02. 建树算法.html" class="related-article" target="_blank">
+                            <div class="related-article-icon">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            
+                            <div class="related-article-content">
+                                <div class="related-article-title">推荐阅读：02. 建树算法</div>
+                                <div class="related-article-desc">如何量化计算物种差异？</div>
+                            </div>
+                            
+                            <div class="related-article-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+
+                    <p>IQ-TREE 专注于建树，它的使用参照以下这篇文章：</p>
+                        <a href="..\..\..\resources\software\05. IQ TREE\05. IQ TREE.html" class="related-article" target="_blank">
+                            <div class="related-article-icon">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            
+                            <div class="related-article-content">
+                                <div class="related-article-title">推荐阅读：05. IQ TREE</div>
+                                <div class="related-article-desc">最大似然法建树的极致代表</div>
+                            </div>
+                            
+                            <div class="related-article-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+
+                    <p>如果你觉得你从 NCBI 上下载下来的样本命名有点长，你可以用以下这个脚本去清洗一下 MSA 生成超矩阵里面的样品命名，只保留 GCA 号或者只保留物种名称。</p>
+
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>洗刷刷</h5>
+                                <span>文件格式：.py | 大小：4.0 KB</span>
+                            </div>
+                        </div>
+                        <a href="./洗刷刷.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+
+                <h2>5. OrthoFinder 原理浅析</h2>
+                <p>虽然 OrthoFinder是基于全基因组视野下的，但是，我们不可能把所有物种的基因组文件一一去做比较得分来判断亲缘关系，这是在人类目前算力水平下不可能实现的方案。因此，我们（就是 OrthoFinder）会把所有物种的直系同源单拷贝基因提取出来，更具体的说，OrthoFinder 干了这两件事情：</p>
+                <ol>
+                    <li>鉴定直系同源基因：一个物种的基因组里有很多重复基因（旁系同源）。OrthoFinder 会通过算法剔除干扰，只找那些“祖先是一个，因为物种分化才分开”的基因。</li>
+                    <li>提取单拷贝基因：如果一个基因在所有木霉菌里都只出现了一次，那么它的进化轨迹是最干净、最能代表物种演化的。</li>
+                </ol>
+                <p>OrthoFinder 本质上就是在取交集。根据我们所投喂的每个物种的总蛋白<code>.fasta</code>文件进行计算得到所有物种都具有的那一部分的蛋白序列（准确来讲就是 直系 且 同源 的基因），最后分别生成直系同源的基因蛋白的<code>.fasta</code>文件，并分开记录。你可以在 <code>Orthogroup_Sequences/</code> 里看到那些所有的直系同源蛋白。</p>
+
+                <p>当我们启用 MSA 时，OrthoFinder 会把所有样本的那些单拷贝基因（即在每个物种里都只出现了一次的“完美交集”）分别对齐，然后像串糖葫芦一样拼成一根巨大的序列。其中，MSA 是一种多序列对齐算法，本质上就是在多次进行的 NW 算法（两个序列之间的全局比对），并做一些结果合并处理，关于 NW 算法，我们在其它文章中有详细讲解。</p>
+
+                <a href="..\..\..\" class="related-article" target="_blank">
+                    <div class="related-article-icon">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    
+                    <div class="related-article-content">
+                        <div class="related-article-title">推荐阅读：比对算法</div>
+                        <div class="related-article-desc">我还没写挖个坑</div>
+                    </div>
+                    
+                    <div class="related-article-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+
+                <p>MSA 的生成大矩阵就像这样：</p>
+                <pre><code class="language-txt">
+>物种1
+第一个直系同源基因编码蛋白氨基酸序列-第二个-第三个-......
+>物种2
+第一个直系同源基因编码蛋白氨基酸序列-第二个-第三个-......
+>物种3
+第一个直系同源基因编码蛋白氨基酸序列-第二个-第三个-......
+                </code></pre>
+                <p>每一个直系同源基因编码蛋白氨基酸序列物种间都有区别，而 MSA 算法就是将它们对齐。</p>
+
+                <p>如果我们不用 MSA 生成多序列比对材料去做最大似然法建树（当然你也可以去做贝叶斯树或其它算法树），OrthoFinder 会依靠 STAG(Species Tree from All Genes) 算法建树，关于 STAG 算法，它的原材料是成千上万棵独立的基因树，它会拆解这几千棵基因树，看每一棵树里物种之间的分支关系，根据支持比例去选择出最有可能的一棵树。那成千上万个小树是怎么来的呢？</p>
+
+                <p>OrthoFinder 会先为它找到的每一个直系同源组（Orthogroup）都画一棵小树（通常用 FastTree 快速生成）。这些小树中，有些是单拷贝的，有些包含重复基因（旁系同源）。</p>
                 
 
                 
