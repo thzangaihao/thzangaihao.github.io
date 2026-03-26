@@ -58,8 +58,30 @@ iqtree -h
                 </code></pre>
 
                 <h2>3. 用法</h2>
-                <h3>3.1 数据准备</h3>
-                <p></p>
+                <p>IQ-TREE 一般用于 OrthoFinder 使用 MSA 跑出来的同源单拷贝基因蛋白对齐后的 <code>.fasta</code> 文件。IQ-TREE 当然也支持基因组序列，在输入之前，一定要对齐！</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>IQ_TREE.py</h5>
+                                <span>文件格式：.py | 大小：4.8 KB</span>
+                            </div>
+                        </div>
+                        <a href="./IQ_TREE.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <p>IQ-TREE 运行一般要耗费很长的时间，我们会在集群等超级计算机上去运行它，下面这一份是在部署了 slurm 的集群服务器的交互式运行脚本，它会自动检测你的比对文件，询问集群资源需求，然后为每个文件生成一个 .sh 脚本并自动执行 sbatch。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>IQ_TREE_slurm.py</h5>
+                                <span>文件格式：.py | 大小：4.1 KB</span>
+                            </div>
+                        </div>
+                        <a href="./IQ_TREE_slurm.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
 
 
 
