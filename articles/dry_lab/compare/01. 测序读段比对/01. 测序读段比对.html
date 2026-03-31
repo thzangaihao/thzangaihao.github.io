@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>01. 测序读段比对 - 海钊知识港</title>
+        <meta name="collection" content="compare"> 
+        <meta name="date" content="2026-03-31">
+        <meta name="description" content="将细碎测序读段数据比对到参考基因组上">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <a href="../../dry_lab_index.html#docking" class="back-link"><i class="fas fa-arrow-left"></i> 返回 干实验 / 比较基因组学</a>
+
+            <h1>01. 测序读段比对</h1>
+            <div class="meta">
+                <span><i class="far fa-calendar"></i> 2025-12-17</span>
+                <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 分子对接</span>
+            </div>
+
+            <div class="content">
+                <h2>1. 前言</h2>
+                    <p>将测序得到的细碎读段数据比对到参考基因组上是最基础的分析操作。简单来讲，我们测序会得到大量的短读长读段，而我们的目的就是将这些读段数据定位到参考基因组上的具体位置，比如第几号染色体正链上的哪几个碱基上。这个操作，我们也可以称之为 mapping。</p>
+
+                    <p>比对更原理的东西设计了许多suanfa</p>
+                <h2>2. 文件结构及类型</h2>
+                    <h4>需要准备的文件：</h4>
+                    <ol>
+                        <li>参考基因组 <code>.fasta</code> 文件。</li>
+                        <li>测序读段数据 <code>.fastq</code> 文件。</li>
+                    </ol>
+                    <h4>要得到的文件：</h4>
+                    <ol>
+                        <li>记录 mapping 信息的 <code>.bam</code> 文件。</li>
+                    </ol>
+                    <h3>2.1 <code>.fasta</code> 文件</h3>
+                        <p><code>.fasta</code>为序列记录文件，<code>.fasta</code>文件的记录基本单位为两行，即两行一元素，其中第一行以 <code>></code> 开头，后面接这个序列的 ID 或者其它信息。第二行为序列的记录行。</p>
+                        <pre><code class="language-fasta">>seq1
+ATGACGATGATGAGCACTCGAGACGT
+>seq2
+GTCATCTAGCTAGCTAGCT</code></pre>
+                        <p><code>.fasta</code> 文件除了能记录物种基因组，你也可以去记录蛋白质序列（单字母缩写），或者你能想到的任何需要以这种形式记录的文件，例如，我经常拿 <code>.fasta</code> 文件来记录小分子 SMILES 代码，用来做分子对接脚本的批量生产，你可以在本站的 Alphafold 栏看到。</p>
+                        <p><code>.fasta</code> 文件有许多其它名称，例如你在 NCBI 上下载基因序列，它的结尾就是 <code>.fna</code> 文件。如果你下载的是蛋白质文件，它的结尾就是 <code>.faa</code> 文件。除此之外，<coed>.fa</coed>，是 <code>.fasta</code> 文件的缩写，它们的数格式一模一样。</p>
+                        <p>在某些特殊的 <code>.fasta</code> 文件中，允许出现占位符或其它字符，例如 <code>-</code> 表示占位 <code>N</code> 表示未知碱基。</p>
+                        <p><code>.fasta</code> 文件允许换行来记载序列行，以提高人类可读性。但是在实际使用时，换行符经常会被当做非法字符在某些软件中报错，因此，我们都会严格按照一行一序列，两行一元素的方式记录，毕竟谁也不会盯着一大堆 ATCG 看。但是某些 <code>.fasta</code> 文件都喜欢使用换行符记录（例如你从 NCBI 上下载的序列文件），我们可以使用以下脚本进行转换：</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>fasta去换行</h5>
+                                    <span>fasta去换行.py | 大小：4.7KB</span>
+                                </div>
+                            </div>
+                            <a href="./fasta去换行.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                    <h3>2.2 <code>.fastq</code> 文件</h3>
+                    <h3>2.3 <code>.bam</code> 文件</h3>
+                <h2>3. 软件</h2>
+                    <p>笔者最常使用两款软件，分别是 Hisat 2 和 Bowtie 2，我们会一一介绍区别。</p>
+                    <h3>3.1 Bowtie 2</h3>
+                        <p>Bowtie 2 用于处理 DNA 测序读段数据，它负责将将序列与参考基因组连续的比对。因此，Bowtie 2 常用于重测序、以及组学研究等。</p>
+                    <h3>3.2 Hisat 2</h3>
+                        <p>Hisat 2 用于处理 RNA 测序读段数据，它和 Bowtie 2 的区别就是它可以利用算法进行不连续比对——比如跨越内含子的比对。因此，Hisat 2 常用于转录组分析的最初始的 mapping。</p>
+                
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

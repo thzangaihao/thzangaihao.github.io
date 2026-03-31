@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/03/25_22:30:13
-// 文章总数: 36
+// 生成时间: 2026/03/31_16:38:37
+// 文章总数: 37
 
 window.ARTICLE_DATABASE = [
     {
@@ -86,6 +86,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-22",
         "summary": "基础条形图、堆叠条形图、簇状条形图",
         "path": "articles/resources/gallery/01. 条形图/01. 条形图.html"
+    },
+    {
+        "title": "01. 测序读段比对",
+        "collection": "compare",
+        "date": "2026-03-31",
+        "summary": "将细碎测序读段数据比对到参考基因组上",
+        "path": "articles/dry_lab/compare/01. 测序读段比对/01. 测序读段比对.html"
     },
     {
         "title": "01. 转录组分析系列：富集分析",
