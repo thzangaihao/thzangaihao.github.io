@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/03/31_16:38:37
-// 文章总数: 37
+// 生成时间: 2026/04/01_16:50:41
+// 文章总数: 38
 
 window.ARTICLE_DATABASE = [
     {
@@ -135,6 +135,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-03-15",
         "summary": "根据蛋白的结构域去预测功能",
         "path": "articles/resources/software/02. interproscan/02. interproscan.html"
+    },
+    {
+        "title": "02. 变异位点筛查",
+        "collection": "compare",
+        "date": "2026-04-01",
+        "summary": "将细碎测序读段数据比对到参考基因组上",
+        "path": "articles/dry_lab/compare/02. 变异位点筛查/02. 变异位点筛查.html"
     },
     {
         "title": "02. 建树算法",

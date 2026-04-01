@@ -28,19 +28,17 @@
         </nav>
 
         <div class="article-container">
-            <a href="../../dry_lab_index.html#docking" class="back-link"><i class="fas fa-arrow-left"></i> 返回 干实验 / 比较基因组学</a>
+            <a href="../../dry_lab_index.html#compare" class="back-link"><i class="fas fa-arrow-left"></i> 返回 干实验 / 比较基因组学</a>
 
             <h1>01. 测序读段比对</h1>
             <div class="meta">
-                <span><i class="far fa-calendar"></i> 2025-12-17</span>
-                <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 分子对接</span>
+                <span><i class="far fa-calendar"></i> 2026-03-31</span>
+                <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 比较基因组学</span>
             </div>
 
             <div class="content">
                 <h2>1. 前言</h2>
                     <p>将测序得到的细碎读段数据比对到参考基因组上是最基础的分析操作。简单来讲，我们测序会得到大量的短读长读段，而我们的目的就是将这些读段数据定位到参考基因组上的具体位置，比如第几号染色体正链上的哪几个碱基上。这个操作，我们也可以称之为 mapping。</p>
-
-                    <p>比对更原理的东西设计了许多suanfa</p>
                 <h2>2. 文件结构及类型</h2>
                     <h4>需要准备的文件：</h4>
                     <ol>
@@ -65,7 +63,7 @@ GTCATCTAGCTAGCTAGCT</code></pre>
                             <div class="download-info">
                                 <i class="fas fa-file-code"></i> <div class="file-details">
                                     <h5>fasta去换行</h5>
-                                    <span>fasta去换行.py | 大小：4.7KB</span>
+                                    <span>文件格式：.py | 大小：4.7 KB</span>
                                 </div>
                             </div>
                             <a href="./fasta去换行.py" download class="download-btn">
@@ -73,13 +71,113 @@ GTCATCTAGCTAGCTAGCT</code></pre>
                             </a>
                         </div>
                     <h3>2.2 <code>.fastq</code> 文件</h3>
+                        <p><code>.fastq</code> 文件为读段记录的原始文件，也是一般测序公司交付给你的原始文件。<code>.fastq</code> 文件记载了所有的测序读段信息，其中一条读段的记录信息占四行，即一个元素占四行，分别是：</p>
+                        <pre><code class="language-fastq">@reads1
+AAATTTCCCGGG
++
+AAAAAEEEEEEE</code></pre>
+                        <ul>
+                            <li>其中，第一行以 <code>@</code> 开头，后续记录这个读段的其它信息，比如说测序仪器编号，index 序列等等。
+                        </li>
+                            <li>第二行记录了这个读段的具体序列。</li>
+                            <li>第三行以一个加号 <code>+</code> 分隔。</li>
+                            <li>第四行是对这个碱基测定的质量，认为这个碱基有多大可能被算错，具体质量有一个符号代替，共划分40档，详细的分级及意义可以在对照表中查到。</li>
+                        </ul>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>碱基质量对照表</h5>
+                                    <span>文件格式：.txt | 大小：1.6 KB</span>
+                                </div>
+                            </div>
+                            <a href="./碱基质量对照表.txt" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                        <p>如果是双端测序数据（现在测序一般都是双端测序），一个样品公司一般会给那你两个 <code>.fastq</code> 文件，分别是 <code>_R1.fastq</code> 和 <code>_R2.fastq</code>，记录了一个读段两头的数据。</p>
+                        <p><code>.fastq</code> 文件都比较大，我们会以压缩包的形成 <code>.fastq.gz</code> 或 <code>.fq.gz</code> 文件进行存储。</p>
                     <h3>2.3 <code>.bam</code> 文件</h3>
+                        <p><code>.bam</code> 文件和 <code>.sam</code> 文件记录的数据都是一样的。区别在于，<code>.sam</code> 文件你可以用记事本打开，为人类可读文件。而 <code>.bam</code> 文件是 <code>.sam</code> 的压缩格式，你可以用相关软件进行查看，文件本身为二进制文件。</p>
+                        <p><code>.bam</code> 文件分为两部分，分别为文件头和序列记录部分，文件头记录了 mapping 的相关信息，而序列记录部分记录了比对的具体结果。</p>
+                        <p>我们可以使用软件 samtools 去打印 <code>.bam</code> 文件的文件头的前几行等：</p>
+                        <pre><code class="language-bash">samtools view -H your_file.bam | head -n 10</code></pre>
+                        <p>同样可以查看序列前几行：</p>
+                        <pre><code class="language-bash">samtools view your_file.bam | head -n 10</code></pre>
+                        <p>一个 read 的比对我们用一行记录，这是信息密度极高的记录方式，我们至少有 12 个参数去记录一个 read 的比对信息：</p>
+                        <ol>
+                            <li>QNAME：读段的名称（Read ID），就是 <code>.fastq</code> 文件 <code>@</code> 后面的那一段。</li>
+                            <li>FLAG：位标识。FLAG 是一个整数，但它实际上是一组二进制开关（0或1）的十进制表示。每个二进制位代表一个特定的含义。</li>
+                            <li>RNAME：参考序列的名称（即比到了哪条染色体/Scaffold上）。* 表示未比对上。</li>
+                            <li>POS：映射的最左端位置。从1开始计数。0 表示未比对上。</li>
+                            <li>MAPQ：映射质量。Phred 格式，表示该比对位置出错的概率。值越高，比对越可靠。255 通常表示质量值不可用。</li>
+                            <li>CIGAR：序列比对情况的简略表示。描述读段如何与参考序列匹配（匹配、缺失、插入等）。</li>
+                            <li>RNEXT：双端测序中配对读段另一条读段所映射的参考序列名。= 表示在同一条参考序列上。</li>
+                            <li>PNEXT：双端测序中配对读段另一条读段映射的位置。</li>
+                            <li>TLEN：插入片段长度。即配对读段之间的模板长度，反映了文库中 DNA 片段的大小。</li>
+                            <li>SEQ：读段的原始序列碱基。</li>
+                            <li>QUAL：读段序列的质量值，与SEQ一一对应。ASCII码表示，字符对应一个Phred质量分数。</li>
+                            <li>other：提供额外信息，以字典的形式记录。</li>
+                        </ol>
+                        <h4>2-FLAG</h4>
+                            <ul>
+                                <li>1：PAIRED: 序列是双端测序（Paired-end）</li>
+                                <li>2：PROPER_PAIR: 序列完美匹配（双端都在参考基因组上且距离合理）</li>
+                                <li>4：UNMAP: 该序列本身未比对上参考基因组</li>
+                                <li>8：MUNMAP: 该序列的配对序列（Mate）未比对上</li>
+                                <li>16：REVERSE: 该序列比对到参考基因组的反向互补链（负链）</li>
+                                <li>32：MREVERSE: 双端测序的配对序列比对到了反向互补链</li>
+                                <li>64：READ1: 该序列是双端测序中的 Read 1</li>
+                                <li>128：READ2: 该序列是双端测序中的 Read 2</li>
+                                <li>256：SECONDARY: 次要比对（该 Read 比对到多个地方，这是非主要的）</li>
+                                <li>512：QCFAIL: 未通过质量控制</li>
+                                <li>1024：DUP: PCR 重复序列或光学重复</li>
+                                <li>2048：SUPPLEMENTARY: 补充比对（如嵌合比对 Chimeric alignment）</li>
+                            </ul>
+                            <p>例如：$99 = 64 + 32 + 2 + 1$，转换为二进制即：000001100011。表示：</p>
+                            <ul>
+                                <li>1：PAIRED: 序列是双端测序（Paired-end）</li>
+                                <li>2：PROPER_PAIR: 序列完美匹配（双端都在参考基因组上且距离合理）</li>
+                                <li>32：它的配对序列（Mate）比对到了负链（反向互补）</li>
+                                <li>64：READ1: 该序列是双端测序中的 Read 1</li>
+                            </ul>
+                        <h4>6-CIGAR</h4>
+                            <ul>
+                                <li>M: 匹配（可以是序列匹配，也可以是错配，具体取决于Base Quality）</li>
+                                <li>I: 相对于参考序列，在读段中插入了碱基</li>
+                                <li>D: 相对于参考序列，在读段中缺失了碱基（参考基因组上有，读段没有）</li>
+                                <li>N: 内含子剪接位点的大段缺失（在RNA-Seq比对中非常关键，直接指示了外显子边界）</li>
+                                <li>S: 软裁剪，序列在比对时被部分忽略，但这些碱基仍然保留在SEQ字段中</li>
+                                <li>H: 硬裁剪，序列在比对时被部分忽略，且这些碱基不保留在SEQ字段中</li>
+                            </ul>
+                            <p>例如：CIGAR = 70M2I30M 表示：</p>
+                            <ul>
+                                <li>70M: 开头有70个碱基与参考序列匹配。</li>
+                                <li>2I: 紧接着，读段中有2个碱基是参考序列上没有的（插入）。</li>
+                                <li>30M: 最后30个碱基再次与参考序列匹配。</li>
+                            </ul>
+
                 <h2>3. 软件</h2>
                     <p>笔者最常使用两款软件，分别是 Hisat 2 和 Bowtie 2，我们会一一介绍区别。</p>
                     <h3>3.1 Bowtie 2</h3>
                         <p>Bowtie 2 用于处理 DNA 测序读段数据，它负责将将序列与参考基因组连续的比对。因此，Bowtie 2 常用于重测序、以及组学研究等。</p>
                     <h3>3.2 Hisat 2</h3>
                         <p>Hisat 2 用于处理 RNA 测序读段数据，它和 Bowtie 2 的区别就是它可以利用算法进行不连续比对——比如跨越内含子的比对。因此，Hisat 2 常用于转录组分析的最初始的 mapping。</p>
+                        <p>Hisat 2 我边写边翻译了一本中文版的使用手册，因为比较大且写于建站之前，我也懒得改成 <code>.html</code> 格式了，因此在这里我直接上传 <code>.md</code> 文档供以下载：</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>Hisat 2</h5>
+                                    <span>文件格式：.md | 大小：52.5 KB</span>
+                                </div>
+                            </div>
+                            <a href="./Hisat2.md" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                <h2>4. 链的正负性与读段的正负性</h2>
+                        <p>这一点是非常重要的！<code>.fasta</code> 链记录的永远是正链，而正链的选取标准有许多，如着丝粒位置，一般由短臂端向长臂端的$5' \rightarrow 3'$进行记录。注意！这里的正链只是分析中的一个锚定参考，基因组的正链 $\neq$ 基因的编码链。</p>
+                        <p>不管是单端测序还是双端测序，我们都是对整个基因组进行文库构建的，而双端测序只是把一条读段反过来再读一遍进行配对。因此，即使你是单端测序，因为文库构建，DNA 片段是随机连接到测序接头上的，我们所获得的 reads 也会 mapping 到正负链上。</p>
+                        <p>所以，每一条 read 都会在参考基因组的正向链和反向互补链上都“试”一遍。<code>.bam</code> 中的读段是在 mapping 时进行正负链上的区分的。</p>
                 
             </div>
         </div>

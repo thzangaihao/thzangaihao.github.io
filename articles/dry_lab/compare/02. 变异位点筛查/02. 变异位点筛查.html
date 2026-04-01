@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>02. 变异位点筛查 - 海钊知识港</title>
+        <meta name="collection" content="compare"> 
+        <meta name="date" content="2026-04-01">
+        <meta name="description" content="找到发生了突变的地方">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <a href="../../dry_lab_index.html#compare" class="back-link"><i class="fas fa-arrow-left"></i> 返回 干实验 / 比较基因组学</a>
+
+            <h1>02. 变异位点筛查</h1>
+            <div class="meta">
+                <span><i class="far fa-calendar"></i> 2026-04-01</span>
+                <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 比较基因组学</span>
+            </div>
+
+            <div class="content">
+                <h2>1. 前言</h2>
+                <p>这一节记录了如何分析找到基因的变异位点，我们对于变异通常分为三类，即点突变（Single Nucleotide Variant, SNV），结构变异（Structural Variation, SV）和 小片段的插入或缺失（通常定义在 50 bp 以下） (Insertion/Deletion, Indel)。
+                </p>
+
+                <p>本文的原理部分需要系统性修读《概率与统计》课程。</p>
+                <h2>2. 文件结构和类型</h2>
+                    <h4>需要准备的文件：</h4>
+                        <ol>
+                            <li>对照组的参考基因组 <code>.fasta</code> 文件。</li>
+                            <li>实验组（诱变组）的 <code>.fastq</code> 测序文件（一般是重测序，测序深度比较低）。</li>
+                            <li>（或）已经将实验组的读段数据 mapping 到对照组参考基因组上的 <code>.bam</code> 文件。</li>
+                            <li>（可选）对照组参考基因组基因注释文件 <code>.gtf</code> 或 <code>.gff3</code> 或其它注释文件，以下用 <code>.gff3</code> 为例。</li>
+                        </ol>
+                    <h4>要得到的文件：</h4>
+                        <ol>
+                            <li>记录单位点突变的 <code>.vcf</code> 文件。</li>
+                            <li>记录结构变异的 <code>.vcf</code> 文件。</li>
+                        </ol>
+                    <h3>2.1 <code>.vcf</code> 文件</h3>
+                        <p><code>.vcf</code> 文件是专门用来记录变异的，和大部分文件一样，也分为文件头和记录区两部分。不同的软件产生的 <code>.vcf</code> 文件在记录参数上有数量上的差异，但是，这八个参数（列）是一定有的：</p>
+                        <ol>
+                            <li>CHROM：染色体，变异所在的染色体（就是参考基因组 <code>.fasta</code>上记录的）名称。</li>
+                            <li>POS：位置，变异发生的起始坐标（基于 1）。</li>
+                            <li>ID：标识符，通常是 dbSNP 数据库的 ID，若无则显示 <code>.</code>。</li>
+                            <li>REF：参考碱基，参考基因组在该位置的碱基。</li>
+                            <li>ALT：变异碱基，样本检测到的变异碱基。</li>
+                            <li>QUAL：质量值，Phred 格式的质量分，$ -10 \log_{10} P(\text{call is wrong})$。。</li>
+                            <li>FILTER：过滤状态，若未通过质控，则显示具体原因（如 LowQual）。</li>
+                            <li>INFO：包含该位点的深度（DP）、等位基因频率（AF）等。</li>
+                        </ol>
+                        <p>如果你处理的是包含样本信息（例如你自己测序的样本）的 VCF，第 8 列之后会出现 FORMAT 列和 Sample 列（如 Sample_01）。</p>
+                        <h4>FORMAT 列</h4>
+                        <ol>
+                            <li>GT (Genotype): 基因型</li>
+                            <li>AD (Allele Depth): 对应 REF 和 ALT 的各自测序深度。</li>
+                            <li>DP (Depth): 该位点的总覆盖深度。</li>
+                            <li>GQ (Genotype Quality): 基因型识别的准确性评分。</li>
+                        </ol>
+                        <h4>Sample 列</h4>
+                        <p>这里记录了该样本具体的数值，与 FORMAT 一一对应。</p>
+                        <p>GT 值的含义：</p>
+                        <ol>
+                            <li>0: 代表参考基因组碱基 (REF)</li>
+                            <li>1: 代表第一个变异碱基 (ALT)</li>
+                            <li>2: 代表第二个变异碱基 (ALT 里的第二项)</li>
+                        </ol>
+                        <p>组合方式：</p>
+                        <ol>
+                            <li>0/0: 纯合未变异</li>
+                            <li>0/1: 杂合变异</li>
+                            <li>1/1: 纯合变异</li>
+                        </ol>
+                        <h4>例子</h4>
+                        <p>假设记录这么一行：</p>
+                        <pre><code class="language-vcf">chr1  100  .  A  G  100  PASS  DP=100  GT:AD:DP  0/1:25,25:50</code></pre>
+                        <p>把它翻译一下就是：“在 1 号染色体的第 100 号位置，参考基因组是 A，但样本变异成了 G。变异质量很好（PASS）。这个位点总共被测到了 100 次（INFO 里的 DP），但在该样本中实际有效深度是 50（Sample 里的 DP），其中支持 A 的有 25 条 read，支持 G 的有 25 条 read，所以这个样本在该位点是杂合子 (0/1)。”</p>
+                        <blockquote>当然，你的物种可能是单倍体，但是 <code>.vcf</code> 文件依然会忠实的记录“杂合”，如果你发现一个位点只有一部分发生突变，那么只有这几种可能：1. 这个位点是多拷贝基因，发生变异的一部分被 mapping 到了这里。2. mapping 精度不高。3. 参考基因组错误。</blockquote>
+
+                <h2>3. 软件</h2>
+                    我们主要基于以下两款软件进行变异分析：Snpeff 进行单位点突变分析，Delly 进行结构变异的分析。
+                <h2>4. 分析流程与参数</h2>
+                    <p>分析流程已经被脚本化，你只需要搭建好环境下载好软件就可以一键运行：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>变异筛查</h5>
+                                <span>文件格式：.py | 大小：7.2 KB</span>
+                            </div>
+                        </div>
+                        <a href="./变异筛查.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                    <p>其中，我们要注意如下几个筛查参数：</p>
+                    <h4>QUAL</h4>
+                        <p>QUAL 值代表该位点存在变异（即不是参考序列碱基）的概率。它通常基于 Phred Quality Score 计算。</p>
+                        <p>$$QUAL = -10 \log_{10} P(\text{error})$$</p>
+                        <table><thead><tr><th>QUAL</th><th>犯错概率</th><th>置信度</th></tr></thead><tbody><tr><td>10</td><td>0.1</td><td>0.9</td></tr><tr><td>20</td><td>0.01</td><td>0.99</td></tr><tr><td>30</td><td>0.001</td><td>0.999</td></tr></tbody></table>
+                        <p>我们一般选择 30，即犯错概率只有 0.001。</p>
+
+                        <p><code>.vcf</code> 中 QUAL 计算很麻烦，它的底层数据原料为 <code>.bam</code> 的点位质量值，其更底层的原料就是 <code>.fastq</code> 文件的读段质量，不过，这其中也会通过复杂的统计模型计算出新的数据原料供下游计算。</p>
+                        <p>VCF 的 QUAL 值实际上是基于一个假设检验：“该位点是纯合参考序列（无变异）”这个假设错误的概率，其具体流程如下：</p>
+                        <ol>
+                            <li>读取 BAM 的碱基质量：软件会查看那 3 条支持 C 的 Reads。如果这 3 个 C 的 BAM $Q_{base}$ 都是 30（非常可信），软件就会认为变异的证据很强。如果 $Q_{base}$ 只有 10（测序仪自己都觉得没测准），软件就会怀疑这 3 个 C 只是随机误差。</li>
+                            <li>计算基因型似然值：软件会计算在当前观测数据 ($D$) 下，各种可能基因型 ($G$) 的概率 $P(D|G)$。其中常见的基因型模型包括：$G_0$: 纯合参考型 (AA)，$G_1$: 杂合型 (AC)，$G_2$: 纯合变异型 (CC)。</li>
+                            <li>计算位点质量：$$QUAL = -10 \log_{10} \frac{P(\text{Data} | \text{Genotype is REF})}{P(\text{Data} | \text{Genotype is NOT REF})}$$</li>
+                        </ol>
+                    <h4>DP</h4>
+                        <p>DP 代表在这个特定基因组位置上，有多少条测序 Reads 覆盖到了它。如果我们选取一个较低的 DP 作为阈值，如果一个位点只被覆盖了 2 次，即使 2 次都是突变碱基，也可能是测序错误。我们一般取 10，即至少有十条 reads 覆盖到这个位点，我们才有分析这个位点的必要性！</p>
+                    <h4>AF</h4>
+                        <p>AF 为支持变异的 Reads 占总 Reads 的比例。对于单倍体样品，设置这个为高阈值可以很好的去除出现“等位基因”突变的情况（理论上来讲突变后形成的突变个体 AF 应该为 1）。如果是二倍体的杂合突变位点（Aa），AF 应该接近 0.5，如果是纯和（aa），则理论应为 1。至于其它倍型，则具体算一下期望，合理进行设置阈值。</p>
+                    <h4>GQ</h4>
+                        <p>GQ 是针对该样本在这个位点被判定为某种基因型（例如 A/C 杂合）的置信度。如果是 <strong>单倍型</strong>，那么这个衡量值就不需要看来，在 AF 指标就应该被过滤掉的。</p>
+                    <h4>SOR</h4>
+                        <p>链偏好性，检查变异的那部分位点类型是否全部来自于正向链或全部来自反向链，如果存在链偏好性，极大概率是测序过程中的系统性错误（假阳性）。</p>
+                        <p>理论上来讲，如果这个变异真的存在，那么正负链上都会出现变异（因为碱基互补配对），而如果一条链偏差的特别的，那说这个位点就有问题，我们需要量化它的“不合理性”，就是链偏好性。</p>
+                        <p>链偏好性的原理非常简单，就是独立性检验，构建 2 × 2 联表，统计正向链/反向连上出现变异的个数，如果相差不大，说明链偏好性不严重，如果偏差很大，那就说明有链偏好性。</p>
+                        <p>独立性检验的初始指标是 FS，就是基于费希尔精确检验（Fisher's Exact Test）算出的 P 值，并进行了 Phred 转换，FS 值越大，表示链偏好性越严重（即观察到的分布纯属巧合的可能性越小）。但是，FS 在深度极高的情况下容易变得过于敏感（即便分布还算合理，FS 也会很大），而 SOR 对高深度数据的处理更加稳健，本质为优势比（Odds Ratio），因此得名缩写：Strand Odds Ratio, SOR。</p>
+                        <p>链偏好性的原因有很多，总之有链偏好性，这个变异位点就不可信！</p>
+                    <h4>MQ</h4>
+                        <p>比对质量，检查覆盖该位点的 Reads 是否本身就比对得很勉强。</p>
+                    <blockquote>永远不要只看 QUAL。在深度很高的情况下，即使是系统性错误，QUAL 也会被刷得很高。这也是为什么我们需要通过 MQ (比对质量)、FS (链偏向) 和 AD (等位基因深度) 进行二次人工筛选的原因。</blockquote>
+                <h2>5. 基因区变异筛查</h2>
+                    <h4>需要准备的文件：</h4>
+                    <ol>
+                    <li>对照组参考基因组基因注释文件 <code>.gtf</code> 或 <code>.gff3</code> 或其它注释文件，以下用 <code>.gff3</code> 为例。</li>
+                    </ol>
+                    <h4>要得到的文件：</h4>
+                
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
