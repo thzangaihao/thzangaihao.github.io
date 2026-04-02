@@ -99,17 +99,6 @@
                     我们主要基于以下两款软件进行变异分析：Snpeff 进行单位点突变分析，Delly 进行结构变异的分析。
                 <h2>4. 分析流程与参数</h2>
                     <p>分析流程已经被脚本化，你只需要搭建好环境下载好软件就可以一键运行：</p>
-                    <div class="download-card">
-                        <div class="download-info">
-                            <i class="fas fa-file-code"></i> <div class="file-details">
-                                <h5>变异筛查</h5>
-                                <span>文件格式：.py | 大小：7.2 KB</span>
-                            </div>
-                        </div>
-                        <a href="./变异筛查.py" download class="download-btn">
-                            <i class="fas fa-cloud-download-alt"></i>
-                        </a>
-                    </div>
                     <p>其中，我们要注意如下几个筛查参数：</p>
                     <h4>QUAL</h4>
                         <p>QUAL 值代表该位点存在变异（即不是参考序列碱基）的概率。它通常基于 Phred Quality Score 计算。</p>
@@ -139,12 +128,38 @@
                     <h4>MQ</h4>
                         <p>比对质量，检查覆盖该位点的 Reads 是否本身就比对得很勉强。</p>
                     <blockquote>永远不要只看 QUAL。在深度很高的情况下，即使是系统性错误，QUAL 也会被刷得很高。这也是为什么我们需要通过 MQ (比对质量)、FS (链偏向) 和 AD (等位基因深度) 进行二次人工筛选的原因。</blockquote>
+                    <h4>参数表</h4>
+                    <p>我用来筛选木霉的参数表：{QUAL:30,DP:35,AF:0.8,GQ:20,MQ:20,SP:60}</p>
+                    <h4>脚本</h4>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>变异筛查</h5>
+                                    <span>文件格式：.py | 大小：7.2 KB</span>
+                                </div>
+                            </div>
+                            <a href="./变异筛查.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                        <p>这个脚本会生成一些文件，其中有：</p>
+                        <ol>
+                            <li><code>_raw.vcf</code>：最原始的所有变异记录文件。</li>
+                            <li><code>_SNP_filtered.vcf</code>：过滤得到后的点变异记录文件。</li>
+                            <li><code>_SV_delly.vcf</code>：结构变异记录文件，为二进制格式，无法用记事本打开，可以使用 bcftools 进行人类可读化输出。</li>
+                            <li><code>_SV_delly.vcf.csi</code>：结构编译文件的索引文件。</li>
+                        </ol>
                 <h2>5. 基因区变异筛查</h2>
+                    <p>当我们筛选出所有的高置信位点时，这些位点不一定分布在基因内部，即使在内部，也不一定在编码区域内。因此，我们需要找出那些实际影响基因的变异位点，生成新的 <code>.vcf</code> 文件。</p>
                     <h4>需要准备的文件：</h4>
                     <ol>
                     <li>对照组参考基因组基因注释文件 <code>.gtf</code> 或 <code>.gff3</code> 或其它注释文件，以下用 <code>.gff3</code> 为例。</li>
+                    <li>上一步得到的 <code>_SNP_filtered.vcf</code> 文件。</li>
                     </ol>
                     <h4>要得到的文件：</h4>
+                    <ol>
+                        <li>经过不断筛查后的基因变异位点记录文件 <code>.vcf</code> 文件。</li>
+                    </ol>
                 
             </div>
         </div>
