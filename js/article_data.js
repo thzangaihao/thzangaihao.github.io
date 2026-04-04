@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/04/01_16:50:41
-// 文章总数: 38
+// 生成时间: 2026/04/04_22:53:53
+// 文章总数: 39
 
 window.ARTICLE_DATABASE = [
     {
@@ -140,7 +140,7 @@ window.ARTICLE_DATABASE = [
         "title": "02. 变异位点筛查",
         "collection": "compare",
         "date": "2026-04-01",
-        "summary": "将细碎测序读段数据比对到参考基因组上",
+        "summary": "找到发生了突变的地方",
         "path": "articles/dry_lab/compare/02. 变异位点筛查/02. 变异位点筛查.html"
     },
     {
@@ -261,6 +261,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-22",
         "summary": "生物信息文件格式转换，文件整合",
         "path": "articles/resources/python/05. 生物文件处理/05. 生物文件处理.html"
+    },
+    {
+        "title": "06. Gviz",
+        "collection": "figure",
+        "date": "2026-04-04",
+        "summary": "mapping 可视化",
+        "path": "articles/resources/gallery/06. Gviz/06. Gviz.html"
     },
     {
         "title": "06. 交互式逻辑",
