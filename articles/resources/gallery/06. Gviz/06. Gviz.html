@@ -38,14 +38,54 @@
             <div class="content">
                 <h2>1. 前言</h2>
                 <p>Gviz 和 IGV 的目的一样，都是将基因组可视化，这个脚本主要构建了 Hisat 2 或 Bowtie 2 mapping 后生成 <code>.bam</code> 文件的可视化绘图，相比 IGV，其更美观，参数调整灵活性更强。</p>
+
                 <h2>2. 单位点锚定图</h2>
-                <p>所需文件：<code>.fasta</code>。</p>
+                <p>此脚本输入要展示的核心碱基编号及其它参数，会生成两条轨道进行比对。</p>
+                <div class="download-card">
+                    <div class="download-info">
+                        <i class="fas fa-file-code"></i> <div class="file-details">
+                            <h5>Gviz_nucleotide</h5>
+                            <span>文件格式：.r | 大小：4.9 KB</span>
+                        </div>
+                    </div>
+                    <a href="./Gviz_nucleotide.r" download class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </a>
+                </div>
+                <pre><code class="language-r">wt_bam    <- "CK-7-9_clean\\CK-7-9_clean.bam"             
+mut_bam   <- "UV2-7-9-8_clean\\UV2-7-9-8_clean.bam" 
+ref_fasta <- "CK-7-9_cleaned_v1.fasta" 
+chr_name  <- "NODE_63_length_216026_cov_23.186387" 
+
+mut_pos <- 35204
+window_size <- 20  
+plot_start  <- mut_pos - window_size
+plot_end    <- mut_pos + window_size</code></pre>
+                <p>输出示例：</p>
+                <img src="./nucleotide.svg" alt="单位点锚定图" class="article-img">
+
                 <h2>3. 基因本体锚定图</h2>
-                <h2></h2>
-                <h2></h2>
-                <h2></h2>
-                <h2></h2>
-                <h2></h2>
+                <p>此脚本输入要展示的基因及其它参数，会生成一条轨道进行展示。</p>
+                <div class="download-card">
+                    <div class="download-info">
+                        <i class="fas fa-file-code"></i> <div class="file-details">
+                            <h5>Gviz_gene</h5>
+                            <span>文件格式：.r | 大小：6.2 KB</span>
+                        </div>
+                    </div>
+                    <a href="./Gviz_gene.r" download class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </a>
+                </div>
+                <pre><code class="language-r">sample_bam <- "CK-7-9_clean\\CK-7-9_clean.bam"             
+ref_fasta  <- "CK-7-9_cleaned_v1.fasta" 
+anno_file  <- "CK-7-9_cleaned_v1_annotated.gff3" 
+
+target_gene <- "TGAM01_v208328"  
+flank_size  <- 50              
+inch_per_bp <- 0.02 </code></pre>
+                <p>输出示例：</p>
+                <img src="./gene.svg" alt="基因本体锚定图" class="article-img">
             </div>
         </div>
 
