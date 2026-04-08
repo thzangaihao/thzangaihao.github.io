@@ -51,8 +51,18 @@
 └── 3_4.py
                     </code></pre>
                 <h2>2. 加氢加电荷</h2>
-                    <p>执行0_1.py文件：</p>
-                    <pre><code class="language-bash">python 0_1.py</code></pre>
+                    <p>执行 <code>1. 加氢加电.py</code> 文件：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>1. 加氢加电.py</h5>
+                                <span>文件格式：.py | 大小：6.6 KB</span>
+                            </div>
+                        </div>
+                        <a href="./1. 加氢加电.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
                     <p>这一步利用pymol对所有cif文件加入氢原子生成<code>.pdb</code>中间文件，再调用OpenBabel计算电荷，生成<code>.pdbqt</code>文件存放在自动生成的<code>'1. Ligand_molecular_pdbqt'</code>和<code>'1. Receptor_protein_pdbqt'</code>文件夹下面：</p>
                     <pre><code class="language-bash">
 .
@@ -77,8 +87,18 @@ ATOM      4  O   MET A   1      28.065 -74.208 -35.182  0.00  0.00    -0.274 OA
 ATOM      5  CB  MET A   1      30.501 -75.842 -34.975  0.00  0.00    +0.038 C 
                     </code></pre>
                 <h2>3. 配置文件生成</h2>
-                    <p>执行1_2.py文件：</p>
-                    <pre><code class="language-bash">python 1_2.py</code></pre>
+                    <p>执行 <code>2. 盒子配置文件生成.py</code> 文件：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>2. 盒子配置文件生成.py</h5>
+                                <span>文件格式：.py | 大小：5.5 KB</span>
+                            </div>
+                        </div>
+                        <a href="./2. 盒子配置文件生成.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
                     <p>这一步是根据<code>.pdbqt</code>文件里的最大原子坐标计算盒子边界，实时盲对接，你也可以在生成的配置文件去结合ADT去手动控制盒子坐标和大小：</p>
                     <pre><code class="language-txt">
 receptor = /home/your_name/......
@@ -153,8 +173,18 @@ def write_config_file(receptor_path, output_dir, box_params):
     return config_path
                     </code></pre>
                 <h2>4. 进行对接</h2>
-                    <p>执行2_3.py文件：</p>
-                    <pre><code class="language-bash">python 2_3.py</code></pre>
+                    <p>执行 <code>3. Vina 运行.py</code> 文件：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>3. Vina 运行.py</h5>
+                                <span>文件格式：.py | 大小：5.4 KB</span>
+                            </div>
+                        </div>
+                        <a href="./3. Vina 运行.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
                     <p>这一步是最耗时的一部，建议tmux挂起，在32穷举度下一个对接大概要跑2-4个小时，对接后的文件以小分子<code>.pdbqt</code>文件的形式存放在<code>3. Docking_Results</code>，同样，也是自动生成的文件夹。</p>
                     <pre><code class="language-bash">
 .
@@ -187,8 +217,18 @@ mode |   affinity | dist from best mode
 Writing output ... done.                        
                     </code></pre>
                 <h2>5. 比结合能汇总</h2>
-                    <p>执行3_4.py文件：</p>
-                    <pre><code class="language-bash">python 3_4.py</code></pre>
+                    <p>执行 <code>4. 比结合能矩阵输出.py</code> 文件：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>4. 比结合能矩阵输出.py</h5>
+                                <span>文件格式：.py | 大小：4.5 KB</span>
+                            </div>
+                        </div>
+                        <a href="./4. 比结合能矩阵输出.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
                     <p>取每一个对接结果的最小值，汇总为<code>.tsv</code>文件存放于工作目录根目录下：
                     <pre><code class="language-bash">
 .

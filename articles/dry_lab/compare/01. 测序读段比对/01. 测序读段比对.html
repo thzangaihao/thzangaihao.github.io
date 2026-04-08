@@ -178,6 +178,23 @@ AAAAAEEEEEEE</code></pre>
                         <p>这一点是非常重要的！<code>.fasta</code> 链记录的永远是正链，而正链的选取标准有许多，如着丝粒位置，一般由短臂端向长臂端的$5' \rightarrow 3'$进行记录。注意！这里的正链只是分析中的一个锚定参考，基因组的正链 $\neq$ 基因的编码链。</p>
                         <p>不管是单端测序还是双端测序，我们都是对整个基因组进行文库构建的，而双端测序只是把一条读段反过来再读一遍进行配对。因此，即使你是单端测序，因为文库构建，DNA 片段是随机连接到测序接头上的，我们所获得的 reads 也会 mapping 到正负链上。</p>
                         <p>所以，每一条 read 都会在参考基因组的正向链和反向互补链上都“试”一遍。<code>.bam</code> 中的读段是在 mapping 时进行正负链上的区分的。</p>
+
+                <h2>5. 可视化</h2>
+                    <p>我们可以依赖这篇文章的方法对 mapping 结果进行可视化。当然，你要用 IGV 也可以，推荐阅读里面的 Gviz 是通过 R 绘图，能使图片更美观且可控性更高！</p>
+                    <a href="..\..\..\resources\gallery\06. Gviz\06. Gviz.html" class="related-article" target="_blank">
+                        <div class="related-article-icon">
+                            <i class="fas fa-link"></i>
+                        </div>
+                        
+                        <div class="related-article-content">
+                            <div class="related-article-title">推荐阅读：06. Gviz</div>
+                            <div class="related-article-desc">mapping 可视化</div>
+                        </div>
+                        
+                        <div class="related-article-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
                 
             </div>
         </div>

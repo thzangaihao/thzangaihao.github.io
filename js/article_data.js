@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/04/04_22:53:53
-// 文章总数: 39
+// 生成时间: 2026/04/08_21:48:41
+// 文章总数: 41
 
 window.ARTICLE_DATABASE = [
     {
@@ -179,6 +179,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/python/03. AlphaFold系列/03. AlphaFold系列.html"
     },
     {
+        "title": "03. BLAST",
+        "collection": "compare",
+        "date": "2026-04-08",
+        "summary": "看看和谁像？",
+        "path": "articles/dry_lab/compare/03. BLAST/03. BLAST.html"
+    },
+    {
         "title": "03. GWAS 分析基础",
         "collection": "gwas",
         "date": "2026-01-28",
@@ -219,6 +226,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-28",
         "summary": "分析结构变异对性状的影响",
         "path": "articles/dry_lab/gwas/04. SV-GWAS LM/04. SV-GWAS LM.html"
+    },
+    {
+        "title": "04. 保守性分析",
+        "collection": "compare",
+        "date": "2026-04-09",
+        "summary": "基因序列或蛋白质序列在不同物种之间的保守性分析",
+        "path": "articles/dry_lab/compare/04. 保守性分析/04. 保守性分析.html"
     },
     {
         "title": "04. 分子对接系列",
