@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/04/08_21:48:41
-// 文章总数: 41
+// 生成时间: 2026/04/10_23:30:17
+// 文章总数: 42
 
 window.ARTICLE_DATABASE = [
     {
@@ -231,7 +231,7 @@ window.ARTICLE_DATABASE = [
         "title": "04. 保守性分析",
         "collection": "compare",
         "date": "2026-04-09",
-        "summary": "基因序列或蛋白质序列在不同物种之间的保守性分析",
+        "summary": "核苷酸序列或蛋白质序列在不同物种之间的保守性分析",
         "path": "articles/dry_lab/compare/04. 保守性分析/04. 保守性分析.html"
     },
     {
@@ -289,5 +289,12 @@ window.ARTICLE_DATABASE = [
         "date": "2026-03-21",
         "summary": "更人性化的文件选取",
         "path": "articles/resources/python/06. 交互式逻辑/06. 交互式逻辑.html"
+    },
+    {
+        "title": "07. 变异分析图",
+        "collection": "figure",
+        "date": "2026-04-10",
+        "summary": "让变异更直观的展示",
+        "path": "articles/resources/gallery/07. 变异分析图/07. 变异分析图.html"
     }
 ];

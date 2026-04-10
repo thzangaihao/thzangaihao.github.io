@@ -4,7 +4,7 @@
         <title>04. 保守性分析 - 海钊知识港</title>
         <meta name="collection" content="compare"> 
         <meta name="date" content="2026-04-09">
-        <meta name="description" content="基因序列或蛋白质序列在不同物种之间的保守性分析">
+        <meta name="description" content="核苷酸序列或蛋白质序列在不同物种之间的保守性分析">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -32,12 +32,33 @@
 
             <h1>04. 保守性分析</h1>
             <div class="meta">
-                <span><i class="far fa-calendar"></i> 2026-04-09</span>
+                <span><i class="far fa-calendar"></i> 2026-04-10</span>
                 <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 比较基因组学</span>
             </div>
 
             <div class="content">
                 <h2>1. 前言</h2>
+                    <p>在这里我们放一个 AI 对其的比喻：“如果说 BLAST 是在茫茫书海中寻找相似的句子，那么保守性分析（Conservation Analysis）就是通过对比不同物种的“同款句子”，找出哪些字词是千万年都不敢改动的。”一般来讲，如果一个功能非常重要，那么它的序列一般都不会发生改变（因为发生改变的都被自然淘汰掉了）。我们可以认为 <b>保守 = 重要</b>！</p>
+                    <p>保守性分析的本质就是将一堆序列进行对齐，算法核心就是多序列比对 MSA 算法 (Multiple Sequence Alignment)。关于 MSA 算法，我们会在算法栏浅析原理，这本质上是一个数学问题。</p>
+                <h2>2. 软件和方式</h2>
+                    <p>我目前做保守性分析最常使用的软件是 MAFFT （也是目前我唯一用过的）。MAFFT 分为在线版和离线版，其使用涉及大量的算法参数调整，但是，幸运的是，我们对其参数不需要了解的很深入就可以使用了！</p>
+                    <p>无论使用哪种，我们的数据原料都是记载要比对的序列的 <code>.fasta</code> 文件。而 MAFFT 输出的也是 <code>.fasta</code> 文件，只是序列里多了破折号 <code>-</code> 。除此之外，还有 <code>Clustal</code> 格式和 <code>Phylip</code> 格式。</p>
+                    <h3>2.1 MAFFT 在线版</h3>
+                        <p>你可以使用这个网址直接进入 MAFFT 的官网：<a href="https://mafft.cbrc.jp/alignment/server/index.html" target="_blank" style="color: #3498db;">MAFFT 官方服务器</a></p>
+                        <p>所有的参数调整都是在 <b>速度</b> 和 <b>准确性</b> 两者之间进行取舍。作为初学者，我们只需要提交 <code>.fasta</code> 文件就可以了。</p>
+                        <p>MAFFT 也提高了几种预设策略：</p>
+                        <ol>
+                            <li>L-INS-i：最慢但最准。适合具有长 gap 或只有局部保守的序列。</li>
+                            <li>G-INS-i：适合整条序列从头到尾都比较相似的情况（全局比对）。</li>
+                            <li>E-INS-i：适合含有大量高度不保守区域的序列。</li>
+                            <li>FFT-NS-2：使用进阶的树结构，速度极快，是比较基因组学处理大规模数据的常用策略。</li>
+                        </ol>
+
+                    <h3>2.2 MAFFT 离线版</h3>
+                        <p>我还没用过，一般在线分析就足够了，后面大批量再构建流程吧！</p>
+
+                <h2>3. 输出文件</h2>
+                <h2>4. 可视化</h2>
 
             </div>
         </div>
