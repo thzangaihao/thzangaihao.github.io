@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>质粒详情 - 海钊知识港</title>
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../css/global.css">
+        <link rel="stylesheet" href="../../../css/plasmid.css">
+
+        <script src="../../../js/global.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+        <script>window.footerPath = '../../../footer.html';</script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="plasmid-detail-container">
+            <a href="plasmid_index.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回质粒数据库</a>
+            
+            <div id="detailContent">
+                <p style="text-align: center; color: #999;">加载中...</p>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const plasmidId = urlParams.get('id');
+
+                if (!plasmidId) {
+                    document.getElementById('detailContent').innerHTML = '<p style="color: red; text-align: center;">未指定质粒 ID，请返回数据库重新选择。</p>';
+                    return;
+                }
+
+                // 解析CSV文件
+                Papa.parse("plasmid_data.csv", {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        const plasmidData = results.data;
+                        const plasmid = plasmidData.find(p => p.id === plasmidId);
+
+                        if (plasmid) {
+                            renderDetail(plasmid);
+                        } else {
+                            document.getElementById('detailContent').innerHTML = '<p style="color: red; text-align: center;">未找到指定的质粒信息。</p>';
+                        }
+                    },
+                    error: function(err) {
+                        document.getElementById('detailContent').innerHTML = '<p style="color: red; text-align: center;">数据加载失败，请检查CSV文件。</p>';
+                    }
+                });
+
+                function renderDetail(p) {
+                    document.title = `${p.name} - 质粒数据库 - 海钊知识港`;
+                    
+                    const content = document.getElementById('detailContent');
+                    content.innerHTML = `
+                        <div class="plasmid-detail-header">
+                            <h1>${p.name}</h1>
+                            <div class="tag-list">
+                                <span class="tag">${p.type || '未分类'}</span>
+                            </div>
+                        </div>
+
+                        <div class="plasmid-description">
+                            ${p.description || '暂无描述信息'}
+                        </div>
+
+                        <div class="plasmid-info-grid">
+                            <div class="info-item">
+                                <span class="label">抗性 (Resistance)</span>
+                                <span class="value"><i class="fas fa-shield-virus"></i> ${p.resistance || '未知'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">大小 (Size)</span>
+                                <span class="value"><i class="fas fa-ruler-horizontal"></i> ${p.size || '未知'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">启动子 (Promoter)</span>
+                                <span class="value"><i class="fas fa-play-circle"></i> ${p.promoter || '无 / 未知'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">标签 (Tags)</span>
+                                <span class="value"><i class="fas fa-tag"></i> ${p.tag || '无'}</span>
+                            </div>
+                        </div>
+
+                        ${p.sequence ? `
+                        <div class="plasmid-sequence">
+                            <h3><i class="fas fa-dna"></i> 序列 (Sequence)</h3>
+                            <div class="sequence-box">
+                                ${p.sequence}
+                            </div>
+                        </div>
+                        ` : ''}
+                    `;
+                }
+            });
+        </script>
+    </body>
+</html>

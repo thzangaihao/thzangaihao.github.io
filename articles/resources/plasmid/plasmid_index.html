@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>质粒数据库 - 海钊知识港</title>
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../css/global.css">
+        <link rel="stylesheet" href="../../../css/plasmid.css">
+
+        <script src="../../../js/global.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+        <script>window.footerPath = '../../../footer.html';</script>
+    </head>
+
+    <body class="category-page">
+        <nav>
+            <div class="logo"><a href="../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="container" style="flex-direction: column;">
+            <div class="list-header" style="margin-bottom: 2rem;">
+                <a href="../resources_index.html" class="back-link" style="margin-bottom: 1rem;"><i class="fas fa-arrow-left"></i> 返回资源站</a>
+                <h2><i class="fa-solid fa-circle-notch fa-rotate-by" style="--fa-rotate-angle: 45deg;"></i> 质粒数据库</h2>
+                <p>实验室常用质粒信息、图谱与序列存档。</p>
+            </div>
+
+            <div class="plasmid-header">
+                <div class="plasmid-search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="搜索质粒名称、抗性或标签...">
+                </div>
+            </div>
+
+            <div class="plasmid-grid" id="plasmidGrid">
+                <!-- 质粒卡片由JS动态生成 -->
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                let plasmidData = [];
+
+                // 解析CSV文件
+                Papa.parse("plasmid_data.csv", {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        plasmidData = results.data;
+                        renderGrid(plasmidData);
+                    },
+                    error: function(err) {
+                        document.getElementById('plasmidGrid').innerHTML = '<p style="color: red;">数据加载失败，请检查CSV文件。</p>';
+                    }
+                });
+
+                // 搜索功能
+                const searchInput = document.getElementById('searchInput');
+                searchInput.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    const filtered = plasmidData.filter(p => 
+                        (p.name && p.name.toLowerCase().includes(term)) ||
+                        (p.resistance && p.resistance.toLowerCase().includes(term)) ||
+                        (p.tag && p.tag.toLowerCase().includes(term)) ||
+                        (p.description && p.description.toLowerCase().includes(term))
+                    );
+                    renderGrid(filtered);
+                });
+
+                // 渲染网格
+                function renderGrid(data) {
+                    const grid = document.getElementById('plasmidGrid');
+                    grid.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        grid.innerHTML = '<p style="color: #999;">没有找到匹配的质粒。</p>';
+                        return;
+                    }
+
+                    data.forEach(p => {
+                        const card = document.createElement('a');
+                        card.className = 'plasmid-card';
+                        card.href = `plasmid_detail.html?id=${encodeURIComponent(p.id)}`;
+                        
+                        card.innerHTML = `
+                            <h3>${p.name}</h3>
+                            <span class="plasmid-type">${p.type || '未分类'}</span>
+                            <p>${p.description || '暂无描述'}</p>
+                            <div class="plasmid-meta">
+                                <span><i class="fas fa-shield-virus"></i> ${p.resistance || '-'}</span>
+                                <span><i class="fas fa-ruler-horizontal"></i> ${p.size || '-'}</span>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }
+            });
+        </script>
+    </body>
+</html>
