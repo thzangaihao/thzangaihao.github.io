@@ -105,9 +105,9 @@
 .plasmid-detail-container {
     background: white;
     border-radius: 12px;
-    padding: 2.5rem;
+    padding: 3rem;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    max-width: 900px;
+    max-width: 1200px; /* 加大容器宽度 */
     margin: 2rem auto;
 }
 
@@ -135,6 +135,24 @@
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: bold;
+}
+
+/* 左右两栏布局 */
+.plasmid-layout {
+    display: flex;
+    gap: 3rem;
+    align-items: flex-start;
+}
+
+.plasmid-left-col {
+    flex: 1.5; /* 左侧占略大比例 */
+}
+
+.plasmid-right-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .plasmid-info-grid {
@@ -170,35 +188,58 @@
     line-height: 1.8;
     color: #555;
     margin-bottom: 2.5rem;
+    text-align: justify;
 }
 
-.plasmid-sequence {
-    margin-top: 2rem;
+/* 图片展示 */
+.plasmid-image-container {
+    width: 100%;
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
 }
 
-.plasmid-sequence h3 {
-    color: var(--primary-color);
-    border-bottom: 2px solid #eee;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.sequence-box {
-    background: #f4f4f4;
-    padding: 1.5rem;
+.plasmid-image-container img {
+    max-width: 100%;
+    height: auto;
     border-radius: 8px;
-    font-family: Consolas, Monaco, monospace;
-    font-size: 0.9rem;
-    color: #333;
-    word-wrap: break-word;
-    word-break: break-all;
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    line-height: 1.5;
+    display: block;
+    margin: 0 auto;
+}
+
+/* 下载按钮 */
+.plasmid-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent-color);
+    color: white !important;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s;
+    width: 100%;
+    justify-content: center;
+}
+
+.plasmid-download-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
 }
 
 @media (max-width: 850px) {
+    .plasmid-layout {
+        flex-direction: column;
+        gap: 2rem;
+    }
+    
     .plasmid-info-grid {
         grid-template-columns: 1fr;
     }

@@ -50,6 +50,7 @@
                     download: true,
                     header: true,
                     skipEmptyLines: true,
+                    encoding: "UTF-8",
                     complete: function(results) {
                         const plasmidData = results.data;
                         const plasmid = plasmidData.find(p => p.id === plasmidId);
@@ -77,37 +78,63 @@
                             </div>
                         </div>
 
-                        <div class="plasmid-description">
-                            ${p.description || '暂无描述信息'}
-                        </div>
+                        <div class="plasmid-layout">
+                            <div class="plasmid-left-col">
+                                <div class="plasmid-info-grid" style="margin-bottom: 1.5rem;">
+                                    <div class="info-item">
+                                        <span class="label">抗性 (Resistance)</span>
+                                        <span class="value"><i class="fa-solid fa-capsules"></i> ${p.resistance || '未知'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="label">大小 (Size)</span>
+                                        <span class="value"><i class="fa-solid fa-ruler-vertical"></i> ${p.size || '未知'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="label">启动子 (Promoter)</span>
+                                        <span class="value"><i class="fas fa-play-circle"></i> ${p.promoter || '无 / 未知'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="label">宿主系统 (Host System)</span>
+                                        <span class="value"><i class="fa-solid fa-bacterium"></i> ${p.host || '未知'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="label">标签与融合蛋白 (Tags/Fusion)</span>
+                                        <span class="value"><i class="fa-solid fa-flag"></i> ${p.fusion_tag || '无'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="label">位置索引 (Location Index)</span>
+                                        <span class="value"><i class="fa-solid fa-location-dot"></i> ${p.location || '未登记'}</span>
+                                    </div>
+                                </div>
 
-                        <div class="plasmid-info-grid">
-                            <div class="info-item">
-                                <span class="label">抗性 (Resistance)</span>
-                                <span class="value"><i class="fas fa-shield-virus"></i> ${p.resistance || '未知'}</span>
+                                <div class="plasmid-description">
+                                    ${p.description || '暂无描述信息'}
+                                </div>
                             </div>
-                            <div class="info-item">
-                                <span class="label">大小 (Size)</span>
-                                <span class="value"><i class="fas fa-ruler-horizontal"></i> ${p.size || '未知'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">启动子 (Promoter)</span>
-                                <span class="value"><i class="fas fa-play-circle"></i> ${p.promoter || '无 / 未知'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">标签 (Tags)</span>
-                                <span class="value"><i class="fas fa-tag"></i> ${p.tag || '无'}</span>
-                            </div>
-                        </div>
+                            
+                            <div class="plasmid-right-col">
+                                ${p.image_path ? `
+                                <div class="plasmid-image-container" style="width: 100%; aspect-ratio: 1/1; padding: 0; overflow: hidden; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-radius: 12px; background: transparent; position: relative;">
+                                    <img src="${p.image_path}" alt="${p.name} 图谱" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div style="display: none; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; background: #f9f9f9; color: #bbb; border: 2px dashed #eee; border-radius: 12px; position: absolute; top: 0; left: 0; box-sizing: border-box;">
+                                        <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                                        <p style="margin: 0; font-size: 0.95rem;">暂无图片</p>
+                                    </div>
+                                </div>
+                                ` : `
+                                <div class="plasmid-image-container" style="width: 100%; aspect-ratio: 1/1; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #f9f9f9; color: #bbb; border: 2px dashed #eee; border-radius: 12px; padding: 0;">
+                                    <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                                    <p style="margin: 0; font-size: 0.95rem;">暂无图片</p>
+                                </div>
+                                `}
 
-                        ${p.sequence ? `
-                        <div class="plasmid-sequence">
-                            <h3><i class="fas fa-dna"></i> 序列 (Sequence)</h3>
-                            <div class="sequence-box">
-                                ${p.sequence}
+                                ${p.file_path ? `
+                                <a href="${p.file_path}" class="plasmid-download-btn" style="margin-top: 1.5rem;" download>
+                                    <i class="fas fa-download"></i> 下载 .dna 文件
+                                </a>
+                                ` : ''}
                             </div>
                         </div>
-                        ` : ''}
                     `;
                 }
             });
