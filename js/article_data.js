@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/04/10_23:30:17
-// 文章总数: 42
+// 生成时间: 2026/04/13_13:53:02
+// 文章总数: 43
 
 window.ARTICLE_DATABASE = [
     {
@@ -198,6 +198,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-03-15",
         "summary": "基因注释文件的操作",
         "path": "articles/resources/software/03. gffread/03. gffread.html"
+    },
+    {
+        "title": "03. 基因组组装算法",
+        "collection": "algorithm",
+        "date": "2026-04-13",
+        "summary": "基因组拼接算法原理浅析",
+        "path": "articles/dry_lab/algorithm/03. 基因组组装算法/03. 基因组组装算法.html"
     },
     {
         "title": "03. 火山图",
