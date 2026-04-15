@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/04/13_13:53:02
-// 文章总数: 43
+// 生成时间: 2026/04/15_15:26:55
+// 文章总数: 46
 
 window.ARTICLE_DATABASE = [
     {
@@ -102,6 +102,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/dry_lab/rnaseq/enrichment_analysis/enrichment_analysis.html"
     },
     {
+        "title": "01. 载体基本原理与分类",
+        "collection": "vec",
+        "date": "2026-04-15",
+        "summary": "载体分类、用途",
+        "path": "articles/wet_lab/载体设计/01. 载体基本原理与分类/01. 载体基本原理与分类.html"
+    },
+    {
         "title": "01. 隐马尔可夫模型",
         "collection": "algorithm",
         "date": "2026-01-24",
@@ -142,6 +149,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-04-01",
         "summary": "找到发生了突变的地方",
         "path": "articles/dry_lab/compare/02. 变异位点筛查/02. 变异位点筛查.html"
+    },
+    {
+        "title": "02. 如何设计优秀的引物？",
+        "collection": "pcr",
+        "date": "2026-04-15",
+        "summary": "如何设计一个引物：考虑Tm值、引物自连和保护碱基",
+        "path": "articles/wet_lab/01. 多聚酶链式反应 (PCR)/02. 如何设计优秀的引物？/02. 如何设计优秀的引物？.html"
     },
     {
         "title": "02. 建树算法",
@@ -191,6 +205,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-28",
         "summary": "变异数据结构，分析依赖软件",
         "path": "articles/dry_lab/gwas/03. GWAS 分析基础/03. GWAS 分析基础.html"
+    },
+    {
+        "title": "03. PCR 体系设置",
+        "collection": "pcr",
+        "date": "2026-04-15",
+        "summary": "最基础的 PCR 体系构建",
+        "path": "articles/wet_lab/01. 多聚酶链式反应 (PCR)/03. PCR 体系设置/03. PCR 体系设置.html"
     },
     {
         "title": "03. gffread",
