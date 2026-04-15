@@ -224,43 +224,43 @@ window.addEventListener('DOMContentLoaded', async () => {
 /* ------------------------------------------------------------
    5.2 首页：渲染最新文章 (支持实时搜索)
    ------------------------------------------------------------ */
-   function renderLatestArticles(searchTerm = '') {
+function renderLatestArticles(searchTerm = '') {
     const container = document.getElementById('latest-articles-list');
-    const titleText = document.getElementById('section-title'); // 标题文字
+    const titleText = document.getElementById('section-title');
     if (!container) return;
 
-    if (!window.ARTICLE_DATABASE || !Array.isArray(window.ARTICLE_DATABASE)) {
-        container.innerHTML = '<p style="text-align:center;color:#999">暂无文章数据</p>';
-        return;
+    if (!window.ARTICLE_DATABASE) { 
+        container.innerHTML = '<p style="text-align:center;color:#999">暂无数据</p>'; 
+        return; 
     }
-
-    // 1. 动态切换标题
+    
+    // 动态切换标题
     if (titleText) {
         titleText.textContent = searchTerm ? '搜索结果' : '最新动态';
     }
 
-    // 2. 过滤逻辑
     const lowerTerm = searchTerm.toLowerCase();
-    const filteredArticles = window.ARTICLE_DATABASE.filter(article => {
+    
+    // 1. 过滤逻辑
+    let latest = [...window.ARTICLE_DATABASE].filter(article => {
         return article.title.toLowerCase().includes(lowerTerm) || 
                article.summary.toLowerCase().includes(lowerTerm);
     }).sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // 3. 处理搜索为空的情况
-    if (filteredArticles.length === 0) {
-        container.innerHTML = `
-            <div style="text-align:center; padding: 3rem 0; color:#999;">
-                <i class="fas fa-search-minus" style="font-size:2rem; margin-bottom:10px; color:#ddd;"></i>
-                <br>未找到与 "${searchTerm}" 相关的文章
-            </div>`;
+    // 2. [关键修复] 仅在默认状态(无搜索词)下，限制显示最新的 10 篇文章
+    if (!searchTerm) {
+        latest = latest.slice(0, 10);
+    }
+    
+    // 3. 处理空结果
+    if (latest.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 3rem 0; color:#999;"><i class="fas fa-search-minus" style="font-size:2rem; margin-bottom:10px; color:#ddd;"></i><br>未找到与 "${searchTerm}" 相关的文章</div>`;
         return;
     }
 
-    // 4. 渲染列表 (保持你确认的灰色胶囊标签样式)
-    const html = filteredArticles.map(article => {
+    const html = latest.map(article => {
         let sectionName = '动态'; 
         let iconClass = 'fas fa-newspaper'; 
-
         if (article.path.includes('dry_lab')) { sectionName = '干实验'; iconClass = 'fas fa-code'; } 
         else if (article.path.includes('wet_lab')) { sectionName = '湿实验'; iconClass = 'fas fa-flask'; } 
         else if (article.path.includes('resources')) { sectionName = '资源站'; iconClass = 'fas fa-book'; } 
@@ -276,7 +276,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 <span class="article-date">${article.date}</span>
             </a>`;
     }).join('');
-
     container.innerHTML = html;
 }
 
