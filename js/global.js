@@ -1,6 +1,6 @@
 /* ============================================================
    文件名: global.js
-   描述: 全站通用脚本 (完美修复版)
+   描述: 全站通用脚本 (终极修复版 - 解决语法崩溃与重复加载)
    ============================================================ */
 
 /* ------------------------------------------------------------
@@ -67,34 +67,22 @@ function loadFooter() {
         .catch(err => console.error('Footer Error:', err));
 }
 
-/* ------------------------------------------------------------
-   3.2 表格响应式增强 (带换行开关 + 外部标题)
-   ------------------------------------------------------------ */
 function makeTablesResponsive() {
     document.querySelectorAll('.content table').forEach(table => {
-        // 防止重复处理
         if (table.closest('.table-outer-container')) return;
 
-        // 1. 创建最外层容器 (用于定位按钮)
         const outerContainer = document.createElement('div');
         outerContainer.className = 'table-outer-container';
-
-        // 2. 创建滚动容器 (原本的 wrapper)
         const scrollWrapper = document.createElement('div');
         scrollWrapper.className = 'table-wrapper';
-
-        // 3. 创建“自动换行”开关按钮
         const toggleBtn = document.createElement('button');
         toggleBtn.className = 'table-toggle-btn';
         toggleBtn.innerHTML = '<i class="fas fa-align-left"></i> 自动换行';
         toggleBtn.title = '点击切换表格换行模式';
         
-        // 按钮点击事件
         toggleBtn.onclick = () => {
             table.classList.toggle('force-wrap');
             const isWrapped = table.classList.contains('force-wrap');
-            
-            // 更新按钮状态和图标
             if (isWrapped) {
                 toggleBtn.innerHTML = '<i class="fas fa-compress"></i> 恢复不换行';
                 toggleBtn.classList.add('active');
@@ -104,7 +92,6 @@ function makeTablesResponsive() {
             }
         };
 
-        // 4. 提取标题逻辑 (保持不变)
         const caption = table.querySelector('caption');
         let externalCaption = null;
         if (caption) {
@@ -114,21 +101,16 @@ function makeTablesResponsive() {
             table.removeChild(caption); 
         }
 
-        // 5. 组装 DOM
-        // 插入外层容器
         table.parentNode.insertBefore(outerContainer, table);
-        
-        // 组装内部结构
-        outerContainer.appendChild(toggleBtn);    // 放按钮
-        outerContainer.appendChild(scrollWrapper);// 放滚动区
-        scrollWrapper.appendChild(table);         // 放表格
-
-        // 插入底部标题
+        outerContainer.appendChild(toggleBtn);
+        outerContainer.appendChild(scrollWrapper);
+        scrollWrapper.appendChild(table);
         if (externalCaption) {
             outerContainer.parentNode.insertBefore(externalCaption, outerContainer.nextSibling);
         }
     });
 }
+
 function autoFillArticleInfo() {
     const container = document.querySelector('.article-container');
     if (!container) return;
@@ -166,15 +148,11 @@ function handleHashNavigation() {
    ------------------------------------------------------------ */
 function renderArticleCards() {
     if (!window.ARTICLE_DATABASE || !Array.isArray(window.ARTICLE_DATABASE)) return;
-    
     window.ARTICLE_DATABASE.forEach(article => {
-        // 寻找带 -section 后缀的容器
         const container = document.getElementById(article.collection + '-section');
         if (!container) return;
-
-        // 生成简单卡片
         const html = `
-            <a href="${getRelativePath(article.path)}" class="article-item">
+            <a href="${getRelativePath(article.path)}" class="article-item" rel="noopener noreferrer">
                 <div class="article-info">
                     <h4>${article.title}</h4>
                     <p>${article.summary}</p>
@@ -185,45 +163,6 @@ function renderArticleCards() {
     });
 }
 
-/* ------------------------------------------------------------
-   8. 初始化入口
-   ------------------------------------------------------------ */
-window.addEventListener('DOMContentLoaded', async () => {
-    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    
-    await loadFooter();
-
-    if (document.body.classList.contains('category-page')) {
-        renderArticleCards(); 
-        handleHashNavigation();
-    }
-    
-    // 初次加载显示所有文章
-    renderLatestArticles();   
-    
-    // ==========================================
-    // [新增] 监听搜索框输入事件，实现实时搜索
-    // ==========================================
-    const searchInput = document.getElementById('article-search');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            renderLatestArticles(e.target.value); // 每次输入都重新渲染
-        });
-    }
-    
-    enhanceCodeBlocks();      
-    loadPrismHighlighter(); 
-    makeTablesResponsive();
-    autoFillArticleInfo();
-    generateTOC();
-    initBackToTop();
-});
-
-
-/* 渲染首页最新文章 (灰色标签版) */
-/* ------------------------------------------------------------
-   5.2 首页：渲染最新文章 (支持实时搜索)
-   ------------------------------------------------------------ */
 function renderLatestArticles(searchTerm = '') {
     const container = document.getElementById('latest-articles-list');
     const titleText = document.getElementById('section-title');
@@ -234,40 +173,37 @@ function renderLatestArticles(searchTerm = '') {
         return; 
     }
     
-    // 动态切换标题
     if (titleText) {
         titleText.textContent = searchTerm ? '搜索结果' : '最新动态';
     }
 
     const lowerTerm = searchTerm.toLowerCase();
     
-    // 1. 过滤逻辑
+    // 过滤逻辑
     let latest = [...window.ARTICLE_DATABASE].filter(article => {
         return article.title.toLowerCase().includes(lowerTerm) || 
                article.summary.toLowerCase().includes(lowerTerm);
     }).sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // 2. [关键修复] 仅在默认状态(无搜索词)下，限制显示最新的 10 篇文章
+    // 无搜索词时，限制显示最新的 10 篇文章
     if (!searchTerm) {
         latest = latest.slice(0, 10);
     }
     
-    // 3. 处理空结果
     if (latest.length === 0) {
         container.innerHTML = `<div style="text-align:center; padding: 3rem 0; color:#999;"><i class="fas fa-search-minus" style="font-size:2rem; margin-bottom:10px; color:#ddd;"></i><br>未找到与 "${searchTerm}" 相关的文章</div>`;
         return;
     }
 
     const html = latest.map(article => {
-        let sectionName = '动态'; 
-        let iconClass = 'fas fa-newspaper'; 
+        let sectionName = '动态'; let iconClass = 'fas fa-newspaper'; 
         if (article.path.includes('dry_lab')) { sectionName = '干实验'; iconClass = 'fas fa-code'; } 
         else if (article.path.includes('wet_lab')) { sectionName = '湿实验'; iconClass = 'fas fa-flask'; } 
         else if (article.path.includes('resources')) { sectionName = '资源站'; iconClass = 'fas fa-book'; } 
         else if (article.path.includes('about')) { sectionName = '关于我'; iconClass = 'fas fa-user'; }
 
         return `
-            <a href="${article.path}" class="article-item" target="_blank" rel="noopener noreferrer">
+            <a href="${article.path}" class="article-item" rel="noopener noreferrer">
                 <div class="article-info">
                     <span class="article-tag"><i class="${iconClass}"></i> ${sectionName}</span>
                     <h4>${article.title}</h4>
@@ -296,35 +232,22 @@ function loadPrismHighlighter() {
     document.body.appendChild(script);
 }
 
-/* ------------------------------------------------------------
-   6.2 代码块增强 (顶部栏 + 自动折叠)
-   ------------------------------------------------------------ */
 function enhanceCodeBlocks() {
-    // ============================================================
-    // [参数配置] 代码块折叠阈值
-    // 超过此高度 (单位: px) 时自动折叠
-    // 360px 大约相当于 15-18 行代码，可根据需要调整
-    // ============================================================
     const CODE_MAX_HEIGHT = 360; 
 
     document.querySelectorAll('pre code').forEach(code => {
         const pre = code.parentElement;
         if (pre.parentElement.classList.contains('code-wrapper')) return;
 
-        // 1. 获取语言
         let langName = 'TEXT';
         const langClass = Array.from(code.classList).find(c => c.startsWith('language-'));
         if (langClass) langName = langClass.replace('language-', '').toUpperCase();
 
-        // 2. 创建容器
         const wrapper = document.createElement('div');
         wrapper.className = 'code-wrapper';
 
-        // 3. 创建顶部 Header
         const header = document.createElement('div');
         header.className = 'code-header';
-        
-        // 组装 Header 内容 (语言标签 + 复制按钮)
         header.innerHTML = `
             <span class="lang-label">${langName}</span>
             <button class="copy-code-btn" onclick="copyCode(this.parentElement.nextElementSibling.innerText, this)">
@@ -332,53 +255,39 @@ function enhanceCodeBlocks() {
             </button>
         `;
 
-        // 4. 组装 DOM 结构
         pre.parentNode.insertBefore(wrapper, pre);
         wrapper.appendChild(header);
         wrapper.appendChild(pre);
 
-        // 5. [核心升级] 自动折叠逻辑
-        // 获取实际代码高度
         const actualHeight = pre.offsetHeight;
-        
         if (actualHeight > CODE_MAX_HEIGHT) {
-            // 添加折叠标记类
             wrapper.classList.add('collapsed');
-            pre.style.maxHeight = CODE_MAX_HEIGHT + 'px'; // 设置初始高度限制
+            pre.style.maxHeight = CODE_MAX_HEIGHT + 'px'; 
             
-            // 创建“展开/收起”按钮
             const expandBtn = document.createElement('div');
             expandBtn.className = 'code-expand-btn';
             expandBtn.innerHTML = '<i class="fas fa-chevron-down"></i> 显示全部代码';
             
-            // 点击事件
             expandBtn.onclick = () => {
                 const isCollapsed = wrapper.classList.contains('collapsed');
-                
                 if (isCollapsed) {
-                    // 动作：展开
                     wrapper.classList.remove('collapsed');
-                    pre.style.maxHeight = 'none'; // 移除高度限制
+                    pre.style.maxHeight = 'none'; 
                     expandBtn.innerHTML = '<i class="fas fa-chevron-up"></i> 收起代码';
                 } else {
-                    // 动作：折叠
                     wrapper.classList.add('collapsed');
                     pre.style.maxHeight = CODE_MAX_HEIGHT + 'px';
                     expandBtn.innerHTML = '<i class="fas fa-chevron-down"></i> 显示全部代码';
-                    
-                    // 如果收起时页面位置太靠下，自动滚回代码块顶部
                     wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             };
-            
-            // 将按钮添加到容器底部
             wrapper.appendChild(expandBtn);
         }
     });
 }
 
 /* ------------------------------------------------------------
-   7. 目录生成 (TOC) - [高级版：防抖 + 智能高亮 + 整体淡入]
+   7. 目录生成 (TOC)
    ------------------------------------------------------------ */
 function generateTOC() {
     const container = document.querySelector('.article-container');
@@ -386,13 +295,11 @@ function generateTOC() {
     if (!container || !content) return;
 
     const headers = content.querySelectorAll('h2, h3');
-    // 如果标题太少，不生成目录，直接显示文章
     if (headers.length < 2) {
         container.style.opacity = '1'; 
         return;
     }
 
-    // --- DOM 构建 ---
     const wrapper = document.createElement('div');
     wrapper.className = 'article-layout-wrapper';
     container.parentNode.insertBefore(wrapper, container);
@@ -406,7 +313,6 @@ function generateTOC() {
 
     const list = sidebar.querySelector('#toc-list');
     
-    // 侧边栏滚动辅助函数
     const scrollSidebar = (link) => {
         const card = document.querySelector('.toc-card');
         if (!card) return;
@@ -418,56 +324,40 @@ function generateTOC() {
         }
     };
 
-    // 生成列表
     headers.forEach((h, i) => {
         if (!h.id) h.id = 'sec-' + i;
         const li = document.createElement('li');
         if (h.tagName === 'H3') li.className = 'toc-sub-item';
-        
         const link = document.createElement('a');
         link.href = `#${h.id}`;
         link.className = 'toc-link';
         link.dataset.target = h.id;
         link.textContent = h.textContent;
-
-        // 点击事件 (带锁，防止乱跳)
         link.onclick = (e) => {
             e.preventDefault();
             isClicking = true; 
-
             document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
-            
             scrollSidebar(link);
             document.getElementById(h.id).scrollIntoView({ behavior: 'smooth' });
-
             if (window.clickTimer) clearTimeout(window.clickTimer);
             window.clickTimer = setTimeout(() => { isClicking = false; }, 1000);
         };
-
         li.appendChild(link);
         list.appendChild(li);
     });
 
-    // 触发整体淡入动画
     void wrapper.offsetWidth;
     wrapper.classList.add('loaded');
 
-    // --- 滚动监听 (智能版) ---
     let isClicking = false;
     const visibleHeaders = new Set();
-
     const observer = new IntersectionObserver(entries => {
-        // 1. 始终更新可见集合
         entries.forEach(entry => {
             if (entry.isIntersecting) visibleHeaders.add(entry.target.id);
             else visibleHeaders.delete(entry.target.id);
         });
-
-        // 2. 如果正在点击，暂停 UI 更新
         if (isClicking) return;
-
-        // 3. 仲裁：优先选择 DOM 顺序最靠前的可见标题
         let activeId = null;
         for (const header of headers) {
             if (visibleHeaders.has(header.id)) {
@@ -475,7 +365,6 @@ function generateTOC() {
                 break; 
             }
         }
-
         if (activeId) {
             document.querySelectorAll('.toc-link').forEach(l => {
                 const isActive = l.dataset.target === activeId;
@@ -489,60 +378,19 @@ function generateTOC() {
 }
 
 /* ------------------------------------------------------------
-   8. 初始化入口
-   ------------------------------------------------------------ */
-window.addEventListener('DOMContentLoaded', async () => {
-    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    
-    await loadFooter();
-
-    // 优先渲染内容
-    if (document.body.classList.contains('category-page')) {
-        renderArticleCards();
-        handleHashNavigation();
-    }
-    renderLatestArticles();   
-    
-    // 装饰性功能
-    enhanceCodeBlocks();      
-    loadPrismHighlighter(); 
-    makeTablesResponsive();
-    
-    // 文章页逻辑 (TOC 和 信息栏)
-    autoFillArticleInfo();
-    generateTOC();
-
-    // 启动返回顶部按钮
-    initBackToTop();
-
-    // 绑定搜索事件
-    const searchInput = document.getElementById('article-search');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            renderLatestArticles(e.target.value);
-        });
-    }
-});
-
-/* ------------------------------------------------------------
-   [新增] 9. 返回顶部按钮 (Back to Top)
+   8. 返回顶部按钮 (Back to Top)
    ------------------------------------------------------------ */
 function initBackToTop() {
-    // 1. 创建按钮 DOM
     const btn = document.createElement('button');
     btn.id = 'back-to-top-btn';
     btn.innerHTML = '<i class="fas fa-arrow-up"></i>';
     btn.title = '回到顶部';
-    
-    // 2. 将按钮添加到页面底部
     document.body.appendChild(btn);
 
-    // 3. 监听滚动事件 (防抖处理，提升性能)
     let scrollTimeout;
     window.addEventListener('scroll', () => {
         if (scrollTimeout) cancelAnimationFrame(scrollTimeout);
         scrollTimeout = requestAnimationFrame(() => {
-            // 当页面向下滚动超过 300px 时显示按钮
             if (window.scrollY > 300) {
                 btn.classList.add('show');
             } else {
@@ -551,12 +399,37 @@ function initBackToTop() {
         });
     });
 
-    // 4. 点击事件：平滑滚动到页面最顶端
     btn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 }
 
+/* ------------------------------------------------------------
+   9. 初始化入口 (统一控制台)
+   ------------------------------------------------------------ */
+window.addEventListener('DOMContentLoaded', async () => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    
+    await loadFooter();
+
+    if (document.body.classList.contains('category-page')) {
+        renderArticleCards(); 
+        handleHashNavigation();
+    }
+    
+    renderLatestArticles();   
+    
+    const searchInput = document.getElementById('article-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            renderLatestArticles(e.target.value);
+        });
+    }
+    
+    enhanceCodeBlocks();      
+    loadPrismHighlighter(); 
+    makeTablesResponsive();
+    autoFillArticleInfo();
+    generateTOC();
+    initBackToTop();
+});
