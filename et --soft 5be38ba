@@ -1,0 +1,72 @@
+[33m1011527[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;31morigin/2.0[m[33m)[m 大型补丁，去代码冗余
+[33m0a38c10[m 修复首页最新动态数量溢出bug
+[33me3fb70c[m 搜索框大更新！
+[33m5be38ba[m[33m ([m[1;31morigin/1.0[m[33m, [m[1;32m1.0[m[33m)[m 搜索功能添加前代码备份
+[33m441b07b[m 湿实验
+[33m47f1932[m 组装算法流程浅析
+[33m951f6eb[m 质粒库！！！
+[33mb8e1d51[m plasmid 尝试
+[33m8d370ee[m 保守性分析
+[33ma5cdd14[m blast
+[33m6d26d96[m 基因比较组学优化
+[33mcf647d6[m Gviz
+[33m4baa549[m GVIZ 可视化 文件处理脚本更新
+[33m006119b[m 脚本
+[33m38543e0[m 变异位点精确筛查
+[33mdc065ad[m 变异筛查
+[33m69fff49[m 比较基因组学
+[33maa3b042[m 建树
+[33m80f4da3[m IQ_TREE & 建树
+[33m57640d5[m orthofinder2 & IQTREE & 建树算法
+[33m7b9ef21[m orthofinder1
+[33m716d14b[m BUSCO
+[33m71e66d2[m Google Search Console
+[33m76bd946[m 细节调整
+[33m89f828d[m 网页元素汇总
+[33ma8bdbd4[m 回滚组件和站内超链接卡片
+[33mcf0a4b3[m AF3
+[33m96e0673[m 更新
+[33mc65841d[m software
+[33m37df05d[m fastp
+[33m1353bf2[m 定位
+[33md036186[m 补充
+[33mc7545c3[m illumina 二代组装项目
+[33mfc48fcc[m refresh
+[33me2ebb92[m Kranken
+[33ma1e97e0[m GWAS 2
+[33m9c5f24b[m GWAS 逻辑修改
+[33m9b32f3c[m LMM_LM原理
+[33ma73dc28[m SV_GWAS_IGV可视化
+[33m6954186[m LMM 优化
+[33m656057d[m 0129 gwas优化
+[33m78b88dc[m GWAS 表格与代码框显示优化
+[33m3b8538c[m 顶栏高度修改
+[33mfc1b1f4[m HMM
+[33mea4ffae[m UI细调
+[33m0a3a29b[m UI 细调
+[33m6f6d5be[m 首页UI重设计 阴影加重
+[33m5d4532f[m 首页UI重设计
+[33m90893af[m PCR
+[33m94bab7a[m 图廊
+[33mdde6ee2[m 脚本迁移
+[33mf78d563[m 目录
+[33me3c718b[m pymo
+[33m885ea7a[m AF3
+[33m75025ae[m AF02
+[33mbdf778c[m 幽灵ID解决跳转异常
+[33m08673b5[m 测试
+[33m9d97987[m 测试
+[33mfe948a9[m 文章数据库化
+[33md02c47d[m 表格优化
+[33me3657bd[m 表格左右滚动优化
+[33mccf2091[m 代码框加强+新增内容
+[33m4c2045c[m 分子对接+回溯优化
+[33m517c01d[m 二级界面响应式优化补齐
+[33m287257e[m 响应式优化
+[33m7a3a3f3[m css js分离
+[33mca6bf17[m 优化+GWAS
+[33mde11d59[m 富集分析
+[33m9b3ae10[m 富集分析
+[33m4045612[m 完成主页与四个子板块的初步装修
+[33ma162735[m Create index.html
+[33me8afb32[m Initial commit
