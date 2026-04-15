@@ -1,5 +1,5 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/04/15_15:26:55
+// 生成时间: 2026/04/15_16:50:37
 // 文章总数: 46
 
 window.ARTICLE_DATABASE = [
@@ -106,7 +106,7 @@ window.ARTICLE_DATABASE = [
         "collection": "vec",
         "date": "2026-04-15",
         "summary": "载体分类、用途",
-        "path": "articles/wet_lab/载体设计/01. 载体基本原理与分类/01. 载体基本原理与分类.html"
+        "path": "articles/wet_lab/03. 载体设计/01. 载体基本原理与分类/01. 载体基本原理与分类.html"
     },
     {
         "title": "01. 隐马尔可夫模型",
