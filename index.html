@@ -57,13 +57,18 @@
 
             <section class="right-col">
                 <div class="category-card">
-                    <h3><i class="fas fa-history"></i> 最新动态</h3>
-                    
-                    <div id="latest-articles-list">
-                        <p style="text-align: center; color: #999; padding: 20px;">
-                            <i class="fas fa-spinner fa-spin"></i> 加载中...
-                        </p>
+                    <div class="sticky-header">
+                        <h3>
+                            <i class="fas fa-list-ul"></i> 
+                            <span id="section-title">最新动态</span> </h3>
+                        
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="article-search" placeholder="搜索全站...">
+                        </div>
                     </div>
+                    
+                    <div id="latest-articles-list"></div>
                 </div>
             </section>
         </div>

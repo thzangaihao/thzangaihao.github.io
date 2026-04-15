@@ -185,17 +185,79 @@ function renderArticleCards() {
     });
 }
 
+/* ------------------------------------------------------------
+   8. 初始化入口
+   ------------------------------------------------------------ */
+window.addEventListener('DOMContentLoaded', async () => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    
+    await loadFooter();
+
+    if (document.body.classList.contains('category-page')) {
+        renderArticleCards(); 
+        handleHashNavigation();
+    }
+    
+    // 初次加载显示所有文章
+    renderLatestArticles();   
+    
+    // ==========================================
+    // [新增] 监听搜索框输入事件，实现实时搜索
+    // ==========================================
+    const searchInput = document.getElementById('article-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            renderLatestArticles(e.target.value); // 每次输入都重新渲染
+        });
+    }
+    
+    enhanceCodeBlocks();      
+    loadPrismHighlighter(); 
+    makeTablesResponsive();
+    autoFillArticleInfo();
+    generateTOC();
+    initBackToTop();
+});
+
+
 /* 渲染首页最新文章 (灰色标签版) */
-function renderLatestArticles() {
+/* ------------------------------------------------------------
+   5.2 首页：渲染最新文章 (支持实时搜索)
+   ------------------------------------------------------------ */
+   function renderLatestArticles(searchTerm = '') {
     const container = document.getElementById('latest-articles-list');
+    const titleText = document.getElementById('section-title'); // 标题文字
     if (!container) return;
 
-    if (!window.ARTICLE_DATABASE) { container.innerHTML = '<p style="text-align:center;color:#999">暂无数据</p>'; return; }
-    
-    // 文章显示个数/数目
-    const latest = [...window.ARTICLE_DATABASE].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
-    
-    const html = latest.map(article => {
+    if (!window.ARTICLE_DATABASE || !Array.isArray(window.ARTICLE_DATABASE)) {
+        container.innerHTML = '<p style="text-align:center;color:#999">暂无文章数据</p>';
+        return;
+    }
+
+    // 1. 动态切换标题
+    if (titleText) {
+        titleText.textContent = searchTerm ? '搜索结果' : '最新动态';
+    }
+
+    // 2. 过滤逻辑
+    const lowerTerm = searchTerm.toLowerCase();
+    const filteredArticles = window.ARTICLE_DATABASE.filter(article => {
+        return article.title.toLowerCase().includes(lowerTerm) || 
+               article.summary.toLowerCase().includes(lowerTerm);
+    }).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // 3. 处理搜索为空的情况
+    if (filteredArticles.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center; padding: 3rem 0; color:#999;">
+                <i class="fas fa-search-minus" style="font-size:2rem; margin-bottom:10px; color:#ddd;"></i>
+                <br>未找到与 "${searchTerm}" 相关的文章
+            </div>`;
+        return;
+    }
+
+    // 4. 渲染列表 (保持你确认的灰色胶囊标签样式)
+    const html = filteredArticles.map(article => {
         let sectionName = '动态'; 
         let iconClass = 'fas fa-newspaper'; 
 
@@ -205,7 +267,7 @@ function renderLatestArticles() {
         else if (article.path.includes('about')) { sectionName = '关于我'; iconClass = 'fas fa-user'; }
 
         return `
-            <a href="${article.path}" class="article-item">
+            <a href="${article.path}" class="article-item" target="_blank" rel="noopener noreferrer">
                 <div class="article-info">
                     <span class="article-tag"><i class="${iconClass}"></i> ${sectionName}</span>
                     <h4>${article.title}</h4>
@@ -214,6 +276,7 @@ function renderLatestArticles() {
                 <span class="article-date">${article.date}</span>
             </a>`;
     }).join('');
+
     container.innerHTML = html;
 }
 
@@ -304,7 +367,7 @@ function enhanceCodeBlocks() {
                     pre.style.maxHeight = CODE_MAX_HEIGHT + 'px';
                     expandBtn.innerHTML = '<i class="fas fa-chevron-down"></i> 显示全部代码';
                     
-                    // 贴心体验：如果收起时页面位置太靠下，自动滚回代码块顶部
+                    // 如果收起时页面位置太靠下，自动滚回代码块顶部
                     wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             };
@@ -436,7 +499,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // 优先渲染内容
     if (document.body.classList.contains('category-page')) {
-        renderArticleCards(); // 现在这个函数存在了，二级页面会正常显示
+        renderArticleCards();
         handleHashNavigation();
     }
     renderLatestArticles();   
@@ -452,6 +515,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // 启动返回顶部按钮
     initBackToTop();
+
+    // 绑定搜索事件
+    const searchInput = document.getElementById('article-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            renderLatestArticles(e.target.value);
+        });
+    }
 });
 
 /* ------------------------------------------------------------
@@ -489,3 +560,4 @@ function initBackToTop() {
         });
     });
 }
+

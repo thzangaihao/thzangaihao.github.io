@@ -617,7 +617,7 @@ a[onclick*="copyToClipboard"] { cursor: copy !important; position: relative; }
         height: 565pt;
     }
 
-    /* [核心修改] 右栏卡片容器 */
+    /* 右栏卡片容器 */
     .home-page .right-col .category-card {
         height: 100%;
         margin-bottom: 0;
@@ -631,7 +631,7 @@ a[onclick*="copyToClipboard"] { cursor: copy !important; position: relative; }
         scrollbar-color: #ddd transparent;
     }
 
-    /* [核心修改] 右栏标题 (吸顶头) */
+    /* 右栏标题 (吸顶头) */
     .home-page .right-col .category-card h3 {
         /* 1. 定位 */
         position: sticky;
@@ -651,7 +651,7 @@ a[onclick*="copyToClipboard"] { cursor: copy !important; position: relative; }
         /* box-shadow: 0 4px 8px rgba(0,0,0,0.02); 微弱阴影，增加层次 */
     }
 
-    /* [核心修改] 右栏内容列表 */
+    /* 右栏内容列表 */
     /* 关键步骤C：给内容单独加 Padding，防止贴边 */
     .home-page .right-col .category-card #latest-articles-list {
         padding: 1.5rem; 
@@ -859,4 +859,73 @@ a[onclick*="copyToClipboard"] { cursor: copy !important; position: relative; }
 .related-article:hover .related-article-arrow {
     transform: translateX(4px);
     color: var(--accent-color);
+}
+
+/* ============================================================
+   [更新] 首页右栏吸顶头部 (包含标题与搜索框)
+   ============================================================ */
+
+@media (min-width: 851px) {
+    /* ... 之前的容器设定保持不变 ... */
+
+    /* [替换] 新的吸顶容器 (Flex布局让标题和搜索框两端对齐) */
+    .home-page .right-col .category-card .sticky-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        
+        background-color: #ffffff;
+        border-radius: 12px 12px 0 0;
+        border-bottom: 1px solid #f0f0f0;
+        
+        margin: 0;
+        padding: 1.2rem 1.5rem; 
+        
+        display: flex;
+        justify-content: space-between; /* 左右两端对齐 */
+        align-items: center;            /* 垂直居中 */
+    }
+
+    /* 重置 h3 的默认边距，适应 Flex 容器 */
+    .home-page .right-col .category-card .sticky-header h3 {
+        margin: 0;
+        padding: 0;
+        border: none;
+    }
+
+    /* 搜索框容器 */
+    .search-box {
+        position: relative;
+        width: 220px; /* 搜索框宽度 */
+    }
+
+    /* 搜索图标定位 */
+    .search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #bdc3c7;
+        font-size: 0.9rem;
+    }
+
+    /* 输入框本体样式 */
+    .search-box input {
+        width: 100%;
+        padding: 8px 12px 8px 32px; /* 左侧留出图标空间 */
+        border: 1px solid #e1e4e8;
+        border-radius: 20px;        /* 胶囊圆角 */
+        background-color: #f8f9fa;
+        font-size: 0.85rem;
+        color: var(--text-main);
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+    /* 搜索框聚焦时的发光效果 */
+    .search-box input:focus {
+        background-color: #ffffff;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+    }
 }
