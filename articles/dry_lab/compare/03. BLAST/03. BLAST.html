@@ -101,35 +101,35 @@
             </div>
 
             <div class="content">
-                <h2>1. 前言</h2>
+                <h2>前言</h2>
                 <p>BLAST (Basic Local Alignment Search Tool) 是一种基于启发式（Heuristic）算法的序列比对工具，旨在快速寻找序列间的局部相似性（Local Alignment）。关于启发式算法，我们会在算法栏进行讲解。本质上 BLAST 就是寻找相似序列。</p>
                 <p>在学习 BLAST 时，我们一定要明确 <b>“用什么去比对什么”</b> 根据查询序列（Query，就是我们要比较的序列）和数据库（Subject）的类型，BLAST 分为以下五种核心工具：</p>
                 <table><thead><tr><th>工具名称</th><th>查询序列 (Query)</th><th>数据库 (Subject)</th><th>常用场景 </th></tr></thead><tbody><tr><td>blastn</td><td>核苷酸 (DNA/RNA)</td><td>核苷酸</td><td>找同源基因、物种鉴定 </td></tr><tr><td>blastp</td><td>蛋白质</td><td>蛋白质</td><td>功能预测、结构域分析 </td></tr><tr><td>blastx</td><td>核苷酸 (6框翻译)</td><td>蛋白质</td><td>鉴定新测序 DNA 中的蛋白质编码基因 </td></tr><tr><td>tblastn</td><td>蛋白质</td><td>核苷酸 (6框翻译)</td><td>在基因组中寻找未标注的蛋白序列 </td></tr><tr><td>tblastx</td><td>核苷酸 (6框翻译)</td><td>核苷酸 (6框翻译)</td><td>亲缘关系较远的物种间寻找同源序列</td></tr></tbody></table>
 
-                <h2>2. BLAST 数据库</h2>
+                <h2>BLAST 数据库</h2>
                     <p>做 BLAST 分析需要用到数据库，在这里展示常用的数据库并作简单介绍：</p>
-                    <h3>2.1 大杂烩数据库</h3>
+                    <h3>大杂烩数据库</h3>
                         <h4>nt (Nucleotide Collection)</h4>
                             <p>包含 GenBank、RefSeq、EMBL、DDBJ 等几乎所有公开的 DNA 序列。当你做核酸的 BLAST 时不知道选用哪个数据库时，先用这个数据库最好了！但是这个数据库数据量巨大，比对速度较慢，通常用于物种鉴定或寻找新基因。且容易出现大量 “假设蛋白” ，我去 BLAST 就是想知道这个基因的功能，结果 nt 数据库告诉你这个基因别人发现了，但也不知道干啥的，说了一句正确的废话。</p>
                         <h4>nr (Non-redundant Protein)</h4>
                             <p>去冗余后的蛋白质序列，就是在数据库中人类已知的所有蛋白序列，且去掉了功能和序列相似性的那部分冗余，就是蛋白质版本的 nt 库。现在 NCBI 推荐默认使用 ClusteredNR。它将相似蛋白聚类，速度比传统的 nr 快很多，且结果更具代表性。</p>
-                    <h3>2.2 精选与参考数据库</h3>
+                    <h3>精选与参考数据库</h3>
                         <h4>RefSeq (Reference Sequence)</h4>
                             <p>每一个 ID 都是唯一的，代表了该物种的官方参考标准（如人、小鼠、拟南芥）。做物种间同源基因比对时的首选。</p>
                         <h4>UniProtKB (Universal Protein Resource)</h4>
                             <p>Swiss-Prot: 人工精选，注释信息极丰富且准确。</p>
                             <p>TrEMBL: 自动翻译，规模大但准确性稍逊。</p>
-                    <h3>2.3 比较基因组学专用平台</h3>
+                    <h3>比较基因组学专用平台</h3>
                         <h4>Ensembl / Ensembl Genomes</h4>
                             <p>专注于脊椎动物、植物、菌类等。它不仅提供序列，还提供预先计算好的基因组对齐数据。</p>
                         <h4>CoGe (Comparative Genomics)</h4>
                             <p>这是一个专门的平台，允许你把自己的序列和成千上万个已发表的基因组进行大规模 BLAST (CoGeBlast)，并直接可视化基因组间的共线性。</p>
                         <h4>PDB (Protein Data Bank)</h4>
                             <p>如果你关注的是结构比较，BLAST 针对 PDB 的比对能告诉你这个蛋白在 3D 空间上长什么样。</p>
-                <h2>3. BLAST 软件</h2>
+                <h2>BLAST 软件</h2>
                     <p>我们已经了解了blast数据库和类型，当我们要做 BLAST 时，有以下几种方法：</p>
                     <p>无论用哪种方式，我们都需要把要比对的序列写成 FASTA 格式。</p>
-                    <h3>3.1 NCBI 网页版</h3>
+                    <h3>NCBI 网页版</h3>
                         <p>我们可以点击这个网址进入 NCBI 提供的 BLAST 在线工具首页：<a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi" target="_blank" style="color: #3498db;">https://blast.ncbi.nlm.nih.gov/Blast.cgi</a></p>
                         <p>NCBI 在 Web BLAST 页提供了四种常用的 BLAST，你也可以直接点击跳转到对应页。</p>
                             <div class="my-blast-nav">                                
@@ -154,7 +154,7 @@
                             </div>
                         <p>进去后，提交所要比对的序列，和所要比对的数据库，直接点击 BLAST 运行就行了，关于算法参数细调，我们需要对 BLAST 算法有一定了解，再此不过多赘述。</p>
 
-                    <h3>3.2 本地版 BLAST+</h3>
+                    <h3>本地版 BLAST+</h3>
                         <p>当你需要拿几万条基因去比对一个新测序的基因组时，网页版就带不动了。你需要安装 BLAST+ 软件包。</p>
                         <p>下载 BLAST+ 你只是下载了一个比对工具，我们还需要下载你想要的数据库。</p>
                         <p>一次基本的 BLAST 命令包含以下几个参数：</p>
@@ -163,8 +163,8 @@
                         <code>脚本我还没写</code>
                         <p>在比较基因组学中，我们最常用 -outfmt 6（表格格式），因为它非常方便后续用 Excel 或 Python/R 处理。</p>
 
-                <h2>4. BLAST 输出解读</h2>
-                    <h3>4.1 重要参数</h3>
+                <h2>BLAST 输出解读</h2>
+                    <h3>重要参数</h3>
                         <h4>E-value</h4>
                             <p>E-value (Expect value，期望值)，定义在随机背景下，匹配到当前得分序列的期望次数。</p>
                             <p>E 值越小越可靠。$E < 10^{-5}$：通常认为具有显著的同源性。$E$ 接近 0 说明匹配结果在统计学上几乎不可能由随机产生。</p>
@@ -174,7 +174,7 @@
                         <h4>Query Coverage</h4>
                             <p>Query Coverage (查询序列覆盖度) 定义为 Query 序列中有多少比例参与了比对。</p>
                             <p>如果 Identity 很高但 Coverage 很低，说明可能只是由于某个保守的结构域（Domain）引起的局部匹配，而非全基因组水平的同源。</p>
-                    <h3>4.2 <code>-outfmt 6</code></h3>
+                    <h3><code>-outfmt 6</code></h3>
                         <p>当你打开 outfmt 6 的结果文件时，你会看到 12 列数据，我们需要明白这几行：</p>
                         <ol>
                             <li>qseqid: Query 的名称</li>

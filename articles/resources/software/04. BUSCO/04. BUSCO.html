@@ -36,12 +36,12 @@
             <h1>04. BUSCO</h1>
             
             <div class="content">
-                <h2>1. 简介</h2>
+                <h2>简介</h2>
                 <p>BUSCO (Benchmarking Universal Single-Copy Orthologs) 通过比对单拷贝直系同源基因库，来量化组装的完整度。</p>
 
                 <p>BUSCO 的核心逻辑是：在一个给定的分类范围内（比如“真核生物”或“胚胎植物”），绝大多数物种都应该拥有且仅拥有一份特定的保守基因。如果你的组装结果里这些基因找得越全，说明组装质量越高。</p>
 
-                <h2>2. 环境搭建及软件安装</h2>
+                <h2>环境搭建及软件安装</h2>
                 <pre><code class="language-bash">
 # 1. 创建并激活环境 (建议安装 v5.x 以上版本)
 conda create -n busco -c conda-forge -c bioconda busco=5.8.1
@@ -51,7 +51,7 @@ conda activate busco
 busco --version
                 </code></pre>
 
-                <h2>3. 用法</h2>
+                <h2>用法</h2>
                 <p>使用以下脚本进行分析。注意，当数据库选择的太广时，你的结果可能看起来非常漂亮（比如 99% 完整），但其实是因为它只检查了最基础的一小部分基因。如果选择错，结果会非常难看（大量 Missing），因为两个物种的基因组成完全不同。</p>
                     <div class="download-card">
                         <div class="download-info">
@@ -78,7 +78,7 @@ cmd = [
 ]
                     </code></pre>
 
-                <h2>4. 输出</h2>
+                <h2>输出</h2>
                 <p>结果会输出很多文件，我们只需要关注 <code>short_summary.txt</code> 文件即可，其中 results 记录了分析结果：</p>
                 <pre><code class="language-txt">
 ***** Results: *****

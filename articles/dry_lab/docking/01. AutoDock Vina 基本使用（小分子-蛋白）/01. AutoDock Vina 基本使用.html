@@ -4,7 +4,7 @@
         <title>01. AutoDock Vina 基本使用 - 海钊知识港</title>
         <meta name="collection" content="docking"> 
         <meta name="date" content="2025-12-17">
-        <meta name="description" content="通过可视化图形界面从0到1进行分子对接">
+        <meta name="description" content="（小分子-蛋白）通过可视化图形界面从 0 到 1 进行小分子-蛋白互作对接">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -33,14 +33,14 @@
             <h1>01. AutoDock Vina 基本使用</h1>
             <div class="meta">
                 <span><i class="far fa-calendar"></i> 2025-12-17</span>
-                <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 分子对接</span>
+                <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 分子互作</span>
             </div>
 
             <div class="content">
                 <h2>前言</h2>
                     <p>分子对接就是把一个小分子和一个蛋白质进行互作模拟，看什么情况下，它们之间的结合能最低，此时会形成一个稳定的复合物，所有的分子蛋白互作都是这样的。能量最低原理就告诉我们，任何物理系统（宏观或微观）在不受外力干扰下，总是自发地趋向于达到总能量最低、最稳定的状态。而计算机要寻找的就是什么情况下它们的结合能最低。</p>
-                <h2>1. 文件准备</h2>
-                    <h3>1.1 配体文件</h3>
+                <h2>文件准备</h2>
+                    <h3>配体文件</h3>
                         <p>配体文件下载：</p>
                         <ol>
                             <li>Pub Chem
@@ -52,7 +52,7 @@
                                 <p>直接键入分子名称，搜索结合复合物，在Unique Ligands下点击配体代号连接，下载SDF格式或CIF格式文件。</p>
                             </li>
                         </ol>
-                    <h3>1.2 蛋白文件</h3>
+                    <h3>蛋白文件</h3>
                         <p>蛋白文件下载：</p>
                         <ol>
                             <li>
@@ -64,14 +64,14 @@
                                 <p>你感兴趣哪个下载哪个cif文件。</p>
                             </li>
                         </ol>
-                <h2>2. 蛋白文件预处理</h2>
+                <h2>蛋白文件预处理</h2>
                     <ol>
                         <li>加氢</li>
                             <p>对蛋白cif文件进行氢原子添加，可以在pymol中手动进行</p>
                         <li>转格式</li>
                             <p>将加好氢的蛋白转存为pdb格式</p>
                     </ol>
-                <h2>3. 处理受体蛋白</h2>
+                <h2>处理受体蛋白</h2>
                     <ol>
                         <li>启动 AutoDockTools，ADT</li>
                         <li>加载蛋白</li>
@@ -85,7 +85,7 @@
                             <p>菜单栏：Grid -> Macromolecule -> Choose</p>
                             <p>在弹出的列表里选中你的蛋白，点击 Select Molecule</p>
                     </ol>
-                <h2>4. 处理配体小分子</h2>
+                <h2>处理配体小分子</h2>
                     <ol>
                         <li>小分子转格式</li>
                             <p>在pymol中将小分子由SDF转为pdb格式</p>
@@ -97,7 +97,7 @@
                         <li>保存为 PDBQT</li>
                             <p>菜单栏：Ligand -> Output -> Save as PDBQT</p>
                     </ol>
-                <h2>5. 画盒子</h2>
+                <h2>画盒子</h2>
                     <ol>
                         <li>设置 Map 类型</li>
                             <p>菜单栏：Grid -> Macromolecule -> Choose (再次选中刚才保存的蛋白 PDBQT)</p>
@@ -114,7 +114,7 @@
                             <p>Size (X, Y, Z)：盒子的大小（单位是埃 Å）。</p>
                             <p>点击 File -> Close saving current</p>
                     </ol>
-                <h2>6. 编写配置文件</h2>
+                <h2>编写配置文件</h2>
                     <p>在你的文件夹里新建一个文本文件，命名为 config.txt，内容如下：</p>
                     <pre><code class="language-txt">
     receptor = protein.pdbqt    # 你的蛋白文件名
@@ -132,7 +132,7 @@
     exhaustiveness = 8          # 搜索细致度，8是标准，想更准可以设 16 或 32（时间变长）
     num_modes = 9               # 输出多少个结果
                     </code></pre>
-                <h2>7. 开始运行</h2>
+                <h2>开始运行</h2>
                     <ol>
                         <li>准备环境</li>
                             <p>下载 vina.exe。</p>

@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/04/15_16:50:37
-// 文章总数: 46
+// 生成时间: 2026/04/17_10:59:46
+// 文章总数: 48
 
 window.ARTICLE_DATABASE = [
     {
@@ -14,8 +14,8 @@ window.ARTICLE_DATABASE = [
         "title": "01. AutoDock Vina 基本使用",
         "collection": "docking",
         "date": "2025-12-17",
-        "summary": "通过可视化图形界面从0到1进行分子对接",
-        "path": "articles/dry_lab/docking/01. AutoDock Vina 基本使用/01. AutoDock Vina 基本使用.html"
+        "summary": "（小分子-蛋白）通过可视化图形界面从 0 到 1 进行小分子-蛋白互作对接",
+        "path": "articles/dry_lab/docking/01. AutoDock Vina 基本使用（小分子-蛋白）/01. AutoDock Vina 基本使用.html"
     },
     {
         "title": "01. Kraken 2 自建库及鉴定",
@@ -126,8 +126,8 @@ window.ARTICLE_DATABASE = [
         "title": "02. AutoDock Vina 自动化",
         "collection": "docking",
         "date": "2026-01-18",
-        "summary": "通过 Python 脚本在 Linux 实现大规模对接任务",
-        "path": "articles/dry_lab/docking/02. AutoDock Vina 自动化/02. AutoDock Vina 自动化.html"
+        "summary": "（小分子-蛋白）通过 Python 脚本在 Linux 实现大规模对接任务",
+        "path": "articles/dry_lab/docking/02. AutoDock Vina 自动化（小分子-蛋白）/02. AutoDock Vina 自动化.html"
     },
     {
         "title": "02. OrthoFinder 建树",
@@ -221,6 +221,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/software/03. gffread/03. gffread.html"
     },
     {
+        "title": "03. 基于核酸基序预测蛋白-核酸互作",
+        "collection": "docking",
+        "date": "2026-04-17",
+        "summary": "（核酸-蛋白）通过 FIMO 预测核酸基序-蛋白互作能力",
+        "path": "articles/dry_lab/docking/03. 基于核酸基序预测蛋白-核酸互作/03. 基于核酸基序预测蛋白-核酸互作.html"
+    },
+    {
         "title": "03. 基因组组装算法",
         "collection": "algorithm",
         "date": "2026-04-13",
@@ -268,6 +275,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-21",
         "summary": "Vina 刚性对接自动化",
         "path": "articles/resources/python/04. 分子对接系列/04. 分子对接系列.html"
+    },
+    {
+        "title": "04. 基于蛋白结构预测蛋白-核酸互作",
+        "collection": "docking",
+        "date": "2026-04-17",
+        "summary": "（核酸-蛋白）通过 HDOCK, DNAminder 对接或预测",
+        "path": "articles/dry_lab/docking/04. 基于蛋白结构预测蛋白-核酸互作/04. 基于蛋白结构预测蛋白-核酸互作.html"
     },
     {
         "title": "04. 富集分析图",

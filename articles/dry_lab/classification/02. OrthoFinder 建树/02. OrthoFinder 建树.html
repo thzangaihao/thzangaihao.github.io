@@ -35,15 +35,15 @@
             <h1>02. OrthoFinder 建树</h1>
             
             <div class="content">
-                <h2>1. 前言</h2>
+                <h2>前言</h2>
                 <p>OrthoFinder 系统发育基因组学高精度建树依赖物种的全基因组背景，与传统的基于单基因（如 18S rRNA 或 ITS）建树相比，利用全基因组数据建树能够提供更强的系统发育信号，显著提高进化树的分辨率和可靠性。</p>
 
                 <blockquote>如果你试图搞懂我们在搞什么东西而不是只是为了画出一棵树，你需要了解以下目的和算法：两个序列之间的比对算法（例如 NW全局比对算法、BLAST 快速比对算法）；建树算法（例如 UPGMA 算法、NJ 算法、贝叶斯算法、最大似然法、STAG 算法等）。</blockquote>
 
-                <h2>2. 数据准备</h2>
+                <h2>数据准备</h2>
                 <p>OrthoFinder 不直接吃基因组 FASTA（核苷酸序列），它需要的是蛋白质序列（Proteome, .faa 或 .pep）。因此，如果我们只有物种的基因组 <code>.fatsa</code> 文件，我们需要进行蛋白质预测与数据清洗。</p>
 
-                <h3>2.1 蛋白序列预测</h3>
+                <h3>蛋白序列预测</h3>
                 <p>蛋白序列预测我们可以使用 funannotate，它整个了多个预测软件，但是为了建树，我们直接运行 Augustus 就行了。可以使用以下这个脚本进行交互式选择：</p>
                     <div class="download-card">
                         <div class="download-info">
@@ -58,7 +58,7 @@
                     </div>
                 <blockquote>因为 Augustus 只支持单核单线程运行，所以这是一个过易并行脚本。当单核性能孱弱，样本基因组较大时，建议用 tmux 等工具挂起运行。</blockquote>
                 
-                <h3>2.2 蛋白数据清洗</h3>
+                <h3>蛋白数据清洗</h3>
                 <p>OrthoFinder 对数据格式要求很严格，必须是纯 <code>.fasta</code> 文件，不得包含注释和无义字符，而 Augustus 生成的文件内部包含大量无关信息，我们需要对其继续清洗：</p>
                     <div class="download-card">
                         <div class="download-info">
@@ -72,8 +72,8 @@
                         </a>
                     </div>
 
-                <h2>3. OrthoFinder</h2>
-                <h3>3.1 下载与安装</h3>
+                <h2>OrthoFinder</h2>
+                <h3>下载与安装</h3>
                 <p>使用 <code>conda</code> 进行安装：</p>
                 <pre><code class="language-bash">
 # 1. 创建环境
@@ -88,7 +88,7 @@ conda install orthofinder
 # 4。 验证安装
 orthofinder --version
                 </code></pre>
-                <h3>3.2 使用</h3>
+                <h3>使用</h3>
                 <p>OrthoFinder 不能在命令行里直接指定多个文件，而是必须指定一个包含了所有目标序列的文件夹，这个交互式脚本会自动创建一个干净的专属工作目录，把选中的蛋白序列复制进去，然后再启动 OrthoFinder。</p>
                     <div class="download-card">
                         <div class="download-info">
@@ -107,7 +107,7 @@ orthofinder --version
 
                 <blockquote>如果你不开启 MSA 法建树（即命令行中不添加 <code>-M msa</code>参数），OrthoFinder 会直接利用 BLAST/Diamond 的比对得分，使用其开发的 STAG (Species Tree from All Genes) 算法。该算法会分析成千上万棵的基因树，寻找其中重复出现的拓扑结构，最后决定产生一棵最能代表全局的物种树。</blockquote>
 
-                <h3>3.3 内容输出</h3>
+                <h3>内容输出</h3>
                 <p>我们只需要关注以下输出结果：</p>
                 <ul>
                     <li><code>Species_Tree/SpeciesTree_rooted.txt</code>：这是 OrthoFinder 利用自带算法（STAG 算法结合 FastTree）初步构建好的带根物种树。它是标准的 Newick 树文本格式，可以直接导入绘图软件查看木霉菌的亲缘关系。你可以使用 <a href="https://itol.embl.de/" target="_blank" style="color: #3498db;">https://itol.embl.de/</a> 直接预览你的树，并进行相对应的修改。
@@ -116,7 +116,7 @@ orthofinder --version
                     <li><code>Comparative_Genomics_Statistics/</code>：这个文件夹里包含了基因家族扩张、收缩、以及木霉属特有基因的统计表格，非常适合用来画条形图或者韦恩图丰富论文结果。</li>
                 </ul>
 
-                <h2>4. IQ-TREE ML 优化建树</h2>
+                <h2>IQ-TREE ML 优化建树</h2>
                     <p><code>Species_Tree/SpeciesTree_rooted.txt</code> 是由 FastTree 依赖 STAG 算法构建的初步结果。为了达到发表论文的严谨性，我们要利用 OrthoFinder 生成的超级矩阵 <code>MultipleSequenceAlignments/SpeciesTreeAlignment.fa</code> 跑一遍最大似然法 (ML) 建树。</p>
 
                     <p>关于原理和你心中许多疑惑，在这片文章应该能解答一部分：</p>
@@ -165,7 +165,7 @@ orthofinder --version
                         </a>
                     </div>
 
-                <h2>5. OrthoFinder 原理浅析</h2>
+                <h2>OrthoFinder 原理浅析</h2>
                 <p>虽然 OrthoFinder是基于全基因组视野下的，但是，我们不可能把所有物种的基因组文件一一去做比较得分来判断亲缘关系，这是在人类目前算力水平下不可能实现的方案。因此，我们（就是 OrthoFinder）会把所有物种的直系同源单拷贝基因提取出来，更具体的说，OrthoFinder 干了这两件事情：</p>
                 <ol>
                     <li>鉴定直系同源基因：一个物种的基因组里有很多重复基因（旁系同源）。OrthoFinder 会通过算法剔除干扰，只找那些“祖先是一个，因为物种分化才分开”的基因。</li>

@@ -37,7 +37,7 @@
 			<div class="content">
 				<h2>前言</h2>
 				<p>最基础的 GWAS 分析必须包括两个文件：表型记录文件和变异文件。</p>
-				<h2>1. 表型记录文件</h2>
+				<h2>表型记录文件</h2>
 				<p>我们先用任何一个矩阵记录文件记录所有个体 ID 和对应的表型数据，表型数据我们先以非量子化的数据为例进行分析。而对于后面关联性分析时，我们需要生成新的分析标准表型文件存储格式文件。</p>
 				<pre><code class="language-tsv">
 ID  	 表型_1	 表型_2	 表型_3
@@ -46,14 +46,14 @@ ID  	 表型_1	 表型_2	 表型_3
 0003	    1.9	    3.1	    9.2
 0004	    2.7	    2.6	    7.6
 				</code></pre>
-				<h2>2. 变异记录文件</h2>
+				<h2>变异记录文件</h2>
 				<p>根据生物学知识，我们一般将变异分析分为以下几种并以不同的 tag 在如<code>.vcf</code>文件中记录：</p>
 				<ol>
 					<li>插入缺失突变 (InDel)：插入或丢失一个或几个碱基。我们一般称为InDel (insert and deletion)。</li>
 					<li>染色体结构变异 (SV)：指具有大型序列结构发生变化的变异，例如片段丢失 (DEL, Deletion)，片段倒位 (INV, Inversion)，染色体内易位 (ITX, Intrachromosomal Translocation)。</li>
 					<li>单碱基突变 (SNP)：单碱基突变，造成单核苷酸多态性 (single-nucleotide polymorphism, SNP)。</li>
 				</ol>
-				<h3>2.1 SV 变异数据结构</h3>
+				<h3>SV 变异数据结构</h3>
 				<p>这是常见的<code>.vcf</code>文件结构：</p>
 				<pre><code class="language-vcf">
 #CHROM	 POS    	 ID         	 REF	 ALT  	 QUAL	 FILTER 	 INFO                                                                                                          	 FORMAT                                 	 E11
@@ -230,11 +230,11 @@ Chr01 	 1249660	 INV00000004	 C  	 <INV>	   97	 LowQual	 IMPRECISE;SVTYPE=INV;SV
 						</tr>
 					</tbody>
 				</table>
-				<h3>2.2 InDel 变异数据结构</h3>
+				<h3>InDel 变异数据结构</h3>
 				还没做过，先放着。
-				<h3>2.3 SNP 变异数据结构</h3>
+				<h3>SNP 变异数据结构</h3>
 				同上。
-				<h2>3. 依赖软件</h2>
+				<h2>依赖软件</h2>
 				<p>首先别忘记设置镜像源，不然下载慢到你怀疑人生：</p>
 				<pre><code class="language-bash">
 # 添加清华镜像源的各个通道
@@ -290,7 +290,7 @@ conda install plink -y
 conda install gemma -y
 conda install tassel -y
 				</code></pre>
-				<h2>4. 合并矩阵原理</h2>
+				<h2>合并矩阵原理</h2>
 				<p>VCF 文件为了节省空间，默认只记录有变异的位点。合并的过程就是把所有样本的位点进行并集处理，并把缺失的信息补全。</p>
 				<p>例如我们对这两个原始<code>.vcf</code>矩阵进行合并：</p>
 				<pre><code class="language-vcf">

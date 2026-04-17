@@ -36,10 +36,10 @@
             <h1>03. gffread</h1>
             
             <div class="content">
-                <h2>1. 简介</h2>
+                <h2>简介</h2>
                 <p>gffread 用于对基因组注释文件的操作，例如格式转换，序列提取等等，在这篇博客中记录了几种常见使用方法和便携脚本。</p>
 
-                <h2>2. 环境搭建及软件安装</h2>
+                <h2>环境搭建及软件安装</h2>
                 <pre><code class="language-bash">
 # 1. 创建名为 gffread_env 的环境，并指定 python 版本（建议 3.9+）
 conda create -n gffread_env python=3.10 -y
@@ -54,8 +54,8 @@ conda install gffread -y
 gffread --version
                 </code></pre>
 
-                <h2>3. 常见用法</h2>
-                <h3>3.1 根据基因提取蛋白质序列</h3>
+                <h2>常见用法</h2>
+                <h3>根据基因提取蛋白质序列</h3>
                 <p>我们需要准备基因组<code>.fasta</code>文件，基因组<code>.gtf</code>注释文件（或其它相关注释文件例如<code>.gff</code>、<code>.gff3</code>），以及你要提取的基因名称列表的<code>.tsv</code>文件。gffread 会根据这些文件提取你指定的基因的蛋白质序列，生成<code>.faa</code>蛋白序列文件。</p>
                     <div class="download-card">
                         <div class="download-info">

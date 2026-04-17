@@ -37,7 +37,7 @@
 			<div class="content">
 				<h2>前言</h2>
 				<p>这篇文章详细的介绍了如何从<code>.delly.vcf</code>到最终每个变异位点的关联性。使用最基础的 LM 普通线性模型。</p>
-				<h2>1. vcf 提取与整理</h2>
+				<h2>vcf 提取与整理</h2>
 				<p>将散落在各个子文件夹中的<code>.vcf.gz</code>文件进行提取并汇总到<code>01_Raw_VCFs</code>文件夹中。</p>
 				<blockquote>注意，因为压缩包形式具有存储和读取的优势，我们提取并存储的是<code>.vcf.gz</code>和其索引。</blockquote>
 				<p>使用交互式脚本进行作业：</p>
@@ -85,7 +85,7 @@ all
 处理结束。成功复制 336 / 336 个文件。
 文件保存在: /home/thz/SV_GWAS/01_Raw_VCFs
 				</code></pre>
-				<h2>2. Delly 合并</h2>
+				<h2>Delly 合并</h2>
 				<p>我们要对<code>01_Raw_VCFs</code>里面所有的<code>.vcf.gz</code>进行合并，生成合并后文件<code>Merged_Population_filtered.vcf.gz</code>并创建索引。
 				<p>使用交互式脚本进行作业：</p>
 				<div class="download-card">
@@ -149,7 +149,7 @@ bcftools view -h Merged_Population.vcf.gz | head -n 50
 bcftools view -H Merged_Population.vcf.gz | head -n 10
 				</code></pre>
 				<blockquote>打印变异位点后，你会发现大部分变异位点只在一个或者几个样本中出现，我们称为低频率变异，在后续我们会通过质控对这种变异位点进行剔除。</blockquote>
-				<h2>3. 位点质控与过滤</h2>
+				<h2>位点质控与过滤</h2>
 				<p>剔除低频率变异 (默认阈值$MAF < 0.05$)，这些变异不具有普遍性，即使对性状有直接关系得出来的的结论也无法有信服力。我们的核心目的是：找到具有普遍存在的变异类型，并计算这个变异与表型的关联性/独立性。</p>
 				<ol>
 					我们默认过滤条件如下：
@@ -226,7 +226,7 @@ bcftools view -h Merged_Population_filtered.vcf.gz | head -n 50
 bcftools view -H Merged_Population_filtered.vcf.gz | head -n 10
 				</code></pre>
 				<blockquote>质控后你会发现记录的变异位点会在大部分（取决于你设定的阈值）样品中出现。</blockquote>
-				<h2>4. PLINK 格式转换</h2>
+				<h2>PLINK 格式转换</h2>
 				<p>大多数 GWAS 软件（包括 GEMMA 和 TASSEL）在处理大规模矩阵时，更喜欢二进制的 PLINK 格式（<code>.bed</code>, <code>.bim</code>, <code>.fam</code>）。</p>
 				<p>使用交互式脚本进行作业：</p>
 				<div class="download-card">
@@ -280,7 +280,7 @@ PLINK_EXEC = "plink"  # 如果需要 PLINK2，请改为 "plink2" 并相应调整
 ......
 [成功] 生成: /home/thz/SV_GWAS/04_PLINK_Binary/Merged_Population_filtered_plink.bed / .bim / .fam
 				</code></pre>
-				<h2>5. 表型数据清洗</h2>
+				<h2>表型数据清洗</h2>
 				<p>将我们的表型文件先转化为<code>.tsv</code>包含表头和样本 ID 的标准文件，进行 ID 对齐和缺失样本剔除。</p>
 				<pre><code class="language-tsv">
 No  	 PHE_1	 PHE_2	 PHE_3
@@ -378,7 +378,7 @@ E17	 27.35	  9.8 	  2.7
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>6. 标准表型数据表自动化生成</h2>
+				<h2>标准表型数据表自动化生成</h2>
 				<p>将TSV拆分成多个符合GEMMA 输入的性状数据表文件，以列头性状作为文件命名。</p>
 				<p>对脚本相关参数进行调节并执行：</p>
 				<div class="download-card">
@@ -442,7 +442,7 @@ TSV 文件样本数: 250
 [成功] 已拆分 5 个性状文件。
 提示：这些文件可以直接用于 GEMMA 的 -p 参数。
 				</code></pre>
-				<h2>7. 关联性分析</h2>
+				<h2>关联性分析</h2>
 				<p>万事俱备，只欠东风：运行最后的关联性分析：</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -563,7 +563,7 @@ Reading Files ...
 所有结果文件已存放于: /home/thz/SV_GWAS/07_GWAS_Results
 ==================================================
 				</code></pre>
-				<h2>8. 阈值位点筛选</h2>
+				<h2>阈值位点筛选</h2>
 				<p>通过脚本根据阈值筛选出具有显著性的位点，获得位点具体信息。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -576,7 +576,7 @@ Reading Files ...
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>9. 结果筛选</h2>
+				<h2>结果筛选</h2>
 				<p>对设定阈值以上的的变异位点进行筛选输出。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -589,7 +589,7 @@ Reading Files ...
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>10. 位点溯源</h2>
+				<h2>位点溯源</h2>
 				<p>对上一步分析出来的位点进行溯源分析，进行基因定位等工作。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -602,7 +602,7 @@ Reading Files ...
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>11. 可视化</h2>
+				<h2>可视化</h2>
 				<p>绘制曼哈顿图和 QQ 图。</p>
 				<div class="download-card">
 					<div class="download-info">

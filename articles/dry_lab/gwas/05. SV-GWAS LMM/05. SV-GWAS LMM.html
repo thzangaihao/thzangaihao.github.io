@@ -37,7 +37,7 @@
 			<div class="content">
 				<h2>前言</h2>
 				<p>相较于上一篇的简单线性模型，这篇文章介绍了混合线性模型 LMM 的分析流程及相关资源。</p>
-				<h2>1. vcf 提取与整理</h2>
+				<h2>vcf 提取与整理</h2>
 				<p>前 6 部对原始文件的处理和 LM 处理一样。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -50,7 +50,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>2. Delly 合并</h2>
+				<h2>Delly 合并</h2>
 				<div class="download-card">
 					<div class="download-info">
 						<i class="fas fa-file-code"></i> <div class="file-details">
@@ -62,7 +62,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>3. 位点质控与过滤</h2>
+				<h2>位点质控与过滤</h2>
 				<div class="download-card">
 					<div class="download-info">
 						<i class="fas fa-file-code"></i> <div class="file-details">
@@ -74,7 +74,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>4. PLINK 格式转换</h2>
+				<h2>PLINK 格式转换</h2>
 				<div class="download-card">
 					<div class="download-info">
 						<i class="fas fa-file-code"></i> <div class="file-details">
@@ -86,7 +86,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>5. 表型数据清洗</h2>
+				<h2>表型数据清洗</h2>
 				<p>建议先运行<code>05_1_测试.py</code>核实样本数目和表型数目。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -110,7 +110,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>6. 标准表型数据表自动化生成</h2>
+				<h2>标准表型数据表自动化生成</h2>
 				<div class="download-card">
 					<div class="download-info">
 						<i class="fas fa-file-code"></i> <div class="file-details">
@@ -122,7 +122,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>7. Kinship 矩阵计算</h2>
+				<h2>Kinship 矩阵计算</h2>
 				<p>以基因变异位点为依据，进行所有样本间的亲缘关系计算，生成亲缘关系矩阵。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -135,7 +135,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>8. Kinship 矩阵可视化</h2>
+				<h2>Kinship 矩阵可视化</h2>
 				<p>绘制热图，判断群体亲缘关系如何，决定是否使用 LMM 模型。或决定是否将亲缘关系作为随机效应引入 LMM 分析中。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -148,7 +148,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>9. PCA 计算及可视化</h2>
+				<h2>PCA 计算及可视化</h2>
 				<p>看群体是否发生分类，分层形成亚群，也是对 LMM 模型的进一步修订，排除假阳性。并进行可视化。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -161,7 +161,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>10. 混合线性模型</h2>
+				<h2>混合线性模型</h2>
 				<p>执行 LMM 混合线性模型分析。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -174,7 +174,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>11. 结果筛选</h2>
+				<h2>结果筛选</h2>
 				<p>对设定阈值以上的的变异位点进行筛选输出。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -187,7 +187,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>12. 位点溯源</h2>
+				<h2>位点溯源</h2>
 				<p>对上一步分析出来的位点进行溯源分析，进行基因定位等工作。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -200,7 +200,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>13. 可视化</h2>
+				<h2>可视化</h2>
 				<p>绘制曼哈顿图和 QQ 图。</p>
 				<div class="download-card">
 					<div class="download-info">
@@ -213,7 +213,7 @@
 						<i class="fas fa-cloud-download-alt"></i>
 					</a>
 				</div>
-				<h2>14. IGV 可视化</h2>
+				<h2>IGV 可视化</h2>
 				<p>将第 11 部筛选出来的位点生成 IGV 可读的<code>.gff3</code>文件。</p>
 				<div class="download-card">
 					<div class="download-info">

@@ -405,7 +405,41 @@ function initBackToTop() {
 }
 
 /* ------------------------------------------------------------
-   9. 初始化入口 (统一控制台)
+   9. 自动标题编号 (Auto Numbering for H2/H3)
+   ------------------------------------------------------------ */
+function autoNumberHeadings() {
+    const content = document.querySelector('.content');
+    if (!content) return;
+
+    // 抓取所有 h2 和 h3
+    const headers = content.querySelectorAll('h2, h3');
+    if (headers.length === 0) return;
+
+    let h2Count = 0;
+    let h3Count = 0;
+
+    headers.forEach(header => {
+        // 防止被重复执行导致多次编号
+        if (header.classList.contains('numbered')) return;
+        header.classList.add('numbered');
+
+        if (header.tagName === 'H2') {
+            h2Count++;
+            h3Count = 0; // 遇到新的 H2，重置 H3 计数器
+            // 插入编号 span (可以用来单独设置 CSS 样式)
+            header.innerHTML = `<span class="heading-number">${h2Count}. </span>` + header.innerHTML;
+        } 
+        else if (header.tagName === 'H3') {
+            h3Count++;
+            // 如果文章一上来没有 H2 直接是 H3，为了美观不显示 0.1，直接跳过或者只显示 H3 计数
+            const prefix = h2Count > 0 ? `${h2Count}.${h3Count}` : `${h3Count}`;
+            header.innerHTML = `<span class="heading-number">${prefix} </span>` + header.innerHTML;
+        }
+    });
+}
+
+/* ------------------------------------------------------------
+    初始化入口 (统一控制台)
    ------------------------------------------------------------ */
 window.addEventListener('DOMContentLoaded', async () => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -430,6 +464,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     loadPrismHighlighter(); 
     makeTablesResponsive();
     autoFillArticleInfo();
+    autoNumberHeadings();
     generateTOC();
     initBackToTop();
 });

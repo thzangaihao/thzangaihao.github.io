@@ -4,7 +4,7 @@
         <title>02. AutoDock Vina 自动化 - 海钊知识港</title>
         <meta name="collection" content="docking"> 
         <meta name="date" content="2026-01-18">
-        <meta name="description" content="通过 Python 脚本在 Linux 实现大规模对接任务">
+        <meta name="description" content="（小分子-蛋白）通过 Python 脚本在 Linux 实现大规模对接任务">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -33,13 +33,13 @@
             <h1>02. AutoDock Vina 自动化</h1>
             <div class="meta">
                 <span><i class="far fa-calendar"></i> 2026-01-18</span>
-                <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 分子对接</span>
+                <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 分子互作</span>
             </div>
 
             <div class="content">
                 <h2>前言</h2>
                     <p>在面对大量小分子和蛋白时，我们不可能手动一一对接，基于此，我编写了一套能够复用的脚本，在Linux终端能够对n个小分子和m个蛋白质进行m*n次对接，并将比结合能生成一个TSV矩阵，此文主要介绍了该流程的使用指南。</p>
-                <h2>1. 工作目录</h2>
+                <h2>工作目录</h2>
                     <p>创建工作目录并存放文件：</p>
                     <pre><code class="language-bash">
 .
@@ -50,7 +50,7 @@
 ├── 2_3.py
 └── 3_4.py
                     </code></pre>
-                <h2>2. 加氢加电荷</h2>
+                <h2>加氢加电荷</h2>
                     <p>执行 <code>1. 加氢加电.py</code> 文件：</p>
                     <div class="download-card">
                         <div class="download-info">
@@ -86,7 +86,7 @@ ATOM      3  C   MET A   1      28.926 -74.142 -36.032  0.00  0.00    +0.231 C
 ATOM      4  O   MET A   1      28.065 -74.208 -35.182  0.00  0.00    -0.274 OA
 ATOM      5  CB  MET A   1      30.501 -75.842 -34.975  0.00  0.00    +0.038 C 
                     </code></pre>
-                <h2>3. 配置文件生成</h2>
+                <h2>配置文件生成</h2>
                     <p>执行 <code>2. 盒子配置文件生成.py</code> 文件：</p>
                     <div class="download-card">
                         <div class="download-info">
@@ -172,7 +172,7 @@ def write_config_file(receptor_path, output_dir, box_params):
     
     return config_path
                     </code></pre>
-                <h2>4. 进行对接</h2>
+                <h2>进行对接</h2>
                     <p>执行 <code>3. Vina 运行.py</code> 文件：</p>
                     <div class="download-card">
                         <div class="download-info">
@@ -216,7 +216,7 @@ mode |   affinity | dist from best mode
     9         -6.7      4.464      8.510
 Writing output ... done.                        
                     </code></pre>
-                <h2>5. 比结合能汇总</h2>
+                <h2>比结合能汇总</h2>
                     <p>执行 <code>4. 比结合能矩阵输出.py</code> 文件：</p>
                     <div class="download-card">
                         <div class="download-info">

@@ -36,10 +36,10 @@
             <h1>01. fastp</h1>
             
             <div class="content">
-                <h2>1. 简介</h2>
+                <h2>简介</h2>
                 <p>对于测序下机的读段数据，常常包含测序芯片接头，还有好多低质量的短读段，我们需要对齐进行识别并去除，我们传统使用 FASTQC 等软件进行质控，使用 cutadapt 软件去除接头，使用 Trimmomatic 等软件进行剪裁，然后使用一些自已开发的脚本进行过滤。在这里我们介绍使用 fastp， 它有着集成，快速，高效特点，最后还会生成一份漂亮的<code>.html</code>质检报告。</p>
 
-                <h2>2. 环境搭建及软件安装</h2>
+                <h2>环境搭建及软件安装</h2>
                 <pre><code class="language-bash">
 # 1. 创建名为 fastp_env 的环境，并指定 python 版本（建议 3.9+）
 conda create -n fastp_env python=3.10 -y
@@ -54,7 +54,7 @@ conda install fastp -y
 fastp --version
                 </code></pre>
 
-                <h2>3. fastq 清洗</h2>
+                <h2>fastq 清洗</h2>
                 使用以下交互式脚本进行文件清洗：
                     <div class="download-card">
                         <div class="download-info">

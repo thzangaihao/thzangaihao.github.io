@@ -37,7 +37,7 @@
             <div class="content">
                 <h2>前言</h2>
                 <p>离线版版本的 AlphaFold3 (AF3) 相比在线版本可以支持任意小分子的对接共预测。我们使用传统的分子对接例如 Vian 一般都进行刚性对接和半柔性对接，而受体与配体的生物学结合一般都存在较大的构象改变。因此使用 AlphaFold 同时预测＋对接，可以极大的提高预测精度和对接精度，这也是 AF3 最为先进的一点。本文以 slurm 任务提交集群作业为例。</p>
-                <h2>1. 资源核实</h2>
+                <h2>资源核实</h2>
                 <p>由于 AF3 模型在进行结构推理和扩散模型优化时，对 GPU 的张量计算能力及显存容量有极高要求（单次任务显存需求通常超过 40GB），所以在进行任务前我们务必需要检查配置，后续以集群查询为例。</p>
                 <p>另外别忘记查看集群或服务器是否本地部署了 AF3 。</p>
                 <ol>
@@ -64,7 +64,7 @@ Partition2           (null)                8          512  2000000
 Partition3           gpu:nvidia_h100-sxm4  8          512  2000000
                     </code></pre>
                 </ol>
-                <h2>2. 任务文件编写</h2>
+                <h2>任务文件编写</h2>
                     <p>AF3 的每一次对接任务都是以一个<code>.json</code>文件来储存的，里面包含你要预测的氨基酸序列，配体小分子的 smiles 表达，当然还支持其它互作对象共预测，我们就继续以小分子对接为例，其 AF3 离线版本标准<code>.json</code>写法如下：</p>
                     <pre><code class="language-json">
 {
@@ -90,7 +90,7 @@ Partition3           gpu:nvidia_h100-sxm4  8          512  2000000
                     </code></pre>
                     <p>其中<code>sequence</code>为氨基酸序列，<code>smiles</code>为配体小分子的 smiles 表达。</p>
                     <blockquote><p>当我们有大量的序列需要预测对接时，我们一般会存放在一个<code>.fasta</code>文件中，此时直接运行相关脚本，会自动生成所有的任务标准文件。</p></blockquote>
-                <h2>3. 创建工作目录</h2>
+                <h2>创建工作目录</h2>
                 <pre><code class="language-bash">
 .
 ├── 0.json              # 存放预测任务文件
@@ -99,7 +99,7 @@ Partition3           gpu:nvidia_h100-sxm4  8          512  2000000
 └ task.slurm            # 存放集群slurem任务提交文件
                 </code></pre>
                 <p>其中，输出文件夹和单次任务的对接日志输出会自动生成，无需担心。</p>
-                <h2>4. 编写任务提交文件</h2>
+                <h2>编写任务提交文件</h2>
                 <p>因为我们是在集群服务器上进行任务，一般来说集群服务器都是以作业队列方式提交任务的，因此我们要写一个<code>.slurm</code>任务提交文件。</p>
                 <p>一次对接任务就要单独执行一次任务递交，我们先进行单次任务尝试提交，如果能正常运行，我们稍后会写一个脚本进行批量提交：</p>
                 <pre><code class="language-bash">
@@ -168,8 +168,8 @@ JobID           JobName      State ExitCode    Elapsed
                 <p>当标准输出日志<code>.stdout.log</code>出现：</p>
                 <pre><code class="language-bash">Done running 1 fold jobs.</code></pre>
                 <p>则说明该次预测对接结束，进入 output 文件夹进行查看。</p>
-                <h2>5. 自动化</h2>
-                <h3>5.1 对接任务文件生成</h3>
+                <h2>自动化</h2>
+                <h3>对接任务文件生成</h3>
                 <p>准备材料：<ol>
                     <li>整个待预测蛋白的<code>.fasta</code>氨基酸序列。</li>
                     <li>所有对接小分子的<code>SMILES</code>文件，为方便管理，按照以下样式记录，保存为<code>.smiles</code>文件。</li>
@@ -205,7 +205,7 @@ JSON/
 │   ├── NADPH_PEP_01.json
 │   └── ...
                     </code></pre>
-                <h3>5.2 集群任务部署</h3>
+                <h3>集群任务部署</h3>
                 <p>迁移文件及任务提交脚本。确保你的目录结构在集群是这样的：</p>
                 <pre><code class="language-Plaintext">
 ./
@@ -259,7 +259,7 @@ JSON/
 │       └── ATP_PEP_01.err
                 </code></pre>
                 <p>输出查看请看后续文章。</p>
-                <h3>5.3 数据矩阵汇总</h3>
+                <h3>数据矩阵汇总</h3>
                 <p>运行数据汇总脚本，分别生成ipTM，pTM得分矩阵。</p>
 
                 <div class="download-card">
