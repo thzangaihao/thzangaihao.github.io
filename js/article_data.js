@@ -1,5 +1,5 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/04/17_10:59:46
+// 生成时间: 2026/04/17_21:59:28
 // 文章总数: 48
 
 window.ARTICLE_DATABASE = [
@@ -221,13 +221,6 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/software/03. gffread/03. gffread.html"
     },
     {
-        "title": "03. 基于核酸基序预测蛋白-核酸互作",
-        "collection": "docking",
-        "date": "2026-04-17",
-        "summary": "（核酸-蛋白）通过 FIMO 预测核酸基序-蛋白互作能力",
-        "path": "articles/dry_lab/docking/03. 基于核酸基序预测蛋白-核酸互作/03. 基于核酸基序预测蛋白-核酸互作.html"
-    },
-    {
         "title": "03. 基因组组装算法",
         "collection": "algorithm",
         "date": "2026-04-13",
@@ -240,6 +233,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-22",
         "summary": "差异分析的结果总览",
         "path": "articles/resources/gallery/03. 火山图/03. 火山图.html"
+    },
+    {
+        "title": "03. 蛋白质-核酸互作",
+        "collection": "docking",
+        "date": "2026-04-17",
+        "summary": "（核酸-蛋白）核酸基序-蛋白互作能力严重与基序扫描",
+        "path": "articles/dry_lab/docking/03. 蛋白质-核酸互作/03. 蛋白质-核酸互作.html"
     },
     {
         "title": "03. 输出数据",
@@ -277,18 +277,18 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/python/04. 分子对接系列/04. 分子对接系列.html"
     },
     {
-        "title": "04. 基于蛋白结构预测蛋白-核酸互作",
-        "collection": "docking",
-        "date": "2026-04-17",
-        "summary": "（核酸-蛋白）通过 HDOCK, DNAminder 对接或预测",
-        "path": "articles/dry_lab/docking/04. 基于蛋白结构预测蛋白-核酸互作/04. 基于蛋白结构预测蛋白-核酸互作.html"
-    },
-    {
         "title": "04. 富集分析图",
         "collection": "figure",
         "date": "2026-03-21",
         "summary": "富集分析结果的可视化预览",
         "path": "articles/resources/gallery/04. 气泡图/04. 富集分析图.html"
+    },
+    {
+        "title": "04. 蛋白与已知 DNA 基序对接",
+        "collection": "docking",
+        "date": "2026-04-17",
+        "summary": "（核酸-蛋白）基于 HDDOCK 的蛋白-核酸共对接",
+        "path": "articles/dry_lab/docking/04. 蛋白与已知 DNA 基序对接/04. 蛋白与已知 DNA 基序对接.html"
     },
     {
         "title": "05. IQ TREE",

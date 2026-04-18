@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>03. 蛋白质-核酸互作 - 海钊知识港</title>
+        <meta name="collection" content="docking"> 
+        <meta name="date" content="2026-04-17">
+        <meta name="description" content="（核酸-蛋白）核酸基序-蛋白互作能力严重与基序扫描">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <a href="../../dry_lab_index.html#docking" class="back-link"><i class="fas fa-arrow-left"></i> 返回 干实验 / 分子对接</a>
+
+            <h1>03. 蛋白质-核酸互作</h1>
+            <div class="meta">
+                <span><i class="far fa-calendar"></i> 2026-04-17</span>
+                <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 分子互作</span>
+            </div>
+
+            <div class="content">
+                <h2>要干嘛...</h2>
+                    <p>当我们有一个蛋白质的三维 <code>.cif</code> 文件，然后我猜测这个蛋白质可能会结合到 DNA 上，我想知道这个蛋白结合位点和它喜欢结合的 DNA 序列，我应该怎么做呢？<br>- 以传统的湿实验来看的话，我们会做 Chip-seq 染色质免疫共沉淀，是的，这是最核心信服力最高的实验了，但是在这之前，我们还有一些纯模拟分析来初步探究：</p>
+
+                    <p>在做分析之前，我们一定要明白自己有什么和要得到什么？我们将基于此来划分这几种情况：</p>
+
+                    <ol>
+                        <li>我有一个蛋白质的三维 <code>.cif</code> 文件，我需要得到这个蛋白可能结合的 DNA 基序。</li>
+
+                        <li>我有蛋白质的三维 <code>.cif</code> 文件，还知道它可能结合的基序（例如通过 JASPAR 数据库获得），我需要将它们进行对接，得到对接后的三维效果文件和结合效果评估指标。</li>
+
+                        <li>我有蛋白质的结合的基序文件，物种的全基因组序列 <code>.fasta</code> 文件，物种的全基因组基于注释 <code>.gtf, .gff3, .gff</code> 文件。我需要在全基因组中寻找它结合的位点及潜在调控基因。</li>
+                    </ol>
+
+                    <p>我们会基于以上三种情况和目的需求进行流程搭建：</p>
+
+                <h2>从蛋白结构预测结合基序</h2>
+                    <p>目前并没有一个单一的软件能实现“输入 CIF，直接吐出精确 DNA Motif”，通常需要遵循以下三个路径之一：</p>
+                    <ol>
+                        <li>同源转推（最常用）： 通过结构比对找到已知的 DNA 结合蛋白家族，借鉴其 Motif。</li>
+                        <li>从头预测位点： 识别蛋白质表面的 DNA 结合口袋，判断其结合偏好。</li>
+                        <li>结构对接（最硬核）： 将蛋白与 DNA 进行遍历分子对接，计算亲和力最高的序列。</li>
+                    </ol>
+                    
+                    <p>接下来我会以我操作中的一个实例进行演示。</p>
+
+                    <h3>同源转推</h3>
+                        <h4>结构预处理与质量检查</h4>
+                            <p>在开始分析前，确保你的 .cif 文件是干净的。使用 PyMOL 或 UCSF ChimeraX 打开文件，检查是否有配体、水分子或缺失的 Loop 区。如果是 AlphaFold 预测的模型，检查 pLDDT 分数，DNA 结合域（DBD）的置信度必须高（>70）。</p>
+
+                            <p>虽多多数现代软件支持 CIF，但某些老旧工具可能只认 .pdb。你可以用 PyMOL 的 <code>save protein.pdb</code> 命令转换。</p>
+
+                        <h4>结构同源性搜索</h4>
+                            <p>一般来讲，如果你知道这个蛋白的名字功能，更推荐你直接在论文中去寻找可能的结合 DNA 基序，或者在转录因子数据库 <a href="https://jaspar.elixir.no/" target="_blank" style="color: #3498db;">JASPAR</a> 等直接去搜寻基序。</p>
+
+                            <p>如果只知道序列信息，那就通过结构相似性找到已经在实验中（如 ChIP-seq 或 SELEX）确定了 Motif 的蛋白质。我们使用这个在线工具可以进行搜寻：<a href="https://search.foldseek.com/search" target="_blank" style="color: #3498db;">Foldseek Webserver</a>。我们需要上传 <code>.cif</code> 文件，数据库选择 PDB 或 AlphaFold/UniProt。查看结果中是否有得分极高的蛋白质已经标记为 "DNA-binding protein"。如果发现你的蛋白与某个已知的转录因子（如 Zinc finger, bZIP, Homeodomain）高度相似，直接去数据库查该家族的 Motif。</p>
+
+                    <h3>从头预测位点</h3>
+                        <p>如果无法通过同源性确定相似蛋白，那我们需要先确认蛋白质哪些地方碰到了 DNA。</p>
+                        <p>我们使用 <a href="https://search.foldseek.com/search" target="_blank" style="color: #3498db;">GraphBind</a> 专门用于预测 DNA/RNA 结合位点的服务器。上传结构，分析输出的残基列表。带正电荷的氨基酸（Arg, Lys）和具有极性侧链的氨基酸（Asn, Gln, His）通常是关键。</p>
+
+                <h2>蛋白与已知 DNA 基序对接</h2>
+                    <p>最简单的来说，我们使用 AlphaFold 进行共对接预测就行了，但是 AlphaFold 的强项是基于演化信息（MSA）的结构预测。如果想得到准确的结合模型，或者说常用方式，我们最好使用信息驱动型对接。</p>
+
+                    <p>我们会使用目前比较火的 HDDOCK，它的使用比较简单，但是数据准备很麻烦，我们会单开一篇文章仔细聊聊。</p>
+
+                <h2>基序全基因组扫描与基因关联</h2>
+
+            </div>
+        </div>
+        
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

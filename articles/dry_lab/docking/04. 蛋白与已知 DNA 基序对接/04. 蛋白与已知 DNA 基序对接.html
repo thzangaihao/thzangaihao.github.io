@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>04. 蛋白与已知 DNA 基序对接 - 海钊知识港</title>
+        <meta name="collection" content="docking"> 
+        <meta name="date" content="2026-04-17">
+        <meta name="description" content="（核酸-蛋白）基于 HDDOCK 的蛋白-核酸共对接">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <a href="../../dry_lab_index.html#docking" class="back-link"><i class="fas fa-arrow-left"></i> 返回 干实验 / 分子对接</a>
+
+            <h1>04. 蛋白与已知 DNA 基序对接</h1>
+            <div class="meta">
+                <span><i class="far fa-calendar"></i> 2026-04-17</span>
+                <span style="margin-left: 20px;"><i class="fas fa-folder"></i> 分子互作</span>
+            </div>
+
+            <div class="content">
+                <h2>前言</h2>
+                    <p>HADDOCK（High Ambiguity Driven protein-protein DOCKing）不像 AlphaFold，它属于信息驱动型分子对接软件。HADDOCK 使用的是经典的生物物理力场（如范德华力、静电引力、脱溶剂能等）进行能量最小化计算。HADDOCK 是高度并行的。在对接过程中，它通常需要生成数百到数千个候选模型（Water Refinement 阶段）。CPU 核心越多，速度越快。我们可以本地部署它，但是对于小规模任务来讲我们只需要网页版本就够了。</p>
+
+                <h2>数据预处理</h2>
+                    <p>我们既然要做蛋白-DNA 互作，那么你肯定要准备好蛋白文件和你要对接的序列文件，在把它喂给 HADDOCK 之前，我们需要把它的格式规范一下，不然你会不断遇到令人奔溃的报错！</p>
+
+                    <h3>蛋白文件处理</h3>
+                        <p>HADDOCK 只支持 PDB 和 mmCIF 格式的文件，为了避免报错，我们统一用 <code>.pdb</code> 格式的文件，对于其它文件，我们可以直接使用 PyMol 进行结构导出-选择 <code>.pdb</code> 格式即可。</p>
+
+                    <h3>DNA 文件处理</h3>
+                        <p>HADDOCK 不支持直接输入核苷酸序列，我们首先需要使用其它软件进行 DNA 的建模。在这里，我们使用 <a href="https://web.x3dna-dssr.org/" target="_blank" style="color: #3498db;">wDSSR</a> 进行 DNA 三维建模。</p>
+
+                        <blockquote>选用 <a href="https://web.x3dna-dssr.org/" target="_blank" style="color: #3498db;">wDSSR</a> 是因为它不需要注册就可以在线使用。</blockquote>
+
+                        <p>进入 <a href="https://web.x3dna-dssr.org/" target="_blank" style="color: #3498db;">wDSSR</a>，在导航栏选择 MODEL，在 Commonly used fiber models 选择建模类型，我们一般选择 B 构型，根据本科分子生物学知识可知，B-DNA 是自然界最常见、生理状态下主要的 DNA 构型。它是右旋的，每圈包含 10.5 个碱基对。另外，wDSSR 还支持很多种 DNA 构型建模。</p>
+
+                        <p>确定构型后，这个使用极其简单，我们只需要在键入框种输入我们的 DNA 序列（5' 到 3'），提交后直接下载 <code>.pdb</code> 格式的文件就可以了，它会自动生成双链模型。</p>
+
+                        <p>wDSSR 生成的 <code>.pdb</code> 文件不符合 HADDOCK 的输入规范（HADDOCK 输入要求特别麻烦），它自带的转换工具功能冗余，我们直接用下面的这个交互式脚本进行规范化转换：</p>
+
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>HADDOCK PDB convert</h5>
+                                    <span>.py | 大小：4.2 KB</span>
+                                </div>
+                            </div>
+                            <a href="./HADDOCK PDB convert.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+
+                <h2>HADDOCK</h2>
+                    <p>HADDOCK 的使用还算简单，你可以直接从这里进入 <a href="https://wenmr.science.uu.nl/haddock2.4/submit/1" target="_blank" style="color: #3498db;">HADDOCK submission</a> 进行任务提交，如果你没有账号的话，请先注册一个它们的账号。另外，我也一并附上它们的实验室导航页 <a href="https://wenmr.science.uu.nl/" target="_blank" style="color: #3498db;">BonvinLab</a> ，它们也开发了好多软件，我们后面慢慢研究。</p>
+
+                    <p>按照它们的要求选取分子类型和提交数据文件后，选择蛋白核心位点和 DNA 核心序列（做盲对接就全部选上就行了），服务器会利用荷兰乌得勒支大学的集群帮你算好，并返回能量评分最高的复合物模型。你可以在 HADDOCK-Workspace 查看你的任务状态。</p>
+
+                    <blockquote>它们那边算力太紧张了，有时间我写一个从头本地部署 HADDOCK 并进行离线版使用的教程。</blockquote>
+                
+            </div>
+        </div>
+        
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
