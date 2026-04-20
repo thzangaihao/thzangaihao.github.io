@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/04/17_21:59:28
-// 文章总数: 48
+// 生成时间: 2026/04/18_18:07:02
+// 文章总数: 49
 
 window.ARTICLE_DATABASE = [
     {
@@ -338,5 +338,12 @@ window.ARTICLE_DATABASE = [
         "date": "2026-04-10",
         "summary": "让变异更直观的展示",
         "path": "articles/resources/gallery/07. 变异分析图/07. 变异分析图.html"
+    },
+    {
+        "title": "07. 爬虫",
+        "collection": "python",
+        "date": "2026-04-18",
+        "summary": "爬取数据库",
+        "path": "articles/resources/python/07. 爬虫/07. 爬虫.html"
     }
 ];
