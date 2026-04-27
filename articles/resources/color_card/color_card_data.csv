@@ -1,0 +1,11 @@
+id,name,colors
+Cherry Blossom Grapes,樱花葡萄,"['#f9a4a2', '#61a8ad']"
+German,德系配色,"['#ffd460', '#f07b3f', '#ea5455', '#2d4059']"
+France,法系配色,"['#283c63', '#928a97', '#fbe8d3', '#f2545b']"
+Deep Ocean,深海,"['#003F5C', '#2F4B7C', '#665191', '#A05195', '#D45087', '#F95D6A']"
+Forest Cabin,森林木屋,"['#7A3E2E', '#B85C38', '#E0A458', '#F2D492', '#7EA16B', '#4D7C8A']"
+okabe-ito,Okabe-Ito 色盲友好,"['#E69F00', '#56B4E9', '#009E73', '#F0E442', '#0072B2', '#D55E00']"
+Nature Soft,Nature 柔和组,"['#4E79A7', '#F28E2B', '#59A14F', '#E15759', '#B07AA1', '#9C755F']"
+Cell Paper,Cell Paper,"['#3B6EA8', '#D34E4E', '#63A375', '#E0A458', '#6C5B7B', '#2A9D8F']"
+
+

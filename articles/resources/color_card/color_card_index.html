@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>配色卡 - 海钊知识港</title>
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../css/global.css">
+        <link rel="stylesheet" href="../../../css/color_card.css">
+
+        <script src="../../../js/global.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+        <script>window.footerPath = '../../../footer.html';</script>
+    </head>
+
+    <body class="category-page">
+        <nav>
+            <div class="logo"><a href="../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="container" style="flex-direction: column;">
+            <div class="list-header" style="margin-bottom: 2rem;">
+                <a href="../resources_index.html" class="back-link" style="margin-bottom: 1rem;"><i class="fas fa-arrow-left"></i> 返回资源站</a>
+                <h2><i class="fa-solid fa-palette"></i> 配色卡</h2>
+                <p>常用科研绘图与网页配色方案，点击色块即可复制颜色值。</p>
+            </div>
+
+            <div class="color-card-header">
+                <div class="color-card-search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="搜索配色名称、ID 或颜色值...">
+                </div>
+
+                <div class="color-mode-toggle" aria-label="颜色显示模式">
+                    <button type="button" class="active" data-mode="hex">HEX</button>
+                    <button type="button" data-mode="rgb">RGB</button>
+                </div>
+            </div>
+
+            <div class="color-card-grid" id="colorCardGrid">
+                <!-- 配色卡由 JS 动态生成 -->
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                let colorCardData = [];
+                let displayMode = "hex";
+
+                Papa.parse("color_card_data.csv", {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    encoding: "UTF-8",
+                    complete: function(results) {
+                        colorCardData = results.data
+                            .map(normalizePalette)
+                            .filter(palette => palette.colors.length > 0);
+                        renderGrid(colorCardData);
+                    },
+                    error: function() {
+                        document.getElementById("colorCardGrid").innerHTML = '<p style="color: red;">数据加载失败，请检查 CSV 文件。</p>';
+                    }
+                });
+
+                document.getElementById("searchInput").addEventListener("input", (event) => {
+                    const term = event.target.value.trim().toLowerCase();
+                    const filtered = colorCardData.filter(palette => {
+                        const haystack = [palette.id, palette.name, ...palette.colors].join(" ").toLowerCase();
+                        return haystack.includes(term);
+                    });
+                    renderGrid(filtered);
+                });
+
+                document.querySelectorAll(".color-mode-toggle button").forEach(button => {
+                    button.addEventListener("click", () => {
+                        displayMode = button.dataset.mode;
+                        document.querySelectorAll(".color-mode-toggle button").forEach(item => item.classList.remove("active"));
+                        button.classList.add("active");
+                        renderGrid(getVisibleData());
+                    });
+                });
+
+                function getVisibleData() {
+                    const term = document.getElementById("searchInput").value.trim().toLowerCase();
+                    if (!term) return colorCardData;
+                    return colorCardData.filter(palette => {
+                        const haystack = [palette.id, palette.name, ...palette.colors].join(" ").toLowerCase();
+                        return haystack.includes(term);
+                    });
+                }
+
+                function normalizePalette(row) {
+                    return {
+                        id: (row.id || "").trim(),
+                        name: (row.name || "").trim(),
+                        colors: parseColorList(row.colors || "").slice(0, 6)
+                    };
+                }
+
+                function parseColorList(value) {
+                    const jsonLike = value.trim().replace(/'/g, '"');
+                    try {
+                        const colors = JSON.parse(jsonLike);
+                        if (Array.isArray(colors)) {
+                            return colors.map(normalizeHex).filter(Boolean);
+                        }
+                    } catch (error) {
+                        return [];
+                    }
+                    return [];
+                }
+
+                function normalizeHex(value) {
+                    const color = String(value).trim().toUpperCase();
+                    if (/^#[0-9A-F]{6}$/.test(color)) return color;
+                    if (/^[0-9A-F]{6}$/.test(color)) return `#${color}`;
+                    return "";
+                }
+
+                function hexToRgb(hex) {
+                    const value = hex.replace("#", "");
+                    const red = parseInt(value.slice(0, 2), 16);
+                    const green = parseInt(value.slice(2, 4), 16);
+                    const blue = parseInt(value.slice(4, 6), 16);
+                    return `rgb(${red}, ${green}, ${blue})`;
+                }
+
+                function getDisplayValue(hex) {
+                    return displayMode === "rgb" ? hexToRgb(hex) : hex;
+                }
+
+                function getTextStyle(hex) {
+                    const value = hex.replace("#", "");
+                    const red = parseInt(value.slice(0, 2), 16);
+                    const green = parseInt(value.slice(2, 4), 16);
+                    const blue = parseInt(value.slice(4, 6), 16);
+                    const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
+                    return luminance > 0.62
+                        ? { color: "#263238", shadow: "0 1px 0 rgba(255,255,255,0.3)" }
+                        : { color: "#ffffff", shadow: "0 1px 2px rgba(0,0,0,0.35)" };
+                }
+
+                function renderGrid(data) {
+                    const grid = document.getElementById("colorCardGrid");
+                    grid.innerHTML = "";
+
+                    if (data.length === 0) {
+                        grid.innerHTML = '<p style="color: #999;">没有找到匹配的配色卡。</p>';
+                        return;
+                    }
+
+                    data.forEach(palette => {
+                        const card = document.createElement("article");
+                        card.className = "color-palette-card";
+
+                        const strip = palette.colors.map(hex => {
+                            const style = getTextStyle(hex);
+                            return `
+                                <button
+                                    type="button"
+                                    class="color-swatch"
+                                    style="background: ${hex}; --label-color: ${style.color}; --label-shadow: ${style.shadow};"
+                                    data-copy-value="${getDisplayValue(hex)}"
+                                    title="复制 ${getDisplayValue(hex)}"
+                                    aria-label="复制 ${getDisplayValue(hex)}"></button>
+                            `;
+                        }).join("");
+
+                        const list = palette.colors.map(hex => `
+                            <li><span class="color-dot" style="background: ${hex};"></span>${getDisplayValue(hex)}</li>
+                        `).join("");
+
+                        card.innerHTML = `
+                            <h3>${escapeHtml(palette.name || palette.id)}</h3>
+                            <div class="color-palette-id">${escapeHtml(palette.id)} · ${palette.colors.length} 色</div>
+                            <div class="color-strip" style="--color-count: ${palette.colors.length};">
+                                ${strip}
+                            </div>
+                            <ul class="color-list">${list}</ul>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }
+
+                document.getElementById("colorCardGrid").addEventListener("click", async (event) => {
+                    const swatch = event.target.closest(".color-swatch");
+                    if (!swatch) return;
+
+                    const value = swatch.dataset.copyValue;
+                    try {
+                        await copyText(value);
+                        swatch.classList.add("copied");
+                        setTimeout(() => swatch.classList.remove("copied"), 900);
+                    } catch (error) {
+                        alert("复制失败，请手动复制色块上的颜色值。");
+                    }
+                });
+
+                function copyText(value) {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        return navigator.clipboard.writeText(value);
+                    }
+
+                    const textarea = document.createElement("textarea");
+                    textarea.value = value;
+                    textarea.style.position = "fixed";
+                    textarea.style.opacity = "0";
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    const success = document.execCommand("copy");
+                    textarea.remove();
+                    return success ? Promise.resolve() : Promise.reject();
+                }
+
+                function escapeHtml(value) {
+                    return String(value).replace(/[&<>"']/g, char => ({
+                        "&": "&amp;",
+                        "<": "&lt;",
+                        ">": "&gt;",
+                        '"': "&quot;",
+                        "'": "&#039;"
+                    }[char]));
+                }
+            });
+        </script>
+    </body>
+</html>

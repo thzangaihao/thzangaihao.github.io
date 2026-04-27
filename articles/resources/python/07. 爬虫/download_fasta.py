@@ -188,7 +188,7 @@ def step3_extract():
     os.makedirs(out_dir, exist_ok=True)
     
     report_lines = [f"Extraction Report: {target_type_name}", "="*40]
-    success_cnt, fail_cnt = 0, 0
+    success_cnt, fail_cnt, corrupt_cnt = 0, 0, 0
     
     for chunk in target_chunks:
         chunk_path = os.path.join(TASKS_DIR, chunk)
@@ -202,15 +202,22 @@ def step3_extract():
             gz_path = os.path.join(source_dir, expected_file)
             
             if os.path.exists(gz_path):
-                # 解压到目标文件夹 (使用 gzip -d -c 并重定向输出，保持原 gz 不变且避免同名覆盖冲突)
-                unzipped_name = expected_file[:-3]
-                unzipped_path = os.path.join(out_dir, unzipped_name)
+                # 【新增逻辑】：静默测试 gzip 文件的完整性
+                test_result = subprocess.run(["gzip", "-t", gz_path], stderr=subprocess.PIPE)
                 
-                with open(unzipped_path, "w") as outfile:
-                    subprocess.run(["gzip", "-d", "-c", gz_path], stdout=outfile)
-                
-                report_lines.append(f"{acc_id}\tSUCCESS")
-                success_cnt += 1
+                if test_result.returncode != 0:
+                    # 返回码非0，说明文件不完整/损坏（下载了一半）
+                    report_lines.append(f"{acc_id}\tCORRUPTED (Incomplete Download)")
+                    corrupt_cnt += 1
+                else:
+                    # 文件完整，进行解压操作
+                    unzipped_name = expected_file[:-3]
+                    unzipped_path = os.path.join(out_dir, unzipped_name)
+                    with open(unzipped_path, "w") as outfile:
+                        subprocess.run(["gzip", "-d", "-c", gz_path], stdout=outfile)
+                    
+                    report_lines.append(f"{acc_id}\tSUCCESS")
+                    success_cnt += 1
             else:
                 report_lines.append(f"{acc_id}\tNOT FOUND")
                 fail_cnt += 1
@@ -219,7 +226,7 @@ def step3_extract():
     with open(report_file, "w") as f:
         f.write("\n".join(report_lines))
         
-    print(f"\n🎉 提取完成！成功: {success_cnt} | 缺失: {fail_cnt}")
+    print(f"\n🎉 提取完成！成功: {success_cnt} | 缺失: {fail_cnt} | 损坏/未下完: {corrupt_cnt}")
     print(f"📂 文件保存在: {out_dir}")
     print(f"📄 报告保存在: {report_file}")
 

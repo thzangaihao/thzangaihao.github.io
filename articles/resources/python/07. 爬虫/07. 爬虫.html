@@ -41,7 +41,7 @@
 
                 <h2>NCBI 爬虫</h2>
                     <h3>分类数据库爬虫</h3>
-                        <h4>属分类查询</h4>
+                        <h4>属上级分类信息查询</h4>
                             <p>提供需要爬取的属列表，会自动返回属以上的所有分类层级及分类 ID。</p>
                             <p>提供以 <code>.csv</code> 换行符记载的属，注意会自动跳过列头，返回数据表，同样为 <code>.csv</code> 格式。</p>
                             <p><code><b>一定要在脚本栏配置邮箱！</b></code>否则 NCBI 会封 IP。脚本已经设置 0.4 秒暂歇，以防 NCBI 反爬虫机制。</p>
@@ -60,7 +60,7 @@
                                     <div class="download-info">
                                         <i class="fas fa-file-code"></i> <div class="file-details">
                                             <h5>示例数据</h5>
-                                            <span>文件格式：.csv | 大小：699 B</span>
+                                            <span>文件格式：.csv | 大小：162 B</span>
                                         </div>
                                     </div>
                                     <a href="./example.csv" download class="download-btn">
@@ -68,7 +68,7 @@
                                     </a>
                                 </div>
 
-                        <h4>参考种及参考基因组查询</h4>
+                        <h4>属下级参考种基因组查询</h4>
                             <p>提供属名单，对属下级 具有参考基因组(ref genome) 的种进行信息爬取。</p>
                                 <div class="download-card">
                                     <div class="download-info">
@@ -85,7 +85,7 @@
                                     <div class="download-info">
                                         <i class="fas fa-file-code"></i> <div class="file-details">
                                             <h5>示例数据</h5>
-                                            <span>文件格式：.csv | 大小：699 B</span>
+                                            <span>文件格式：.csv | 大小：162 B</span>
                                         </div>
                                     </div>
                                     <a href="./example.csv" download class="download-btn">
@@ -121,7 +121,7 @@
 
                         <h4>基因组爬取</h4>
                             <p>提供组装 ID，下载基因组信息，包括全基因组序列文件、CDS 文件、蛋白质文件和基因组注释文件。</p>
-                            <p>因为大批量基因组数据下载是非常吃网络和时间的，因此我们使用任务拆分法，同时建议申请 NCBI 的下载 API，可以将每秒请求 4 个提升为 10 个。拆封参数和 API 配置均由脚本内部完整。</p>
+                            <p>因为大批量基因组数据下载是非常吃网络和时间的，因此我们使用任务拆分法，同时建议申请 NCBI 的下载 API，可以将每秒请求 4 个提升为 10 个。拆封参数和 API 配置均由脚本内部完整，并自动生成 <code>.json</code> 配置文件。</p>
                                 <div class="download-card">
                                     <div class="download-info">
                                         <i class="fas fa-file-code"></i> <div class="file-details">

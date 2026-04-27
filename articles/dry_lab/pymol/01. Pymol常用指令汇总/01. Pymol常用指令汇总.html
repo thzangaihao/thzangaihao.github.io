@@ -73,6 +73,37 @@ label resi 50 and n. CA, ""
 # 清除所有标签
 label all, ""
                 </code></pre>
+
+                <h2>蛋白对齐</h2>
+                <p>我们可以使用 <code>align obj_1, obj_2</code> 进行对齐：</p>
+                <pre><code class="language-python">
+align obj_1, obj_2
+                </code></pre>
+
+                <h2>材质设置</h2>
+                <p>pymol 自带的材质会反光，给人一种油亮亮的感觉，我不太喜欢，我们可以用这几个参数：</p>
+                <pre><code class="language-python">
+# 控制反射光的强度。设为 0 即完全不反射光源。
+set spec_power, 0
+# 控制高光的集中程度。
+set spec_reflect, 0
+                </code></pre>
+                <h2>颜色设置</h2>
+                <p>我们首先要把自定义颜色存入变量中：</p>
+                <pre><code class="language-python">
+set_color color_name, [74, 92, 120]
+                </code></pre>
+                <p>再将其设置给对象：</p>
+                <pre><code class="language-python">
+color color_name, object_name
+                </code></pre>
+                <h2>光照设置</h2>
+                <p>我们可以更改环境光亮度：</p>
+                <pre><code class="language-python">
+set ambient, 0.5
+                </code></pre>
+                <p>调高 ambient（环境光）会让模型看起来更“扁平”，类似手绘漫画风格，但是会使其减弱立体效果。</p>
+
             </div>
         </div>
 
