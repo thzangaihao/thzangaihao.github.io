@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/04/18_18:07:02
-// 文章总数: 49
+// 生成时间: 2026/04/29_16:27:57
+// 文章总数: 51
 
 window.ARTICLE_DATABASE = [
     {
@@ -135,6 +135,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-03-23",
         "summary": "系统发育基因组学高精度建树",
         "path": "articles/dry_lab/classification/02. OrthoFinder 建树/02. OrthoFinder 建树.html"
+    },
+    {
+        "title": "02. PacBio CSS HiFi 三代组装项目",
+        "collection": "assemble",
+        "date": "2026-04-29",
+        "summary": "Hifiasm 组装 PacBio CSS HiFi 数据流程化及端粒识别",
+        "path": "articles/dry_lab/assemble/02. PacBio CSS HiFi 三代组装项目/02. PacBio CSS HiFi 三代组装项目.html"
     },
     {
         "title": "02. interproscan",
@@ -324,6 +331,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-04-04",
         "summary": "mapping 可视化",
         "path": "articles/resources/gallery/06. Gviz/06. Gviz.html"
+    },
+    {
+        "title": "06. QUAST",
+        "collection": "software",
+        "date": "2026-04-29",
+        "summary": "基因组组装连续性评估",
+        "path": "articles/resources/software/06. QUAST/06. QUAST.html"
     },
     {
         "title": "06. 交互式逻辑",

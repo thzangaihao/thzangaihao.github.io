@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>02. PacBio CSS HiFi 三代组装项目 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="assemble"> 
+        <meta name="collection-title" content="基因组组装">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-04-29">
+        <meta name="description" content="Hifiasm 组装 PacBio CSS HiFi 数据流程化及端粒识别">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>02. PacBio CSS HiFi 三代组装项目</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                <p>这篇博客适用于由 PacBio CSS HiFi 三代测序平台产生的长读段数据在无参考证据文件时的从头组装（de novo组装）。因为组装流程已经被脚本高度自动化，这篇文章简单讲一下具体流程，环境搭建等，并解读软件的输出报告和意义。简单言之，我们是将公司给我们的<code>.fastq</code>文件组装出<code>.fasta</code>文件。</p>
+
+                <h2>文件校准与预处理</h2>
+                    <h3>数据完整性验证</h3>
+                        <p>md5 校验是文件完整性和准确性（防止被篡改）的常用方法，我们会根据文件算出一串哈希密钥，再根据公司提供的哈希密钥进行验证，若两者一致，则文件完整。</p>
+                        <p>在 Linux 下，我们使用 md5sum 进行文件哈希密钥计算，而在 Windows 下，我们可以使用 WinMD5 进行验证。</p>
+                    <h3>数据质量评估</h3>
+                        <p>公司给我们的数据已经经过了 PacBio 官方软件 ccs 的处理，质量非常好，我们直接使用就好了，不需要再复洗数据了！。</p>
+                        <p>如果你不放心，我们也可以使用 fasqp 等进行再次清洗评估（<code>.bam</code> 转 <code>.fastq</code> 见下文）。</p>
+
+                <h2>组装</h2>
+                    <p>我们使用 Hifiasm 进行组装，这里只做脚本的备份：</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>hifi_assemble</h5>
+                                    <span>文件格式：.py | 大小：6.4 KB</span>
+                                </div>
+                            </div>
+                            <a href="./hifi_assemble.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                    <p>这个脚本会把公司给你的 <code>.bam</code> 文件先转为 <code>.fastq</code> 文件，再喂到 hifiasm 进行组装，直接出结果，非常方便！</p>
+                    <p>但值得注意的是，脚本使用的参数是默认参数，对于基因组较小的真菌组装效果已经很好了，如果设计大型组装项目，我们可能会对算法进行一些细调，如果我没记错的话，hifiasm 是 DBG 图算法，我们可以再寻找欧拉路径那一块卡一下阈值，但是一般默认就已经很好了！</p>
+                    <pre><code class="language-python">cmd = ["hifiasm", "-o", prefix, "-t", str(threads), fastq_file]</code></pre>
+                    <p>这个脚本把 <code>.bam</code> 转 <code>.fastq</code> 的功能分离出来了，可以灵活使用：</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>bam2fq_tool</h5>
+                                    <span>文件格式：.py | 大小：3.2 KB</span>
+                                </div>
+                            </div>
+                            <a href="./bam2fq_tool.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                    <p>你可以在这个备份页里找到更多有用的文件转换：</p>
+                        <a href="..\..\..\resources\python\05. 生物文件处理\05. 生物文件处理.html" class="related-article" target="_blank">
+                            <div class="related-article-icon">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            
+                            <div class="related-article-content">
+                                <div class="related-article-title">05. 生物文件处理</div>
+                                <div class="related-article-desc">生物信息文件格式转换，文件整合</div>
+                            </div>
+                            
+                            <div class="related-article-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+
+                <h2>质量评估</h2>
+                    <h3>Quast 组装连续性评估</h3>
+                    <a href="..\..\..\resources\software\06. QUAST\06. QUAST.html" class="related-article" target="_blank">
+                        <div class="related-article-icon">
+                            <i class="fas fa-link"></i>
+                        </div>
+                        
+                        <div class="related-article-content">
+                            <div class="related-article-title">06. QUAST</div>
+                            <div class="related-article-desc">基因组组装连续性评估</div>
+                        </div>
+                        
+                        <div class="related-article-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    <h3>端粒评估</h3>
+                        <p>我们使用我自己编写的脚本进行端粒评估，你只需要准备好拼接好后的 <code>.fasta</code> 文件即可。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>telomere</h5>
+                                    <span>文件格式：.py | 大小：9.7 KB</span>
+                                </div>
+                            </div>
+                            <a href="./telomere.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                        <blockquote>我尝试过许多软件去分析端粒，但是越是简单的功能人们做的越是冗余，用的人红温。这个脚本非常简单，甚至连 python 第三方包都没有！</blockquote>
+                    <h3>BUSCO 组装完整性评估</h3>
+                    <a href="..\..\..\resources\software\04. BUSCO\04. BUSCO.html" class="related-article" target="_blank">
+                        <div class="related-article-icon">
+                            <i class="fas fa-link"></i>
+                        </div>
+                        
+                        <div class="related-article-content">
+                            <div class="related-article-title">04. BUSCO</div>
+                            <div class="related-article-desc">基因组组装完整性评估</div>
+                        </div>
+                        
+                        <div class="related-article-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    
+
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
