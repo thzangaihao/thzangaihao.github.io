@@ -8,7 +8,7 @@ from datetime import datetime
 # ==========================================
 # 1. 基础配置
 # ==========================================
-THREADS = 128  # 默认线程数，可在此修改
+THREADS = 128  # 默认线程数，充分利用集群性能
 
 def log_info(message):
     """打印带时间戳的日志信息"""
@@ -28,13 +28,11 @@ def check_dependencies():
 def bam_to_fastq(bam_file, fastq_file, threads):
     """将 BAM 转换为 FASTQ"""
     log_info(f"  -> 开始格式转换: BAM to FASTQ")
-    # 使用 samtools 提取 fastq，-T 重定向一些可能需要的标签，通常直接提取即可
     cmd = ["samtools", "fastq", "-@", str(threads), bam_file]
-    
     try:
         with open(fastq_file, "w") as out_fq:
             subprocess.run(cmd, stdout=out_fq, stderr=subprocess.DEVNULL, check=True)
-        log_info(f"  -> 格式转换完成！已生成: {fastq_file}")
+        log_info(f"  -> 格式转换完成！已生成临时 FASTQ。")
     except subprocess.CalledProcessError as e:
         log_info(f"  -> 错误：BAM 转换失败！{e}")
         raise
@@ -43,7 +41,6 @@ def run_hifiasm(fastq_file, prefix, threads):
     """运行 Hifiasm"""
     log_info(f"  -> 开始运行 hifiasm 进行序列拼接...")
     cmd = ["hifiasm", "-o", prefix, "-t", str(threads), fastq_file]
-    
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         log_info(f"  -> hifiasm 组装核心步骤完成！")
@@ -57,7 +54,6 @@ def extract_fasta(gfa_file, fasta_file):
     if not os.path.exists(gfa_file):
         log_info(f"  -> 警告：找不到图文件 {gfa_file}，跳过提取。")
         return
-
     try:
         contig_count = 0
         with open(gfa_file, 'r') as gfa, open(fasta_file, 'w') as fasta:
@@ -76,22 +72,28 @@ def extract_fasta(gfa_file, fasta_file):
 # ==========================================
 if __name__ == "__main__":
     print("="*60)
-    print("      自动化 HiFi 基因组组装队列系统 (BAM -> FASTQ -> FASTA)")
+    print("   自动化 HiFi 基因组组装队列系统 (支持 BAM/FASTQ 直投)")
     print("="*60)
 
     check_dependencies()
 
-    # 1. 扫描所有的 BAM 文件
-    log_info("正在扫描当前目录及子目录下的 .bam 文件...")
-    bam_files = glob.glob("**/*.bam", recursive=True)
+    # 1. 扫描所有支持的文件类型
+    log_info("正在扫描当前目录及子目录下的序列文件...")
+    extensions = ["**/*.bam", "**/*.fastq", "**/*.fastq.gz", "**/*.fq", "**/*.fq.gz"]
+    all_files = []
+    for ext in extensions:
+        all_files.extend(glob.glob(ext, recursive=True))
+    
+    # 过滤掉隐藏文件并去重排序
+    all_files = sorted(list(set([f for f in all_files if not os.path.basename(f).startswith(".")])))
 
-    if not bam_files:
-        log_info("未找到任何 .bam 文件，脚本退出。")
+    if not all_files:
+        log_info("未找到任何 .bam 或 FASTQ 相关文件，脚本退出。")
         sys.exit(0)
 
     # 2. 交互式选择菜单
     print("\n发现以下待处理文件：")
-    for i, file_path in enumerate(bam_files, 1):
+    for i, file_path in enumerate(all_files, 1):
         print(f"  [{i}] {file_path}")
     
     print("\n请选择要组装的文件编号 (例如: 1,3,4)，或者输入 'all' 处理全部：")
@@ -99,13 +101,13 @@ if __name__ == "__main__":
 
     selected_files = []
     if choice == 'all':
-        selected_files = bam_files
+        selected_files = all_files
     else:
         try:
             indices = [int(x.strip()) - 1 for x in choice.split(',')]
-            selected_files = [bam_files[i] for i in indices if 0 <= i < len(bam_files)]
+            selected_files = [all_files[i] for i in indices if 0 <= i < len(all_files)]
         except Exception:
-            log_info("输入格式有误，请输入用逗号分隔的数字，脚本退出。")
+            log_info("输入格式有误，脚本退出。")
             sys.exit(1)
 
     if not selected_files:
@@ -119,10 +121,12 @@ if __name__ == "__main__":
     log_info(f"创建总输出目录: {work_dir}\n")
 
     # 4. 执行队列任务
-    for index, bam_path in enumerate(selected_files, 1):
-        sample_name = os.path.splitext(os.path.basename(bam_path))[0]
-        # 去掉可能的 .hifi_reads 后缀让名字更清爽
-        sample_name = sample_name.replace(".hifi_reads", "") 
+    for index, file_path in enumerate(selected_files, 1):
+        # 清理文件名获取干净的 Sample Name
+        base_name = os.path.basename(file_path)
+        for ext in [".bam", ".fastq.gz", ".fastq", ".fq.gz", ".fq", ".hifi_reads"]:
+            base_name = base_name.replace(ext, "")
+        sample_name = base_name
         
         print("-" * 60)
         log_info(f"任务 [{index}/{len(selected_files)}] 开始处理样本: {sample_name}")
@@ -137,19 +141,35 @@ if __name__ == "__main__":
             os.makedirs(d, exist_ok=True)
 
         # 配置文件路径
-        out_fastq = os.path.join(dir_fastq, f"{sample_name}.fastq")
         prefix_hifiasm = os.path.join(dir_hifiasm, sample_name)
         primary_gfa = f"{prefix_hifiasm}.bp.p_ctg.gfa"
         final_fasta = os.path.join(dir_fasta, f"{sample_name}.p_ctg.fasta")
 
-        # 依次执行管线
+        # 智能判定输入类型
         try:
-            bam_to_fastq(bam_path, out_fastq, THREADS)
-            run_hifiasm(out_fastq, prefix_hifiasm, THREADS)
+            input_for_hifiasm = file_path
+            
+            if file_path.lower().endswith(".bam"):
+                # 如果是 BAM，则转换到 01_fastq 目录下
+                out_fastq = os.path.join(dir_fastq, f"{sample_name}.fastq")
+                bam_to_fastq(file_path, out_fastq, THREADS)
+                input_for_hifiasm = out_fastq
+            else:
+                # 如果已经是 FASTQ，直接使用，并在 01_fastq 里建个软链接保持目录整洁
+                log_info("  -> 输入已是 FASTQ 格式，智能跳过格式转换。")
+                symlink_path = os.path.join(dir_fastq, os.path.basename(file_path))
+                try:
+                    os.symlink(os.path.abspath(file_path), symlink_path)
+                except FileExistsError:
+                    pass
+
+            # 执行组装与提取
+            run_hifiasm(input_for_hifiasm, prefix_hifiasm, THREADS)
             extract_fasta(primary_gfa, final_fasta)
             log_info(f"样本 {sample_name} 全部处理完毕！结果位于: {dir_fasta}")
+            
         except Exception as e:
-            log_info(f"样本 {sample_name} 处理失败，跳过该样本进入下一个。")
+            log_info(f"样本 {sample_name} 处理失败，跳过该样本进入下一个。错误信息：{e}")
             continue
 
     print("-" * 60)

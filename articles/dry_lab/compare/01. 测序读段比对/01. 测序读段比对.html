@@ -157,23 +157,38 @@ AAAAAEEEEEEE</code></pre>
                             </ul>
 
                 <h2>软件</h2>
-                    <p>笔者最常使用两款软件，分别是 Hisat 2 和 Bowtie 2，我们会一一介绍区别。</p>
-                    <h3>Bowtie 2</h3>
-                        <p>Bowtie 2 用于处理 DNA 测序读段数据，它负责将将序列与参考基因组连续的比对。因此，Bowtie 2 常用于重测序、以及组学研究等。</p>
-                    <h3>Hisat 2</h3>
-                        <p>Hisat 2 用于处理 RNA 测序读段数据，它和 Bowtie 2 的区别就是它可以利用算法进行不连续比对——比如跨越内含子的比对。因此，Hisat 2 常用于转录组分析的最初始的 mapping。</p>
-                        <p>Hisat 2 我边写边翻译了一本中文版的使用手册，因为比较大且写于建站之前，我也懒得改成 <code>.html</code> 格式了，因此在这里我直接上传 <code>.md</code> 文档供以下载：</p>
-                        <div class="download-card">
-                            <div class="download-info">
-                                <i class="fas fa-file-code"></i> <div class="file-details">
-                                    <h5>Hisat 2</h5>
-                                    <span>文件格式：.md | 大小：52.5 KB</span>
+                    <h3>短读段比对</h3>
+                        <h4>Bowtie 2</h4>
+                            <p>Bowtie 2 用于处理 DNA 测序读段数据，它负责将将序列与参考基因组连续的比对。因此，Bowtie 2 常用于重测序、以及组学研究等。</p>
+                        <h4>Hisat 2</h4>
+                            <p>Hisat 2 用于处理 RNA 测序读段数据，它和 Bowtie 2 的区别就是它可以利用算法进行不连续比对——比如跨越内含子的比对。因此，Hisat 2 常用于转录组分析的最初始的 mapping。</p>
+                            <p>Hisat 2 我边写边翻译了一本中文版的使用手册，因为比较大且写于建站之前，我也懒得改成 <code>.html</code> 格式了，因此在这里我直接上传 <code>.md</code> 文档供以下载：</p>
+                            <div class="download-card">
+                                <div class="download-info">
+                                    <i class="fas fa-file-code"></i> <div class="file-details">
+                                        <h5>Hisat 2</h5>
+                                        <span>文件格式：.md | 大小：52.5 KB</span>
+                                    </div>
                                 </div>
+                                <a href="./Hisat2.md" download class="download-btn">
+                                    <i class="fas fa-cloud-download-alt"></i>
+                                </a>
                             </div>
-                            <a href="./Hisat2.md" download class="download-btn">
-                                <i class="fas fa-cloud-download-alt"></i>
-                            </a>
-                        </div>
+                    <h3>长度段比对</h3>
+                        <h4>Minimap 2</h4>
+                            <p>在对于三代测序的长度短比对种，上述的短比对工具不再适用。Minimap 2 用于处理长读段数据，它同样可以进行不连续比对，因此常用于基因组装、以及转录组分析等。</p>
+                            <p>对于基于 DBG 图算法的组装结果，我们可以这个脚本进行 回比对 量化单碱基覆盖度：</p>
+                            <div class="download-card">
+                                <div class="download-info">
+                                    <i class="fas fa-file-code"></i> <div class="file-details">
+                                        <h5>Minimap 2 回比对脚本</h5>
+                                        <span>文件格式：.py | 大小：2.3 KB</span>
+                                    </div>
+                                </div>
+                                <a href="./minimap_回比对.py" download class="download-btn">
+                                    <i class="fas fa-cloud-download-alt"></i>
+                                </a>
+                            </div>
                 <h2>链的正负性与读段的正负性</h2>
                         <p>这一点是非常重要的！<code>.fasta</code> 链记录的永远是正链，而正链的选取标准有许多，如着丝粒位置，一般由短臂端向长臂端的$5' \rightarrow 3'$进行记录。注意！这里的正链只是分析中的一个锚定参考，基因组的正链 $\neq$ 基因的编码链。</p>
                         <p>不管是单端测序还是双端测序，我们都是对整个基因组进行文库构建的，而双端测序只是把一条读段反过来再读一遍进行配对。因此，即使你是单端测序，因为文库构建，DNA 片段是随机连接到测序接头上的，我们所获得的 reads 也会 mapping 到正负链上。</p>
