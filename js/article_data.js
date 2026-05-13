@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/04/29_16:27:57
-// 文章总数: 51
+// 生成时间: 2026/05/13_14:59:31
+// 文章总数: 52
 
 window.ARTICLE_DATABASE = [
     {
@@ -53,6 +53,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/dry_lab/gwas/01. 全基因组关联分析基础原理/01. 全基因组关联分析基础原理.html"
     },
     {
+        "title": "01. 基因组基因预测",
+        "collection": "gene",
+        "date": "2026-05-13",
+        "summary": "基因组上基因的预测",
+        "path": "articles/dry_lab/gene/01. 基因组基因预测/01. 基因组基因预测.html"
+    },
+    {
         "title": "01. 多聚酶链式反应基本原理",
         "collection": "pcr",
         "date": "2026-01-22",
@@ -68,10 +75,10 @@ window.ARTICLE_DATABASE = [
     },
     {
         "title": "01. 工作流记录",
-        "collection": "mapping",
+        "collection": "gene",
         "date": "2026-03-12",
         "summary": "低样本量，重测序，紫外诱变关键位点的定位",
-        "path": "articles/dry_lab/mapping/01. 工作流记录/01. 工作流记录.html"
+        "path": "articles/dry_lab/gene/01. 工作流记录/01. 工作流记录.html"
     },
     {
         "title": "01. 文章复用元素",

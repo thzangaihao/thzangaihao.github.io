@@ -6,7 +6,7 @@ from datetime import datetime
 # ==========================================
 # 1. 基础配置
 # ==========================================
-THREADS = 128  # 充分利用你的服务器性能
+THREADS = int(input("请输入线程数 (如: 128) >>> "))  # 充分利用你的服务器性能
 
 def log_info(message):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {message}")
