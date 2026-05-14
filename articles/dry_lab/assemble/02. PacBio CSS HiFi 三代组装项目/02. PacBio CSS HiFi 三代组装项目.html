@@ -47,12 +47,13 @@
                         <p>如果你不放心，我们也可以使用 fasqp 等进行再次清洗评估（<code>.bam</code> 转 <code>.fastq</code> 见下文）。</p>
 
                 <h2>组装</h2>
-                    <p>我们使用 Hifiasm 进行组装，这里只做脚本的备份：</p>
+                    <h3>Hifiasm 组装</h3>
+                    <p>我们使用 Hifiasm 进行组装，Hifiasm 为 DBG 算法组装工具，这里只做脚本的备份：</p>
                         <div class="download-card">
                             <div class="download-info">
                                 <i class="fas fa-file-code"></i> <div class="file-details">
                                     <h5>hifi_assemble</h5>
-                                    <span>文件格式：.py | 大小：6.4 KB</span>
+                                    <span>文件格式：.py | 大小：7.4 KB</span>
                                 </div>
                             </div>
                             <a href="./hifi_assemble.py" download class="download-btn">
@@ -89,6 +90,21 @@
                                 <i class="fas fa-chevron-right"></i>
                             </div>
                         </a>
+
+                    <h3>Hicanu 组装</h3>
+                        <p>Hicanu 是基于 OLC 算法的组装工具，组装效果也不错，但相较于 Hifiasm 来说，Hicanu 的运行时间更长一点。</p>
+                        <p>这个脚本也支持 <code>.bam</code> 文件和 <code>.fastq</code> 文件的直接投喂。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>hicanu_assemble</h5>
+                                    <span>文件格式：.py | 大小：6.4 KB</span>
+                                </div>
+                            </div>
+                            <a href="./hicanu_assemble.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
 
                 <h2>质量评估</h2>
                     <h3>Quast 组装连续性评估</h3>

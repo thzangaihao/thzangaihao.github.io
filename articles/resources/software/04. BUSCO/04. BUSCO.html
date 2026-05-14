@@ -52,7 +52,11 @@ busco --version
                 </code></pre>
 
                 <h2>用法</h2>
-                <p>使用以下脚本进行分析。注意，当数据库选择的太广时，你的结果可能看起来非常漂亮（比如 99% 完整），但其实是因为它只检查了最基础的一小部分基因。如果选择错，结果会非常难看（大量 Missing），因为两个物种的基因组成完全不同。</p>
+                <h3>数据库选择及下载</h3>
+                    <p>你可以在 <a href="https://busco.ezlab.org/list_of_lineages.html" target="_blank" style="color: #3498db;">这里</a> 看到 BUSCO 支持的所有的 orthoDB 数据库及库基因大小。如果你发现你研究的属（Genus）在 BUSCO 数据库列表中不存在，这是非常正常的现象。BUSCO 的 odb10 数据库并不是针对每一个具体的“属”设计的，而是基于进化上的类群进行层级化分布的。当找不到对应的属级数据库时，你应该遵循“向上寻根，择优匹配”的原则。如果你实在是找不到，你也可以用 eukaryota_odb10 库进行评估。</p>
+                    <blockquote>注意，当数据库选择的太广时，你的结果可能看起来非常漂亮（比如 99% 完整），但其实是因为它只检查了最基础的一小部分基因。如果选择错，结果会非常难看（大量 Missing），因为两个物种的基因组成完全不同。</blockquote>
+                <h3>脚本</h3>
+                    <p>这个脚本默认用 hypocreales_odb10 数据库进行分析，你可以在终端输入你样本的最优数据库进行评估（如果没有下载，则会先进行下载）。</p>
                     <div class="download-card">
                         <div class="download-info">
                             <i class="fas fa-file-code"></i> <div class="file-details">
