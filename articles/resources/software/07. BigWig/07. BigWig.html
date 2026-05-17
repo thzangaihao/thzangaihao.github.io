@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>07. BigWig - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="software"> 
+        <meta name="collection-title" content="软件">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-05-15">
+        <meta name="description" content="BAM 转 BigWig 脚本，适用于基因组数据的轻量级可视化">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>07. BigWig</h1>
+            
+            <div class="content">
+                <h2>简介</h2>
+                <p>BigWig 是一种用于存储和显示基因组数据的文件格式，特别适用于表示连续的定量数据，如 ChIP-Seq、RNA-Seq 等测序数据的覆盖度。</p>
+                <p>相较于在 IGV 或其他基因组浏览器中显示 BAM 文件，BigWig 格式更加轻量级，加载速度更快，适合在网页上进行可视化展示。</p>
+
+                <h2>用法</h2>
+                <p>丢进去比对好的 <code>.bam</code> 文件，直接出结果。我们使用以下脚本：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>bam_to_bigwig.py</h5>
+                                <span>文件格式：.py | 大小：2.6 KB</span>
+                            </div>
+                        </div>
+                        <a href="./bam_to_bigwig.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                <blockquote>注意生成参数的详细设置在脚本头部信息。</blockquote>
+
+
+
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

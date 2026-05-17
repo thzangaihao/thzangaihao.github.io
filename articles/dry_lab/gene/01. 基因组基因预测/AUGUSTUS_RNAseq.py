@@ -140,7 +140,8 @@ if __name__ == "__main__":
     
     if use_hints:
         cmd_aug.append(f"--hintsfile={hints_gff}")
-        cmd_aug.append("--allow_hinted_splicesites=atac") 
+        cmd_aug.append("--allow_hinted_splicesites=atac")
+        cmd_aug.append("--extrinsicCfgFile=extrinsic.M.RM.E.W.cfg")
         log_info(f">>> [2/2] 开始基于 RNA-seq 的 AUGUSTUS 共预测 (请耐心等待)...")
     else:
         log_info(f">>> [1/1] 开始纯算法 AUGUSTUS 从头预测 (请耐心等待)...")

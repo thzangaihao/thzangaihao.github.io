@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/05/13_14:59:31
-// 文章总数: 52
+// 生成时间: 2026/05/16_13:00:50
+// 文章总数: 54
 
 window.ARTICLE_DATABASE = [
     {
@@ -319,6 +319,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/dry_lab/gwas/05. SV-GWAS LMM/05. SV-GWAS LMM.html"
     },
     {
+        "title": "05. 染色体共线性分析",
+        "collection": "compare",
+        "date": "2026-05-16",
+        "summary": "染色体共线性分析",
+        "path": "articles/dry_lab/compare/05. 染色体共线性分析/05. 染色体共线性分析.html"
+    },
+    {
         "title": "05. 染色体层级图",
         "collection": "figure",
         "date": "2026-03-21",
@@ -352,6 +359,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-03-21",
         "summary": "更人性化的文件选取",
         "path": "articles/resources/python/06. 交互式逻辑/06. 交互式逻辑.html"
+    },
+    {
+        "title": "07. BigWig",
+        "collection": "software",
+        "date": "2026-05-15",
+        "summary": "BAM 转 BigWig 脚本，适用于基因组数据的轻量级可视化",
+        "path": "articles/resources/software/07. BigWig/07. BigWig.html"
     },
     {
         "title": "07. 变异分析图",

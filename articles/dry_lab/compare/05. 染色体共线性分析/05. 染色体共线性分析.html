@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>05. 染色体共线性分析 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <meta name="collection" content="compare">
+        <meta name="collection-title" content="比较基因组学">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-05-16">
+        <meta name="description" content="染色体共线性分析">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>05. 染色体共线性分析</h1>
+
+            <div class="content">
+                <h2>前言</h2>
+                    <p>染色体共线性分析就是看两个染色体之间哪里像哪里不像，将像的地方用线条标记出来。本文章已经建立傻瓜脚本，请浏览文末。</p>
+                <h2>数据</h2>
+                    <p>既然要做共线性分析，我们肯定至少要有两个基因组序列的 <code>.fasta</code> 文件，除此之外，我们还需要它们的基因组注释文件和蛋白组文件，为了分析严谨性，我们会取最长的转录本作为蛋白组序列。</p>
+                    <p>如果你目前只有 <code>.fasta</code> 文件，我们需要经过以下流程进行文件处理准备。</p>
+                    <h3><code>.gtf</code> 基因组注释文件</h3>
+                        <p>关于注释文件，这一篇文章详细介绍：</p>
+                            <a href="..\..\..\dry_lab\gene\01. 基因组基因预测\01. 基因组基因预测.html" class="related-article" target="_blank">
+                                <div class="related-article-icon">
+                                    <i class="fas fa-link"></i>
+                                </div>
+        
+                                <div class="related-article-content">
+                                    <div class="related-article-title">推荐阅读：01. 基因组基因预测</div>
+                                    <div class="related-article-desc">基因组上的基因预测</div>
+                                </div>
+                                
+                                <div class="related-article-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </a>
+                    <h3><code>.faa</code> 最长蛋白组文件</h3>
+                        <p>关于最长蛋白组文件的提取，我们可以使用 gffread 工具结合上一步的注释文件得到蛋白文件：</p>
+                            <a href="..\..\..\resources\software\03. gffread\03. gffread.html" class="related-article" target="_blank">
+                                <div class="related-article-icon">
+                                    <i class="fas fa-link"></i>
+                                </div>
+        
+                                <div class="related-article-content">
+                                    <div class="related-article-title">推荐阅读：03. gffread</div>
+                                    <div class="related-article-desc">基因注释文件的操作</div>
+                                </div>
+                                
+                                <div class="related-article-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </a>
+                        <blockquote>注意选择最长转录本模式。</blockquote>
+                        <p>对于数据库或其它地方来的蛋白组文件，我们可以拿下面这个脚本再进行一遍最长转录本过滤：</p>
+                            <div class="download-card">
+                                <div class="download-info">
+                                    <i class="fas fa-file-code"></i> <div class="file-details">
+                                        <h5>filter_longest_transcript.py</h5>
+                                        <span>文件格式：.py | 大小：4.6 KB</span>
+                                    </div>
+                                </div>
+                                <a href="./filter_longest_transcript.py" download class="download-btn">
+                                    <i class="fas fa-cloud-download-alt"></i>
+                                </a>
+                            </div>
+                        <blockquote>请务必打开 <code>.faa</code> 和 <code>.gff</code> 检查一下！<code>.faa</code> 里的条目 ID（如 >Sb01g001010），必须能在 <code>.gff</code> 文件的第三列为 mRNA（或 transcript/CDS）那行的 ID= 属性中完全对应找到。如果对不上，后续分析软件会找不到位置。</blockquote>
+                <h2>比对</h2>
+                    <p>接下来，我们将进入核心的比对与共线性搜索阶段。目前学术界最常用的工具有两个：MCScanX（经典老牌）和 JCVI（Python版，可视化极美）。无论你用哪一个，接下来的核心核心步骤只有两步：制作基因位置文件 和 全对全蛋白比对（Diamond）。我们下面以 JCVI 为例进行说明。</p>
+                    <h3>统一文件命名</h3>
+                        <p>共线性软件需要通过文件名来识别物种。请在你的工作目录下，将两个物种的文件重命名为统一的前缀。假设你的物种 A 叫 Sbi（比如高粱），物种 B 叫 Osa（比如水稻）：</p>
+                        <ul>
+                            <li>物种 A： Sbi.faa 和 Sbi.gff</li>
+                            <li>物种 B： Osa.faa 和 Osa.gff</li>
+                        </ul>
+                        <blockquote>这一步<code>非常非常非非常非常重要</code>，你再后续分析遇到的大部分的报错基本上都是由于名称对不上造成的。另外，如果你使用 Liftoff 做的转移注释，则会遇到流程跑通但没结果，这是因为 JCVI 发生了内存冲突导致错误过滤。基于此，我们的脚本和文件命名需要慎重！当然，也推荐你最后的的<code>傻瓜脚本</code>！</blockquote>
+                    <h3>生成简化位置文件（以 JCVI 为例）</h3>
+                        <p>JCVI 需要的是 .bed 格式。你可以直接用 JCVI 自带的工具从你的 GFF 转换。</p>
+                        <p>这里先备份一下 jcvi 安装的 conda 环境配置。</p>
+                        <pre><code class="language-bash">conda create -n jcvi_env python=3.9 -y
+conda activate jcvi_env
+conda install -c conda-forge -c bioconda jcvi -y
+
+# 如果你嫌 conda 太慢，你也可以直接用 pip 安装：
+pip install jcvi
+</code></pre>
+                        <p>我们直接运行交互式脚本：</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>gff_to_bed.py</h5>
+                                    <span>文件格式：.py | 大小：3.9 KB</span>
+                                </div>
+                            </div>
+                            <a href="./gff_to_bed.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                        <p>生成后的 <code>.bed</code> 文件非常小，因为它只有四个字段：染色体、起始位置、结束位置和基因名：</p>
+                        <pre><code class="language-txt">chr1	1000	2000	gene1
+chr1	3000	4000	gene2
+chr2	1500	2500	gene3
+</code></pre>
+                    <h3>全基因组蛋白序列双向比对（Diamond）</h3>
+                        <p>我们要找到物种 A 和物种 B 之间所有的同源基因对。使用 Diamond 比传统的 BLASTP 快上百倍。</p>
+                        <p>Diamond 运行的核心逻辑是，建立一个参考数据库，然后再拿其它数据进行比对，我们这里以 A 物种作为建库物种。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>run_diamond_blast.py</h5>
+                                    <span>文件格式：.py | 大小：8.0 KB</span>
+                                </div>
+                            </div>
+                            <a href="./run_diamond_blast.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                        <p>运行后会生成两类文件 <code>.blast</code> 和 <code>.dmnd</code>。其中 <code>.dmnd</code> 是预建的数据库文件，<code>.blast</code> 是比对结果文件。<code>.blast</code> 它本质上就是一个 <code>.tsv</code> 文件。</p>
+                    <h3>运行共线性搜索</h3>
+                        <p>我们需要检查一下文件是否齐全：</p>
+                        <ol>
+                            <li>物种 A 的蛋白文件： Sbi.faa</li>
+                            <li>物种 A 的位置文件： Sbi.bed</li>
+                            <li>物种 B 的蛋白文件： Osa.faa</li>
+                            <li>物种 B 的位置文件： Osa.bed</li>
+                            <li>全对全比对结果： diamond_output.blast</li>
+                        </ol>
+                        <p>如果以上文件都准备好了，我们就可以运行共线性搜索了。JCVI 的共线性搜索脚本如下：</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>run_synteny_search.py</h5>
+                                    <span>文件格式：.py | 大小：5.1 KB</span>
+                                </div>
+                            </div>
+                            <a href="./run_synteny_search.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                        <p>运行后会生成一个 <code>.anchors</code> 文件，这个文件就是共线性分析的核心结果文件了。它里面记录了所有被判定为共线性基因对的信息，包括它们在染色体上的位置、比对得分等。同时，还会生成一个 <code>.pdf</code> 文件，用于可视化共线性结果：</p>
+                        <img src="./1.png" alt="没有图片底注" class="article-img">
+                <h2>傻瓜脚本</h2>
+                    <p>在你正确配置环境后，傻瓜脚本只需要你提供物种的基因组 <code>.fasta</code> 文件和注释 <code>.gtf</code> 等文件即可自动完成共线性分析。</p>
+                    <p>在其中，不同分析样本不能同名。在多个分析样本分析时，你需要指定一个中心样本进行建库，以此作为参考基准。如果你只有两个分析样本，那么你可以任选一个作为中心样本进行建库。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>master_synteny_pipeline.py</h5>
+                                <span>文件格式：.py | 大小：11.6 KB</span>
+                            </div>
+                        </div>
+                        <a href="./master_synteny_pipeline.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                    <p>运行示例：</p>
+                    <pre><code class="language-bash">============================================================
+ 👑 全基因组共线性分析终极自动化管线
+   (One-Click Synteny Master Pipeline)
+============================================================
+
+🌟 步骤一：配置【参考物种】(Reference)
+
+📂 扫描到以下 2 个 参考物种基因组序列 (.fasta/.fna):
+  [1] Hifiasm_genome/fo2.fasta
+  [2] GCA_013085055.1_ASM1308505v1_genome/fo2ncbi.fna
+👉 请选择 参考物种基因组序列 (.fasta/.fna) 编号 (q退出): 2
+
+📂 扫描到以下 2 个 参考物种注释文件 (.gff/.gff3):
+  [1] GCA_013085055.1_ASM1308505v1_genome/fo2ncbi.gff
+  [2] Hifiasm_genome/fo2.gff3
+👉 请选择 参考物种注释文件 (.gff/.gff3) 编号 (q退出): 1
+👉 请输入参考物种前缀代号 (例如 fo2ncbi): fo2ncbi        
+
+🌟 步骤二：配置【待比较物种】(Query)
+
+--- 正在添加第 1 个查询物种 ---
+
+📂 扫描到以下 1 个 待比较物种基因组序列:
+  [1] Hifiasm_genome/fo2.fasta
+👉 请选择 待比较物种基因组序列 编号 (q退出): 1
+
+📂 扫描到以下 1 个 待比较物种注释文件:
+  [1] Hifiasm_genome/fo2.gff3
+👉 请选择 待比较物种注释文件 编号 (q退出): 1
+👉 请输入该物种前缀代号: fo2
+
+[?] 是否继续添加下一个待比较物种？(y/n): n
+
+⚡ 请设置并发线程数 (当前系统 192 核，默认使用 153):  
+
+📁 成功创建独立主控工作区: Master_Synteny_Workspace_20260516_184030
+
+==================================================
+ 🛠️ 阶段 A：数据标准化预处理 (蛋白提取与 BED 格式化)
+==================================================
+
+⚙️ [fo2ncbi] 正在提取全基因组蛋白序列...
+⚙️ [fo2ncbi] 正在筛选最长转录本并注入物种前缀 'fo2ncbi_'...
+✅ [fo2ncbi] 蛋白提取完成！代表转录本数量: 16202
+⚙️ [fo2ncbi] 正在生成简化基因位置文件 (BED)...
+[05/16/26 18:41:54] DEBUG    Load file `/home/thz/SAF/4_assemble/fo2/GCA_013085055.1_ASM1308505v1_genome/fo2ncbi.gff`                base.py:39
+[05/16/26 18:42:00] DEBUG    Extracted 16202 features (type=mRNA id=ID parent=Parent)                                               gff.py:3128
+✅ [fo2ncbi] BED 文件生成完毕，前缀注入成功！
+
+⚙️ [fo2] 正在提取全基因组蛋白序列...
+⚙️ [fo2] 正在筛选最长转录本并注入物种前缀 'fo2_'...
+✅ [fo2] 蛋白提取完成！代表转录本数量: 14511
+⚙️ [fo2] 正在生成简化基因位置文件 (BED)...
+[05/16/26 18:42:02] DEBUG    Load file `/home/thz/SAF/4_assemble/fo2/Hifiasm_genome/fo2.gff3`                                        base.py:39
+[05/16/26 18:42:08] DEBUG    Extracted 14520 features (type=mRNA id=ID parent=Parent)                                               gff.py:3128
+✅ [fo2] BED 文件生成完毕，前缀注入成功！
+
+==================================================
+ ⚔️ 阶段 B：全基因组比对与共线性搜寻
+==================================================
+
+==================================================
+ 🚀 开始分析核心对: [fo2ncbi] ⚔️ [fo2]
+==================================================
+▶️ 正在构建 Diamond 数据库...
+
+......
+
+Database sequences  14510
+  Database letters  7058849
+     Database hash  0998daf01d19b80efac990ef62069476
+        Total time  0.107000s
+▶️ 正在运行全对全双向比对 (Diamond BLASTP)...
+▶️ 正在合并比对结果并封装...
+
+🧠 正在调用 JCVI MCscan 核心算法寻找 Anchors...
+
+......
+
+[05/16/2026 06:42:19 PM] DEBUG    Figure saved to `fo2ncbi.fo2.pdf` (810px x 810px)                                                 base.py:347
+🎉 成功！[fo2ncbi] 与 [fo2] 的共线性区块识别完毕！
+
+🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆
+ 全自动化管线运行圆满结束！
+ ⏱️ 总耗时: 0.46 分钟
+ 📂 所有结果都已安全存放在:
+   Master_Synteny_Workspace_20260516_184152/
+
+ 💡 接下来，你只需进入该文件夹，直接执行绘图命令：
+    python -m jcvi.graphics.dotplot fo2ncbi.fo2.anchors
+🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆🏆
+                    </code></pre>
+
+
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
