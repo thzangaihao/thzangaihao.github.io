@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/05/16_13:00:50
-// 文章总数: 54
+// 生成时间: 2026/05/17_13:30:02
+// 文章总数: 55
 
 window.ARTICLE_DATABASE = [
     {
@@ -380,5 +380,12 @@ window.ARTICLE_DATABASE = [
         "date": "2026-04-18",
         "summary": "爬取数据库",
         "path": "articles/resources/python/07. 爬虫/07. 爬虫.html"
+    },
+    {
+        "title": "08. 染色体共线图",
+        "collection": "figure",
+        "date": "2026-05-17",
+        "summary": "漂亮或复杂的染色体共线丝带图",
+        "path": "articles/resources/gallery/08. 染色体共线图/08. 染色体共线图.html"
     }
 ];
