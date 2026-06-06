@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/05/17_13:30:02
-// 文章总数: 55
+// 生成时间: 2026/06/06_15:50:23
+// 文章总数: 58
 
 window.ARTICLE_DATABASE = [
     {
@@ -298,6 +298,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/gallery/04. 气泡图/04. 富集分析图.html"
     },
     {
+        "title": "04. 数据降维系列：PCA",
+        "collection": "algorithm",
+        "date": "2026-06-06",
+        "summary": "数据可视化降维三巨头-快",
+        "path": "articles/dry_lab/algorithm/04. 数据降维系列：PCA/04. 数据降维系列：PCA.html"
+    },
+    {
         "title": "04. 蛋白与已知 DNA 基序对接",
         "collection": "docking",
         "date": "2026-04-17",
@@ -317,6 +324,13 @@ window.ARTICLE_DATABASE = [
         "date": "2026-02-03",
         "summary": "分析结构变异对性状的影响",
         "path": "articles/dry_lab/gwas/05. SV-GWAS LMM/05. SV-GWAS LMM.html"
+    },
+    {
+        "title": "05. 数据降维系列：t-SNE",
+        "collection": "algorithm",
+        "date": "2026-06-06",
+        "summary": "数据可视化降维三巨头-准",
+        "path": "articles/dry_lab/algorithm/05. 数据降维系列：t-SNE/05. 数据降维系列：t-SNE.html"
     },
     {
         "title": "05. 染色体共线性分析",
@@ -361,6 +375,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/python/06. 交互式逻辑/06. 交互式逻辑.html"
     },
     {
+        "title": "06. 数据降维系列：UMAP",
+        "collection": "algorithm",
+        "date": "2026-06-06",
+        "summary": "数据可视化降维三巨头-狠",
+        "path": "articles/dry_lab/algorithm/06. 数据降维系列：UMAP/06. 数据降维系列：UMAP.html"
+    },
+    {
         "title": "07. BigWig",
         "collection": "software",
         "date": "2026-05-15",
@@ -385,7 +406,7 @@ window.ARTICLE_DATABASE = [
         "title": "08. 染色体共线图",
         "collection": "figure",
         "date": "2026-05-17",
-        "summary": "漂亮或复杂的染色体共线丝带图",
+        "summary": "漂亮和复杂的染色体共线丝带图",
         "path": "articles/resources/gallery/08. 染色体共线图/08. 染色体共线图.html"
     }
 ];
