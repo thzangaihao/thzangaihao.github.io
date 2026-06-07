@@ -47,6 +47,33 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.02);
 }
 
+.color-count-filter {
+    display: inline-flex;
+    align-items: center;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.color-count-filter button {
+    border: none;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    transition: all 0.16s;
+}
+
+.color-count-filter button.active {
+    background: var(--accent-color);
+    color: white;
+    font-weight: 600;
+}
+
 .color-mode-toggle button {
     border: none;
     background: transparent;
@@ -193,7 +220,8 @@
     }
 
     .color-card-search-bar,
-    .color-mode-toggle {
+    .color-mode-toggle,
+    .color-count-filter {
         width: 100%;
     }
 

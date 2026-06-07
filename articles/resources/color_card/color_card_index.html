@@ -38,9 +38,20 @@
                     <input type="text" id="searchInput" placeholder="搜索配色名称、ID 或颜色值...">
                 </div>
 
-                <div class="color-mode-toggle" aria-label="颜色显示模式">
-                    <button type="button" class="active" data-mode="hex">HEX</button>
-                    <button type="button" data-mode="rgb">RGB</button>
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                    <div class="color-count-filter" aria-label="按色数筛选">
+                        <button type="button" class="active" data-count="all">全部</button>
+                        <button type="button" data-count="2">2色</button>
+                        <button type="button" data-count="3">3色</button>
+                        <button type="button" data-count="4">4色</button>
+                        <button type="button" data-count="5">5色</button>
+                        <button type="button" data-count="6+">6色及以上</button>
+                    </div>
+
+                    <div class="color-mode-toggle" aria-label="颜色显示模式">
+                        <button type="button" class="active" data-mode="hex">HEX</button>
+                        <button type="button" data-mode="rgb">RGB</button>
+                    </div>
                 </div>
             </div>
 
@@ -55,6 +66,7 @@
             document.addEventListener("DOMContentLoaded", () => {
                 let colorCardData = [];
                 let displayMode = "hex";
+                let colorCountFilter = "all";
 
                 Papa.parse("color_card_data.csv", {
                     download: true,
@@ -65,20 +77,15 @@
                         colorCardData = results.data
                             .map(normalizePalette)
                             .filter(palette => palette.colors.length > 0);
-                        renderGrid(colorCardData);
+                        renderGrid(getVisibleData());
                     },
                     error: function() {
                         document.getElementById("colorCardGrid").innerHTML = '<p style="color: red;">数据加载失败，请检查 CSV 文件。</p>';
                     }
                 });
 
-                document.getElementById("searchInput").addEventListener("input", (event) => {
-                    const term = event.target.value.trim().toLowerCase();
-                    const filtered = colorCardData.filter(palette => {
-                        const haystack = [palette.id, palette.name, ...palette.colors].join(" ").toLowerCase();
-                        return haystack.includes(term);
-                    });
-                    renderGrid(filtered);
+                document.getElementById("searchInput").addEventListener("input", () => {
+                    renderGrid(getVisibleData());
                 });
 
                 document.querySelectorAll(".color-mode-toggle button").forEach(button => {
@@ -90,12 +97,32 @@
                     });
                 });
 
+                document.querySelectorAll(".color-count-filter button").forEach(button => {
+                    button.addEventListener("click", () => {
+                        colorCountFilter = button.dataset.count;
+                        document.querySelectorAll(".color-count-filter button").forEach(item => item.classList.remove("active"));
+                        button.classList.add("active");
+                        renderGrid(getVisibleData());
+                    });
+                });
+
                 function getVisibleData() {
                     const term = document.getElementById("searchInput").value.trim().toLowerCase();
-                    if (!term) return colorCardData;
                     return colorCardData.filter(palette => {
                         const haystack = [palette.id, palette.name, ...palette.colors].join(" ").toLowerCase();
-                        return haystack.includes(term);
+                        const matchesTerm = !term || haystack.includes(term);
+
+                        let matchesCount = true;
+                        if (colorCountFilter === 'all') {
+                            matchesCount = true;
+                        } else if (colorCountFilter === '6+') {
+                            matchesCount = palette.colors.length >= 6;
+                        } else {
+                            const need = parseInt(colorCountFilter, 10);
+                            matchesCount = palette.colors.length === need;
+                        }
+
+                        return matchesTerm && matchesCount;
                     });
                 }
 
