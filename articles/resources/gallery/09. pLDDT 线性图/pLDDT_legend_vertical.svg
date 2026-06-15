@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_2" data-name="图层 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128.04 114.63">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #f4ed51;
+      }
+
+      .cls-2 {
+        fill: #222;
+        font-family: ArialMT, Arial;
+        font-size: 13px;
+        isolation: isolate;
+      }
+
+      .cls-3 {
+        fill: #5fcced;
+      }
+
+      .cls-4 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-5 {
+        fill: #e0883a;
+      }
+
+      .cls-6 {
+        fill: #326bf6;
+      }
+    </style>
+  </defs>
+  <g id="_图层_1-2" data-name="图层 1">
+    <g>
+      <rect class="cls-6" width="22" height="15" shape-rendering="crispEdges"/>
+      <text class="cls-2" transform="translate(29 13)"><tspan x="0" y="0">pLDD</tspan><tspan class="cls-4" x="33.24" y="0">T</tspan><tspan x="40.94" y="0" xml:space="preserve"> ≥ 90</tspan></text>
+    </g>
+    <g>
+      <rect class="cls-3" y="32.47" width="22" height="15" shape-rendering="crispEdges"/>
+      <text class="cls-2" transform="translate(29 45.47)"><tspan x="0" y="0">70 ≤ pLDD</tspan><tspan class="cls-4" x="62.05" y="0">T</tspan><tspan x="69.76" y="0" xml:space="preserve"> &lt; 90</tspan></text>
+    </g>
+    <g>
+      <rect class="cls-1" y="64.94" width="22" height="15" shape-rendering="crispEdges"/>
+      <text class="cls-2" transform="translate(29 77.94)"><tspan x="0" y="0">50 ≤ pLDD</tspan><tspan class="cls-4" x="62.05" y="0">T</tspan><tspan x="69.76" y="0" xml:space="preserve"> &lt; 70</tspan></text>
+    </g>
+    <g>
+      <rect class="cls-5" y="97.41" width="22" height="15" shape-rendering="crispEdges"/>
+      <text class="cls-2" transform="translate(29 110.41)"><tspan x="0" y="0">pLDD</tspan><tspan class="cls-4" x="33.24" y="0">T</tspan><tspan x="40.94" y="0" xml:space="preserve"> &lt; 50</tspan></text>
+    </g>
+  </g>
+</svg>

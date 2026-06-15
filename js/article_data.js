@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/06/06_15:50:23
-// 文章总数: 58
+// 生成时间: 2026/06/15_12:54:34
+// 文章总数: 60
 
 window.ARTICLE_DATABASE = [
     {
@@ -270,6 +270,13 @@ window.ARTICLE_DATABASE = [
         "path": "articles/resources/software/04. BUSCO/04. BUSCO.html"
     },
     {
+        "title": "04. SOE PCR",
+        "collection": "pcr",
+        "date": "2026-06-14",
+        "summary": "基因敲除新技术",
+        "path": "articles/wet_lab/01. 多聚酶链式反应 (PCR)/04. SOE PCR/04. SOE PCR.html"
+    },
+    {
         "title": "04. SV-GWAS LM",
         "collection": "gwas",
         "date": "2026-01-28",
@@ -408,5 +415,12 @@ window.ARTICLE_DATABASE = [
         "date": "2026-05-17",
         "summary": "漂亮和复杂的染色体共线丝带图",
         "path": "articles/resources/gallery/08. 染色体共线图/08. 染色体共线图.html"
+    },
+    {
+        "title": "09. pLDDT 线性图",
+        "collection": "figure",
+        "date": "2026-06-15",
+        "summary": "pLDDT 得分线性可视化",
+        "path": "articles/resources/gallery/09. pLDDT 线性图/09. pLDDT 线性图.html"
     }
 ];

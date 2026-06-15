@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_2" data-name="图层 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 97.39 112.47">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5 {
+        stroke-width: .5px;
+      }
+
+      .cls-2 {
+        fill: #326bf6;
+      }
+
+      .cls-2, .cls-3, .cls-4, .cls-5 {
+        stroke: #231815;
+        stroke-miterlimit: 4.82;
+      }
+
+      .cls-6, .cls-7, .cls-8, .cls-9 {
+        isolation: isolate;
+      }
+
+      .cls-7, .cls-8 {
+        fill: #222;
+        font-family: ArialMT, Arial;
+        font-size: 10px;
+      }
+
+      .cls-8 {
+        letter-spacing: -.04em;
+      }
+
+      .cls-3 {
+        fill: #5fcced;
+      }
+
+      .cls-4 {
+        fill: #e0883a;
+      }
+
+      .cls-5 {
+        fill: #f4ed51;
+      }
+
+      .cls-9 {
+        font-family: Arial-BoldMT, Arial;
+        font-size: 11.36px;
+        font-weight: 700;
+      }
+    </style>
+  </defs>
+  <g id="_图层_1-2" data-name="图层 1">
+    <g>
+      <g id="uuid-5dd51435-ec3b-4a23-85cd-6de13d506969" data-name=" 图层 1-2">
+        <g>
+          <rect class="cls-2" x="1.52" y="27.22" width="16.34" height="11.14" shape-rendering="crispEdges"/>
+          <g class="cls-6">
+            <text class="cls-7" transform="translate(23.06 36.88)"><tspan x="0" y="0">pLDD</tspan></text>
+            <text class="cls-8" transform="translate(47.75 36.88)"><tspan x="0" y="0">T</tspan></text>
+            <text class="cls-7" transform="translate(53.47 36.88)"><tspan x="0" y="0" xml:space="preserve"> ≥ 90</tspan></text>
+          </g>
+        </g>
+        <g>
+          <rect class="cls-3" x="1.52" y="51.34" width="16.34" height="11.14" shape-rendering="crispEdges"/>
+          <g class="cls-6">
+            <text class="cls-7" transform="translate(23.06 60.99)"><tspan x="0" y="0">70 ≤ pLDD</tspan></text>
+            <text class="cls-8" transform="translate(69.15 60.99)"><tspan x="0" y="0">T</tspan></text>
+            <text class="cls-7" transform="translate(74.87 60.99)"><tspan x="0" y="0" xml:space="preserve"> &lt; 90</tspan></text>
+          </g>
+        </g>
+        <g>
+          <rect class="cls-5" x="1.52" y="75.45" width="16.34" height="11.14" shape-rendering="crispEdges"/>
+          <g class="cls-6">
+            <text class="cls-7" transform="translate(23.06 85.11)"><tspan x="0" y="0">50 ≤ pLDD</tspan></text>
+            <text class="cls-8" transform="translate(69.15 85.11)"><tspan x="0" y="0">T</tspan></text>
+            <text class="cls-7" transform="translate(74.87 85.11)"><tspan x="0" y="0" xml:space="preserve"> &lt; 70</tspan></text>
+          </g>
+        </g>
+        <g>
+          <rect class="cls-4" x="1.52" y="99.57" width="16.34" height="11.14" shape-rendering="crispEdges"/>
+          <g class="cls-6">
+            <text class="cls-7" transform="translate(23.06 109.23)"><tspan x="0" y="0">pLDD</tspan></text>
+            <text class="cls-8" transform="translate(47.75 109.23)"><tspan x="0" y="0">T</tspan></text>
+            <text class="cls-7" transform="translate(53.47 109.23)"><tspan x="0" y="0" xml:space="preserve"> &lt; 50</tspan></text>
+          </g>
+        </g>
+      </g>
+      <g class="cls-6">
+        <g class="cls-6">
+          <g class="cls-6">
+            <text class="cls-9" transform="translate(1.52 9.75)"><tspan x="0" y="0">pLDDT scores</tspan></text>
+          </g>
+        </g>
+      </g>
+      <path class="cls-1" d="M0,16.19h86.37"/>
+    </g>
+  </g>
+</svg>

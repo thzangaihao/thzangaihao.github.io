@@ -1,6 +1,7 @@
 id,name,colors
 KS,瑞典国旗,"['#006AA7', '#FECC02']"
 Cherry Blossom Grapes,樱花青提,"['#f9a4a2', '#61a8ad']"
+Anthropic,A\,"['#f0eee6', '#e3dacc', '#d8b5a4','#c18064', '#141413']"
 German,德系配色,"['#ffd460', '#f07b3f', '#ea5455', '#2d4059']"
 France,法系配色,"['#283c63', '#928a97', '#fbe8d3', '#f2545b']"
 Deep Ocean,深海,"['#003F5C', '#2F4B7C', '#665191', '#A05195', '#D45087', '#F95D6A']"
