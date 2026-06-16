@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 500" width="100%" height="100%">
+<style>
+    .border { fill: white; stroke: black; stroke-width: 2; }
+    .well { fill: white; stroke: black; stroke-width: 1.5; }
+    .label { font-family: Arial, Helvetica, sans-serif; font-size: 20px; text-anchor: middle; dominant-baseline: central; fill: black; }
+</style>
+<path d="M 50 10 L 690 10 L 690 490 L 10 490 L 10 50 Z" class="border" />
+<text x="35" y="90" class="label">A</text>
+<text x="90" y="45" class="label">1</text>
+<circle cx="90" cy="90" r="22" class="well" />
+<text x="140" y="45" class="label">2</text>
+<circle cx="140" cy="90" r="22" class="well" />
+<text x="190" y="45" class="label">3</text>
+<circle cx="190" cy="90" r="22" class="well" />
+<text x="240" y="45" class="label">4</text>
+<circle cx="240" cy="90" r="22" class="well" />
+<text x="290" y="45" class="label">5</text>
+<circle cx="290" cy="90" r="22" class="well" />
+<text x="340" y="45" class="label">6</text>
+<circle cx="340" cy="90" r="22" class="well" />
+<text x="390" y="45" class="label">7</text>
+<circle cx="390" cy="90" r="22" class="well" />
+<text x="440" y="45" class="label">8</text>
+<circle cx="440" cy="90" r="22" class="well" />
+<text x="490" y="45" class="label">9</text>
+<circle cx="490" cy="90" r="22" class="well" />
+<text x="540" y="45" class="label">10</text>
+<circle cx="540" cy="90" r="22" class="well" />
+<text x="590" y="45" class="label">11</text>
+<circle cx="590" cy="90" r="22" class="well" />
+<text x="640" y="45" class="label">12</text>
+<circle cx="640" cy="90" r="22" class="well" />
+<text x="35" y="140" class="label">B</text>
+<circle cx="90" cy="140" r="22" class="well" />
+<circle cx="140" cy="140" r="22" class="well" />
+<circle cx="190" cy="140" r="22" class="well" />
+<circle cx="240" cy="140" r="22" class="well" />
+<circle cx="290" cy="140" r="22" class="well" />
+<circle cx="340" cy="140" r="22" class="well" />
+<circle cx="390" cy="140" r="22" class="well" />
+<circle cx="440" cy="140" r="22" class="well" />
+<circle cx="490" cy="140" r="22" class="well" />
+<circle cx="540" cy="140" r="22" class="well" />
+<circle cx="590" cy="140" r="22" class="well" />
+<circle cx="640" cy="140" r="22" class="well" />
+<text x="35" y="190" class="label">C</text>
+<circle cx="90" cy="190" r="22" class="well" />
+<circle cx="140" cy="190" r="22" class="well" />
+<circle cx="190" cy="190" r="22" class="well" />
+<circle cx="240" cy="190" r="22" class="well" />
+<circle cx="290" cy="190" r="22" class="well" />
+<circle cx="340" cy="190" r="22" class="well" />
+<circle cx="390" cy="190" r="22" class="well" />
+<circle cx="440" cy="190" r="22" class="well" />
+<circle cx="490" cy="190" r="22" class="well" />
+<circle cx="540" cy="190" r="22" class="well" />
+<circle cx="590" cy="190" r="22" class="well" />
+<circle cx="640" cy="190" r="22" class="well" />
+<text x="35" y="240" class="label">D</text>
+<circle cx="90" cy="240" r="22" class="well" />
+<circle cx="140" cy="240" r="22" class="well" />
+<circle cx="190" cy="240" r="22" class="well" />
+<circle cx="240" cy="240" r="22" class="well" />
+<circle cx="290" cy="240" r="22" class="well" />
+<circle cx="340" cy="240" r="22" class="well" />
+<circle cx="390" cy="240" r="22" class="well" />
+<circle cx="440" cy="240" r="22" class="well" />
+<circle cx="490" cy="240" r="22" class="well" />
+<circle cx="540" cy="240" r="22" class="well" />
+<circle cx="590" cy="240" r="22" class="well" />
+<circle cx="640" cy="240" r="22" class="well" />
+<text x="35" y="290" class="label">E</text>
+<circle cx="90" cy="290" r="22" class="well" />
+<circle cx="140" cy="290" r="22" class="well" />
+<circle cx="190" cy="290" r="22" class="well" />
+<circle cx="240" cy="290" r="22" class="well" />
+<circle cx="290" cy="290" r="22" class="well" />
+<circle cx="340" cy="290" r="22" class="well" />
+<circle cx="390" cy="290" r="22" class="well" />
+<circle cx="440" cy="290" r="22" class="well" />
+<circle cx="490" cy="290" r="22" class="well" />
+<circle cx="540" cy="290" r="22" class="well" />
+<circle cx="590" cy="290" r="22" class="well" />
+<circle cx="640" cy="290" r="22" class="well" />
+<text x="35" y="340" class="label">F</text>
+<circle cx="90" cy="340" r="22" class="well" />
+<circle cx="140" cy="340" r="22" class="well" />
+<circle cx="190" cy="340" r="22" class="well" />
+<circle cx="240" cy="340" r="22" class="well" />
+<circle cx="290" cy="340" r="22" class="well" />
+<circle cx="340" cy="340" r="22" class="well" />
+<circle cx="390" cy="340" r="22" class="well" />
+<circle cx="440" cy="340" r="22" class="well" />
+<circle cx="490" cy="340" r="22" class="well" />
+<circle cx="540" cy="340" r="22" class="well" />
+<circle cx="590" cy="340" r="22" class="well" />
+<circle cx="640" cy="340" r="22" class="well" />
+<text x="35" y="390" class="label">G</text>
+<circle cx="90" cy="390" r="22" class="well" />
+<circle cx="140" cy="390" r="22" class="well" />
+<circle cx="190" cy="390" r="22" class="well" />
+<circle cx="240" cy="390" r="22" class="well" />
+<circle cx="290" cy="390" r="22" class="well" />
+<circle cx="340" cy="390" r="22" class="well" />
+<circle cx="390" cy="390" r="22" class="well" />
+<circle cx="440" cy="390" r="22" class="well" />
+<circle cx="490" cy="390" r="22" class="well" />
+<circle cx="540" cy="390" r="22" class="well" />
+<circle cx="590" cy="390" r="22" class="well" />
+<circle cx="640" cy="390" r="22" class="well" />
+<text x="35" y="440" class="label">H</text>
+<circle cx="90" cy="440" r="22" class="well" />
+<circle cx="140" cy="440" r="22" class="well" />
+<circle cx="190" cy="440" r="22" class="well" />
+<circle cx="240" cy="440" r="22" class="well" />
+<circle cx="290" cy="440" r="22" class="well" />
+<circle cx="340" cy="440" r="22" class="well" />
+<circle cx="390" cy="440" r="22" class="well" />
+<circle cx="440" cy="440" r="22" class="well" />
+<circle cx="490" cy="440" r="22" class="well" />
+<circle cx="540" cy="440" r="22" class="well" />
+<circle cx="590" cy="440" r="22" class="well" />
+<circle cx="640" cy="440" r="22" class="well" />
+</svg>

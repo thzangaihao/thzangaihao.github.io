@@ -20,6 +20,11 @@ collection_pattern = re.compile(r'<meta\s+name=["\']collection["\']\s+content=["
 date_pattern = re.compile(r'<meta\s+name=["\']date["\']\s+content=["\'](.*?)["\']', re.IGNORECASE)
 # 提取 meta description
 desc_pattern = re.compile(r'<meta\s+name=["\']description["\']\s+content=["\'](.*?)["\']', re.IGNORECASE)
+# 提取 meta featured
+featured_pattern = re.compile(r'<meta\s+name=["\']featured["\']\s+content=["\'](.*?)["\']', re.IGNORECASE)
+
+def is_featured_value(value):
+    return value.strip().lower() in ('true', 'yes', '1', 'featured', '精选')
 
 print(f"正在使用 glob 递归扫描 '{base_dir}' 目录下的所有 .html 文章...")
 
@@ -50,6 +55,7 @@ for file_path in files:
                 title_match = title_pattern.search(content)
                 date_match = date_pattern.search(content)
                 desc_match = desc_pattern.search(content)
+                featured_match = featured_pattern.search(content)
 
                 # 优先使用 title 标签，没找到就用文件名
                 title = title_match.group(1) if title_match else file_name.replace('.html', '')
@@ -65,7 +71,8 @@ for file_path in files:
                     'collection': coll_match.group(1), # 对应 HTML 中的 id="pcr"
                     'date': date_match.group(1) if date_match else 'Unknown',
                     'summary': desc_match.group(1) if desc_match else '暂无简介',
-                    'path': rel_path  # 例如: "articles/dry_lab/data/GWAS.html"
+                    'path': rel_path,  # 例如: "articles/dry_lab/data/GWAS.html"
+                    'featured': is_featured_value(featured_match.group(1)) if featured_match else False
                 }
                 
                 articles.append(article_info)

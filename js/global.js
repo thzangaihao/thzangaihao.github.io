@@ -7,7 +7,11 @@
    1. 全局配置 (Configuration)
    ------------------------------------------------------------ */
 window.MathJax = {
-    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        tags: 'ams'
+    },
     options: { ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
 };
 
@@ -15,6 +19,15 @@ window.MathJax = {
    2. 全局工具函数 (Utilities)
    ------------------------------------------------------------ */
 function getRelativePath(dbPath) { return '../../' + dbPath; }
+
+function isTruthyMeta(value) {
+    return ['true', 'yes', '1', 'featured', '精选'].includes((value || '').trim().toLowerCase());
+}
+
+function featuredStarHtml(article) {
+    if (!article?.featured) return '';
+    return '<i class="fas fa-star featured-star" title="精选文章" aria-label="精选文章"></i>';
+}
 
 let copyFeedbackTimer = null;
 let currentActiveElement = null;
@@ -116,12 +129,23 @@ function autoFillArticleInfo() {
     if (!container) return;
     const getMeta = (n) => document.querySelector(`meta[name="${n}"]`)?.content;
     const [collId, collTitle, pPath, pTitle, date] = [getMeta('collection'), getMeta('collection-title'), getMeta('parent-path'), getMeta('parent-title'), getMeta('date')];
-    if (!collId || !pPath || !date) return;
+    const isFeatured = isTruthyMeta(getMeta('featured'));
 
     const h1 = container.querySelector('h1');
     if (h1) {
-        h1.insertAdjacentHTML('beforebegin', `<a href="${pPath}#${collId}" class="back-link"><i class="fas fa-arrow-left"></i> 返回 ${pTitle} / ${collTitle}</a>`);
-        h1.insertAdjacentHTML('afterend', `<div class="meta"><span><i class="far fa-calendar"></i> ${date}</span><span style="margin-left:20px"><i class="fas fa-folder"></i> ${collTitle}</span></div>`);
+        if (collId && collTitle && pPath && pTitle && date) {
+            h1.insertAdjacentHTML('beforebegin', `<a href="${pPath}#${collId}" class="back-link"><i class="fas fa-arrow-left"></i> 返回 ${pTitle} / ${collTitle}</a>`);
+            h1.insertAdjacentHTML('afterend', `<div class="meta"><span><i class="far fa-calendar"></i> ${date}</span><span style="margin-left:20px"><i class="fas fa-folder"></i> ${collTitle}</span></div>`);
+        }
+
+        if (isFeatured && !container.querySelector('.featured-notice')) {
+            h1.insertAdjacentHTML('afterend', `
+                <div class="featured-notice">
+                    <i class="fas fa-star"></i>
+                    <span>精选文章</span>
+                </div>
+            `);
+        }
     }
 }
 
@@ -152,9 +176,9 @@ function renderArticleCards() {
         const container = document.getElementById(article.collection + '-section');
         if (!container) return;
         const html = `
-            <a href="${getRelativePath(article.path)}" class="article-item" rel="noopener noreferrer">
+            <a href="${getRelativePath(article.path)}" class="article-item${article.featured ? ' is-featured' : ''}" rel="noopener noreferrer">
                 <div class="article-info">
-                    <h4>${article.title}</h4>
+                    <h4>${featuredStarHtml(article)}${article.title}</h4>
                     <p>${article.summary}</p>
                 </div>
                 <span class="article-date">${article.date}</span>
@@ -203,10 +227,10 @@ function renderLatestArticles(searchTerm = '') {
         else if (article.path.includes('about')) { sectionName = '关于我'; iconClass = 'fas fa-user'; }
 
         return `
-            <a href="${article.path}" class="article-item" rel="noopener noreferrer">
+            <a href="${article.path}" class="article-item${article.featured ? ' is-featured' : ''}" rel="noopener noreferrer">
                 <div class="article-info">
                     <span class="article-tag"><i class="${iconClass}"></i> ${sectionName}</span>
-                    <h4>${article.title}</h4>
+                    <h4>${featuredStarHtml(article)}${article.title}</h4>
                     <p>${article.summary}</p>
                 </div>
                 <span class="article-date">${article.date}</span>
