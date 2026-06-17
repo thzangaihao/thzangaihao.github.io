@@ -4,3 +4,4 @@ pET-28a,pET-28a(+),Expression,KanR,5369 bp,T7,E. coli (BL21),"N-His, Thrombin",N
 pMD19-T,pMD19-T,TA Cloning,AmpR,2692 bp,lac,E. coli,-,None,pMD19-T 是一种 T-Vector，专门设计用于直接连接 PCR 产物，它的骨架通常基于 pUC 系列。当你通过 PCR 扩增出一个基因，想把它快速转入质粒进行测序或后续操作时，pMD19-T 是最省事的选择。大多数普通 DNA 聚合酶（如 Taq 酶）在扩增产物的 3' 端会自动加上一个多余的 A（腺嘌呤）。pMD19-T 在线性化末端带有预留的 T（胸腺嘧啶），利用 T-A 配对可以直接高效连接 PCR 产物，无需设计酶切位点。,data/pMD19-T.dna,img/pMD19-T.png
 pKNT-mCherry,pKNT-mCherry,Expression,"KanR, AmpR",6410 bp,"T3, lac, T7, RP27",E. coli (DH5α),mCherry,None,把目的基因导入真菌，可以表达出红色荧光，具有不可操纵的 RP27 强启动子，用于基因过表达。,data/PKNT-mCherry.dna,img/PKNT-mCherry.jpg
 pKNT-GFP,pKNT-GFP,Expression,"KanR, AmpR",7660 bp,"T3, lac, T7, RP27",E. coli (DH5α),GFP,None,把目的基因导入真菌，可以表达出绿色荧光，具有不可操纵的 RP27 强启动子，用于基因过表达。,data/PKNT-GFP.dna,img/PKNT-GFP.jpg
+pBI121,pBI121,Expression,KanR,14758 bp,CaMV 35S,Agrobacterium tumefaciens,GUS,None,植物表达载体，使用强力的 CaMV 35S 启动子，在农杆菌中进行转化后，可以将目的基因导入植物细胞进行表达。pBI121 常用于植物分子生物学研究，尤其是基因功能分析和转基因植物的构建。,data/pBI121.dna,img/pBI121.jpg
