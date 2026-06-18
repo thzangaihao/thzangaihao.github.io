@@ -1,5 +1,5 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/06/16_21:41:42
+// 生成时间: 2026/06/18_21:16:14
 // 文章总数: 61
 
 window.ARTICLE_DATABASE = [
@@ -137,7 +137,7 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-24",
         "summary": "通过观测序列推测未知序列",
         "path": "articles/dry_lab/algorithm/01. 隐马尔可夫模型/01. 隐马尔可夫模型.html",
-        "featured": true
+        "featured": false
     },
     {
         "title": "02. AlphaFold3 离线版使用说明",
@@ -201,7 +201,7 @@ window.ARTICLE_DATABASE = [
         "date": "2026-03-25",
         "summary": "如何量化计算物种差异？",
         "path": "articles/dry_lab/algorithm/02. 建树算法/02. 建树算法.html",
-        "featured": true
+        "featured": false
     },
     {
         "title": "02. 热图",
@@ -273,7 +273,7 @@ window.ARTICLE_DATABASE = [
         "date": "2026-04-13",
         "summary": "基因组拼接算法原理浅析",
         "path": "articles/dry_lab/algorithm/03. 基因组组装算法/03. 基因组组装算法.html",
-        "featured": true
+        "featured": false
     },
     {
         "title": "03. 火山图",
