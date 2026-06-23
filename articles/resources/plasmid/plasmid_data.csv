@@ -5,3 +5,5 @@ pMD19-T,pMD19-T,TA Cloning,AmpR,2692 bp,lac,E. coli,-,None,pMD19-T 是一种 T-V
 pKNT-mCherry,pKNT-mCherry,Expression,"KanR, AmpR",6410 bp,"T3, lac, T7, RP27",E. coli (DH5α),mCherry,None,把目的基因导入真菌，可以表达出红色荧光，具有不可操纵的 RP27 强启动子，用于基因过表达。,data/PKNT-mCherry.dna,img/PKNT-mCherry.jpg
 pKNT-GFP,pKNT-GFP,Expression,"KanR, AmpR",7660 bp,"T3, lac, T7, RP27",E. coli (DH5α),GFP,None,把目的基因导入真菌，可以表达出绿色荧光，具有不可操纵的 RP27 强启动子，用于基因过表达。,data/PKNT-GFP.dna,img/PKNT-GFP.jpg
 pBI121,pBI121,Expression,KanR,14758 bp,CaMV 35S,Agrobacterium tumefaciens,GUS,None,植物表达载体，使用强力的 CaMV 35S 启动子，在农杆菌中进行转化后，可以将目的基因导入植物细胞进行表达。pBI121 常用于植物分子生物学研究，尤其是基因功能分析和转基因植物的构建。,data/pBI121.dna,img/pBI121.jpg
+pGADT7,pGADT7,Yeast Two-Hybrid,LeuR,7988 bp,ADH1,Saccharomyces cerevisiae,GAL4 AD,None,用于酵母双杂交系统的质粒载体，携带 GAL4 激活域（AD），适用于构建激活域融合蛋白。pGADT7 常与 pGBKT7 配合使用，用于检测蛋白质-蛋白质相互作用。,data/pGADT7.dna,img/AD.png
+pGBKT7,pGBKT7,Yeast Two-Hybrid,TrpR,7307 bp,ADH1,Saccharomyces cerevisiae,GAL4 BD,None,用于酵母双杂交系统的质粒载体，携带 GAL4 结合域（BD），适用于构建结合域融合蛋白。pGBKT7 常与 pGADT7 配合使用，用于检测蛋白质-蛋白质相互作用。,data/pGBKT7.dna,img/BK.png

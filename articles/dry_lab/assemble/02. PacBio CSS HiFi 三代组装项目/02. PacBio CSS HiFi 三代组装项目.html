@@ -60,40 +60,12 @@
                                 <i class="fas fa-cloud-download-alt"></i>
                             </a>
                         </div>
-                    <p>这个脚本会把公司给你的 <code>.bam</code> 文件先转为 <code>.fastq</code> 文件，再喂到 hifiasm 进行组装，直接出结果，非常方便！</p>
-                    <p>但值得注意的是，脚本使用的参数是默认参数，对于基因组较小的真菌组装效果已经很好了，如果设计大型组装项目，我们可能会对算法进行一些细调，如果我没记错的话，hifiasm 是 DBG 图算法，我们可以再寻找欧拉路径那一块卡一下阈值，但是一般默认就已经很好了！</p>
-                    <pre><code class="language-python">cmd = ["hifiasm", "-o", prefix, "-t", str(threads), fastq_file]</code></pre>
-                    <p>这个脚本把 <code>.bam</code> 转 <code>.fastq</code> 的功能分离出来了，可以灵活使用：</p>
-                        <div class="download-card">
-                            <div class="download-info">
-                                <i class="fas fa-file-code"></i> <div class="file-details">
-                                    <h5>bam2fq_tool</h5>
-                                    <span>文件格式：.py | 大小：3.2 KB</span>
-                                </div>
-                            </div>
-                            <a href="./bam2fq_tool.py" download class="download-btn">
-                                <i class="fas fa-cloud-download-alt"></i>
-                            </a>
-                        </div>
-                    <p>你可以在这个备份页里找到更多有用的文件转换：</p>
-                        <a href="..\..\..\resources\python\05. 生物文件处理\05. 生物文件处理.html" class="related-article" target="_blank">
-                            <div class="related-article-icon">
-                                <i class="fas fa-link"></i>
-                            </div>
-                            
-                            <div class="related-article-content">
-                                <div class="related-article-title">05. 生物文件处理</div>
-                                <div class="related-article-desc">生物信息文件格式转换，文件整合</div>
-                            </div>
-                            
-                            <div class="related-article-arrow">
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </a>
+
 
                     <h3>Hicanu 组装</h3>
                         <p>Hicanu 是基于 OLC 算法的组装工具，组装效果也不错，但相较于 Hifiasm 来说，Hicanu 的运行时间更长一点。</p>
                         <p>这个脚本也支持 <code>.bam</code> 文件和 <code>.fastq</code> 文件的直接投喂。</p>
+                        <p>历经数个月的开发与功能完善，这个脚本功能已经非常完善了！</p>
                         <div class="download-card">
                             <div class="download-info">
                                 <i class="fas fa-file-code"></i> <div class="file-details">

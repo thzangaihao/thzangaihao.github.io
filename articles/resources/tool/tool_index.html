@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>工具库 - 海钊知识港</title>
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../css/global.css">
+        <link rel="stylesheet" href="../../../css/plasmid.css">
+        <style>
+            #toolGrid {
+                display: block;
+                column-count: 3;
+                column-gap: 1.5rem;
+            }
+
+            .tool-card {
+                position: relative;
+                padding-right: 4.25rem;
+                cursor: default;
+                width: 100%;
+                display: inline-block;
+                margin: 0 0 1.5rem;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .tool-card:hover .tool-download-btn {
+                opacity: 1;
+            }
+
+            .tool-download-btn {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                width: 2.6rem;
+                height: 2.6rem;
+                border-radius: 50%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--accent-color);
+                color: #fff;
+                text-decoration: none;
+                opacity: 0.88;
+                transition: transform 0.25s, box-shadow 0.25s, opacity 0.25s, background 0.25s;
+            }
+
+            .tool-download-btn:hover {
+                background: #2980b9;
+                color: #fff;
+                transform: translateY(-4px);
+                box-shadow: 0 8px 18px rgba(52, 152, 219, 0.28);
+            }
+
+            .tool-download-btn.disabled {
+                background: #bdc3c7;
+                cursor: not-allowed;
+                pointer-events: none;
+                box-shadow: none;
+            }
+
+            .tool-card p {
+                display: block;
+                -webkit-line-clamp: unset;
+                -webkit-box-orient: unset;
+                overflow: visible;
+                text-overflow: initial;
+                margin-bottom: 0;
+            }
+
+            @media (max-width: 1000px) {
+                #toolGrid {
+                    column-count: 2;
+                }
+            }
+
+            @media (max-width: 640px) {
+                #toolGrid {
+                    column-count: 1;
+                }
+            }
+        </style>
+
+        <script src="../../../js/global.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+        <script>window.footerPath = '../../../footer.html';</script>
+    </head>
+
+    <body class="category-page">
+        <nav>
+            <div class="logo"><a href="../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="container" style="flex-direction: column;">
+            <div class="list-header" style="margin-bottom: 2rem;">
+                <a href="../resources_index.html" class="back-link" style="margin-bottom: 1rem;"><i class="fas fa-arrow-left"></i> 返回资源站</a>
+                <h2><i class="fa-solid fa-screwdriver-wrench"></i> 工具库</h2>
+                <p>快速工具</p>
+            </div>
+
+            <div class="plasmid-header">
+                <div class="plasmid-search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="搜索工具名称或用途...">
+                </div>
+            </div>
+
+            <div class="plasmid-grid" id="toolGrid">
+                <!-- 工具卡片由 JS 动态生成 -->
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                let toolData = [];
+
+                Papa.parse("tool_data.csv", {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    encoding: "UTF-8",
+                    complete: function(results) {
+                        toolData = results.data.filter(t => t.id && t.name);
+                        renderGrid(toolData);
+                    },
+                    error: function() {
+                        document.getElementById('toolGrid').innerHTML = '<p style="color: red;">数据加载失败，请检查 CSV 文件。</p>';
+                    }
+                });
+
+                const searchInput = document.getElementById('searchInput');
+                searchInput.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    const filtered = toolData.filter(t =>
+                        (t.name && t.name.toLowerCase().includes(term)) ||
+                        (t.description && t.description.toLowerCase().includes(term))
+                    );
+                    renderGrid(filtered);
+                });
+
+                function renderGrid(data) {
+                    const grid = document.getElementById('toolGrid');
+                    grid.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        grid.innerHTML = '<p style="color: #999;">暂无工具条目。</p>';
+                        return;
+                    }
+
+                    data.forEach(t => {
+                        const card = document.createElement('div');
+                        card.className = 'plasmid-card tool-card';
+                        const downloadButton = t.script_path
+                            ? `<a class="tool-download-btn" href="${t.script_path}" download title="下载脚本" aria-label="下载 ${t.name} 脚本"><i class="fas fa-download"></i></a>`
+                            : `<span class="tool-download-btn disabled" title="暂无脚本" aria-label="暂无脚本"><i class="fas fa-download"></i></span>`;
+                        
+                        card.innerHTML = `
+                            ${downloadButton}
+                            <h3>${t.name}</h3>
+                            <p title="${t.description || ''}">${t.description || '暂无用途描述'}</p>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }
+            });
+        </script>
+    </body>
+</html>
