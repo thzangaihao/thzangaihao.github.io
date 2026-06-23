@@ -37,11 +37,20 @@ def bam_to_fastq(bam_file, fastq_file, threads):
         log_info(f"  -> 错误：BAM 转换失败！{e}")
         raise
 
-def run_hifiasm(fastq_file, prefix, threads):
-    """运行 Hifiasm"""
+def run_hifiasm(fastq_file, prefix, threads, ploidy_mode):
+    """根据倍性选择运行 Hifiasm"""
     log_info(f"  -> 开始运行 hifiasm 进行序列拼接...")
-    cmd = ["hifiasm", "-o", prefix, "-t", str(threads), fastq_file]
+    
+    # 根据用户选择动态生成参数
+    if ploidy_mode in ['1', '2']:
+        # 模式1和2使用 --primary 生成 p_ctg 和 a_ctg
+        cmd = ["hifiasm", "-o", prefix, "-t", str(threads), "--primary", fastq_file]
+    else:
+        # 模式3默认行为，生成 hap1 和 hap2
+        cmd = ["hifiasm", "-o", prefix, "-t", str(threads), fastq_file]
+        
     try:
+        log_info(f"  -> 执行命令: {' '.join(cmd)}")
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         log_info(f"  -> hifiasm 组装核心步骤完成！")
     except subprocess.CalledProcessError as e:
@@ -50,7 +59,6 @@ def run_hifiasm(fastq_file, prefix, threads):
 
 def extract_fasta(gfa_file, fasta_file):
     """从 GFA 提取主组装 FASTA"""
-    log_info(f"  -> 正在提取最终 FASTA 序列...")
     if not os.path.exists(gfa_file):
         log_info(f"  -> 警告：找不到图文件 {gfa_file}，跳过提取。")
         return
@@ -63,7 +71,7 @@ def extract_fasta(gfa_file, fasta_file):
                     if len(parts) >= 3:
                         fasta.write(f">{parts[1]}\n{parts[2]}\n")
                         contig_count += 1
-        log_info(f"  -> 提取完成！共获得 {contig_count} 条 Contigs。")
+        log_info(f"  -> 成功从 {os.path.basename(gfa_file)} 提取 {contig_count} 条 Contigs。")
     except Exception as e:
         log_info(f"  -> 错误：提取 FASTA 时发生异常：{e}")
 
@@ -72,31 +80,30 @@ def extract_fasta(gfa_file, fasta_file):
 # ==========================================
 if __name__ == "__main__":
     print("="*60)
-    print("   自动化 HiFi 基因组组装队列系统 (支持 BAM/FASTQ 直投)")
+    print("   自动化 HiFi 基因组组装队列系统 (支持多倍型/单倍体)")
     print("="*60)
 
     check_dependencies()
 
-    # 1. 扫描所有支持的文件类型
+    # 1. 扫描文件
     log_info("正在扫描当前目录及子目录下的序列文件...")
     extensions = ["**/*.bam", "**/*.fastq", "**/*.fastq.gz", "**/*.fq", "**/*.fq.gz"]
     all_files = []
     for ext in extensions:
         all_files.extend(glob.glob(ext, recursive=True))
     
-    # 过滤掉隐藏文件并去重排序
     all_files = sorted(list(set([f for f in all_files if not os.path.basename(f).startswith(".")])))
 
     if not all_files:
         log_info("未找到任何 .bam 或 FASTQ 相关文件，脚本退出。")
         sys.exit(0)
 
-    # 2. 交互式选择菜单
+    # 2. 交互式选择样本
     print("\n发现以下待处理文件：")
     for i, file_path in enumerate(all_files, 1):
         print(f"  [{i}] {file_path}")
     
-    print("\n请选择要组装的文件编号 (例如: 1,3,4)，或者输入 'all' 处理全部：")
+    print("\n请选择要组装的文件编号 (例如: 1,3,4)，或输入 'all' 处理全部：")
     choice = input("你的选择 >>> ").strip().lower()
 
     selected_files = []
@@ -114,15 +121,25 @@ if __name__ == "__main__":
         log_info("未选择任何有效文件，脚本退出。")
         sys.exit(0)
 
-    # 3. 创建带时间戳的顶级工作目录
+    # 3. 交互式选择组装策略
+    print("\n请选择物种倍性及组装策略：")
+    print("  [1] 单倍体模式 (仅提取 Primary Contig，适合真菌等单倍体物种)")
+    print("  [2] 主副组装模式 (生成 Primary/Alternate，适合高杂合二倍体构建单一参考基因组)")
+    print("  [3] 默认双倍体分型模式 (生成 Hap1/Hap2，适合植物二倍体全相态组装)")
+    ploidy_mode = input("策略选择 (1/2/3) >>> ").strip()
+    
+    if ploidy_mode not in ['1', '2', '3']:
+        log_info("无效输入，默认回退至 [3] 双倍体分型模式。")
+        ploidy_mode = '3'
+
+    # 4. 创建工作目录
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     work_dir = os.path.abspath(f"assemble_{timestamp}")
     os.makedirs(work_dir, exist_ok=True)
     log_info(f"创建总输出目录: {work_dir}\n")
 
-    # 4. 执行队列任务
+    # 5. 执行队列任务
     for index, file_path in enumerate(selected_files, 1):
-        # 清理文件名获取干净的 Sample Name
         base_name = os.path.basename(file_path)
         for ext in [".bam", ".fastq.gz", ".fastq", ".fq.gz", ".fq", ".hifi_reads"]:
             base_name = base_name.replace(ext, "")
@@ -131,7 +148,6 @@ if __name__ == "__main__":
         print("-" * 60)
         log_info(f"任务 [{index}/{len(selected_files)}] 开始处理样本: {sample_name}")
 
-        # 为该样本创建专属的三个子目录
         sample_dir = os.path.join(work_dir, sample_name)
         dir_fastq = os.path.join(sample_dir, "01_fastq")
         dir_hifiasm = os.path.join(sample_dir, "02_hifiasm")
@@ -140,22 +156,16 @@ if __name__ == "__main__":
         for d in [dir_fastq, dir_hifiasm, dir_fasta]:
             os.makedirs(d, exist_ok=True)
 
-        # 配置文件路径
         prefix_hifiasm = os.path.join(dir_hifiasm, sample_name)
-        primary_gfa = f"{prefix_hifiasm}.bp.p_ctg.gfa"
-        final_fasta = os.path.join(dir_fasta, f"{sample_name}.p_ctg.fasta")
 
-        # 智能判定输入类型
         try:
             input_for_hifiasm = file_path
             
             if file_path.lower().endswith(".bam"):
-                # 如果是 BAM，则转换到 01_fastq 目录下
                 out_fastq = os.path.join(dir_fastq, f"{sample_name}.fastq")
                 bam_to_fastq(file_path, out_fastq, THREADS)
                 input_for_hifiasm = out_fastq
             else:
-                # 如果已经是 FASTQ，直接使用，并在 01_fastq 里建个软链接保持目录整洁
                 log_info("  -> 输入已是 FASTQ 格式，智能跳过格式转换。")
                 symlink_path = os.path.join(dir_fastq, os.path.basename(file_path))
                 try:
@@ -163,9 +173,27 @@ if __name__ == "__main__":
                 except FileExistsError:
                     pass
 
-            # 执行组装与提取
-            run_hifiasm(input_for_hifiasm, prefix_hifiasm, THREADS)
-            extract_fasta(primary_gfa, final_fasta)
+            # 运行 Hifiasm
+            run_hifiasm(input_for_hifiasm, prefix_hifiasm, THREADS, ploidy_mode)
+            
+            # 动态提取 GFA
+            log_info(f"  -> 正在根据选择的策略提取最终 FASTA 序列...")
+            extract_targets = []
+            
+            if ploidy_mode == '1':
+                extract_targets.append(("bp.p_ctg.gfa", "p_ctg.fasta"))
+            elif ploidy_mode == '2':
+                extract_targets.append(("bp.p_ctg.gfa", "p_ctg.fasta"))
+                extract_targets.append(("bp.a_ctg.gfa", "a_ctg.fasta"))
+            elif ploidy_mode == '3':
+                extract_targets.append(("bp.hap1.p_ctg.gfa", "hap1.fasta"))
+                extract_targets.append(("bp.hap2.p_ctg.gfa", "hap2.fasta"))
+
+            for gfa_suffix, fasta_suffix in extract_targets:
+                gfa_file = f"{prefix_hifiasm}.{gfa_suffix}"
+                fasta_file = os.path.join(dir_fasta, f"{sample_name}.{fasta_suffix}")
+                extract_fasta(gfa_file, fasta_file)
+
             log_info(f"样本 {sample_name} 全部处理完毕！结果位于: {dir_fasta}")
             
         except Exception as e:

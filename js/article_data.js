@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/06/18_21:16:14
-// 文章总数: 61
+// 生成时间: 2026/06/22_22:36:51
+// 文章总数: 62
 
 window.ARTICLE_DATABASE = [
     {
@@ -113,6 +113,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-03-31",
         "summary": "将细碎测序读段数据比对到参考基因组上",
         "path": "articles/dry_lab/compare/01. 测序读段比对/01. 测序读段比对.html",
+        "featured": false
+    },
+    {
+        "title": "01. 立木立信",
+        "collection": "blog",
+        "date": "2026-06-22",
+        "summary": "我感到难过，不是因为你欺骗了我，而是因为我再也无法相信你了",
+        "path": "articles/about/02. 笔语茶谈/01. 立木立信.html",
         "featured": false
     },
     {
