@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>蛋白质结构查看器 - 海钊知识港</title>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../css/global.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/molstar@4.11.0/build/viewer/molstar.css">
+
+        <script src="../../../js/global.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/molstar@4.11.0/build/viewer/molstar.js"></script>
+        <script>window.footerPath = '../../../footer.html';</script>
+
+        <style>
+            :root {
+                --viewer-expanded-top: 0px;
+            }
+
+            html.structure-viewer-expanded {
+                scrollbar-gutter: auto;
+            }
+
+            html.structure-viewer-expanded,
+            html.structure-viewer-expanded body {
+                overflow: hidden;
+            }
+
+            html.structure-viewer-expanded nav {
+                display: none;
+            }
+
+            .structure-workspace {
+                display: grid;
+                grid-template-columns: 320px minmax(0, 1fr);
+                gap: 1.5rem;
+                min-height: 680px;
+            }
+
+            .structure-panel,
+            .viewer-panel {
+                background: #ffffff;
+                border: 1px solid #e8edf2;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            }
+
+            .structure-panel {
+                padding: 1.4rem;
+            }
+
+            .upload-zone {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 220px;
+                padding: 1.5rem;
+                border: 2px dashed #cfd8e3;
+                border-radius: 8px;
+                background: #f8fbff;
+                text-align: center;
+                cursor: pointer;
+                transition: border-color 0.2s, background 0.2s, transform 0.2s;
+            }
+
+            .upload-zone:hover,
+            .upload-zone.drag-over {
+                border-color: var(--accent-color);
+                background: #eef7ff;
+                transform: translateY(-2px);
+            }
+
+            .upload-zone i {
+                margin-bottom: 0.8rem;
+                color: var(--accent-color);
+                font-size: 2.4rem;
+            }
+
+            .upload-zone strong {
+                color: var(--primary-color);
+                font-size: 1.05rem;
+            }
+
+            .upload-zone span {
+                margin-top: 0.45rem;
+                color: #7f8c8d;
+                font-size: 0.88rem;
+                line-height: 1.5;
+            }
+
+            .file-input {
+                display: none;
+            }
+
+            .viewer-actions {
+                display: flex;
+                gap: 0.7rem;
+                margin: 1rem 0;
+            }
+
+            .viewer-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.45rem;
+                width: 100%;
+                border: none;
+                border-radius: 6px;
+                padding: 0.75rem 1rem;
+                background: var(--accent-color);
+                color: #ffffff;
+                font-weight: 700;
+                cursor: pointer;
+                transition: background 0.2s, transform 0.2s;
+            }
+
+            .viewer-btn:hover {
+                background: #2980b9;
+                transform: translateY(-2px);
+            }
+
+            .viewer-btn.secondary {
+                background: #eef2f3;
+                color: var(--text-main);
+            }
+
+            .viewer-btn.secondary:hover {
+                background: #e0e7eb;
+            }
+
+            .viewer-status {
+                min-height: 44px;
+                margin: 1rem 0 0;
+                padding: 0.8rem 0.95rem;
+                border-radius: 6px;
+                background: #f5f7fa;
+                color: #5f6f7a;
+                font-size: 0.9rem;
+            }
+
+            .viewer-status.error {
+                background: #fff1f0;
+                color: #c0392b;
+            }
+
+            .viewer-status.success {
+                background: #effaf3;
+                color: #1e8449;
+            }
+
+            .format-list {
+                margin: 1.2rem 0 0;
+                padding: 0;
+                list-style: none;
+                color: #6f7f8a;
+                font-size: 0.88rem;
+            }
+
+            .format-list li {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .format-list i {
+                width: 18px;
+                color: var(--accent-color);
+                text-align: center;
+            }
+
+            .viewer-panel {
+                position: relative;
+                min-height: 680px;
+                overflow: hidden;
+            }
+
+            #molstarViewer {
+                position: absolute;
+                inset: 0;
+            }
+
+            #molstarViewer .msp-plugin .msp-layout-expanded {
+                top: var(--viewer-expanded-top) !important;
+            }
+
+            .viewer-placeholder {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+                color: #8a98a3;
+                text-align: center;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            .viewer-placeholder.expanded {
+                position: fixed;
+                top: var(--viewer-expanded-top);
+                right: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 1001;
+            }
+
+            .viewer-placeholder.hidden {
+                display: none;
+            }
+
+            @media (max-width: 900px) {
+                .structure-workspace {
+                    grid-template-columns: 1fr;
+                }
+
+                .viewer-panel {
+                    min-height: 520px;
+                }
+            }
+        </style>
+    </head>
+
+    <body class="category-page">
+        <nav>
+            <div class="logo"><a href="../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="container" style="flex-direction: column;">
+            <div class="list-header" style="margin-bottom: 2rem;">
+                <a href="../resources_index.html" class="back-link" style="margin-bottom: 1rem;"><i class="fas fa-arrow-left"></i> 返回资源站</a>
+                <h2><i class="fa-solid fa-cube"></i> 蛋白质结构查看器</h2>
+                <p>基于 Mol* 的三维结构预览工具，可上传 AlphaFold、PDB 等来源的结构文件。</p>
+            </div>
+
+            <div class="structure-workspace">
+                <aside class="structure-panel">
+                    <label class="upload-zone" id="uploadZone" for="structureFile">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <strong>上传三维结构文件</strong>
+                        <span>点击选择，或将文件拖拽到这里。文件只在浏览器本地读取，不会上传到服务器。</span>
+                    </label>
+
+                    <input class="file-input" type="file" id="structureFile" accept=".cif,.mmcif,.bcif,.pdb,.ent">
+
+                    <div class="viewer-actions">
+                        <button class="viewer-btn" type="button" id="chooseFileBtn">
+                            <i class="fa-solid fa-folder-open"></i> 选择文件
+                        </button>
+                        <button class="viewer-btn secondary" type="button" id="clearBtn">
+                            <i class="fa-solid fa-rotate-left"></i> 清空
+                        </button>
+                    </div>
+
+                    <div class="viewer-status" id="viewerStatus">正在加载 Mol* 可视化组件...</div>
+
+                    <ul class="format-list">
+                        <li><i class="fa-solid fa-check"></i> 推荐格式：<code>.cif</code> / <code>.mmcif</code></li>
+                        <li><i class="fa-solid fa-check"></i> 兼容格式：<code>.pdb</code> / <code>.bcif</code></li>
+                        <li><i class="fa-solid fa-shield-halved"></i> 本地预览：结构内容不会离开当前浏览器</li>
+                    </ul>
+                </aside>
+
+                <section class="viewer-panel" aria-label="蛋白质三维结构预览">
+                    <div id="molstarViewer"></div>
+                    <div class="viewer-placeholder" id="viewerPlaceholder">
+                        <div>
+                            <i class="fa-solid fa-cube" style="font-size: 2.6rem; color: #c6d3de; margin-bottom: 1rem;"></i>
+                            <div>上传结构文件后，会在这里显示三维模型。</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const fileInput = document.getElementById("structureFile");
+                const uploadZone = document.getElementById("uploadZone");
+                const chooseFileBtn = document.getElementById("chooseFileBtn");
+                const clearBtn = document.getElementById("clearBtn");
+                const statusEl = document.getElementById("viewerStatus");
+                const placeholder = document.getElementById("viewerPlaceholder");
+                const viewerHost = document.getElementById("molstarViewer");
+                let viewer = null;
+
+                updateExpandedViewportOffset();
+                window.addEventListener("resize", updateExpandedViewportOffset);
+                initMolstar();
+
+                chooseFileBtn.addEventListener("click", () => fileInput.click());
+                fileInput.addEventListener("change", () => {
+                    if (fileInput.files && fileInput.files[0]) loadLocalFile(fileInput.files[0]);
+                });
+
+                clearBtn.addEventListener("click", async () => {
+                    fileInput.value = "";
+                    if (viewer) await viewer.plugin.clear();
+                    placeholder.classList.remove("hidden");
+                    setStatus("已清空视图。");
+                });
+
+                ["dragenter", "dragover"].forEach(eventName => {
+                    uploadZone.addEventListener(eventName, event => {
+                        event.preventDefault();
+                        uploadZone.classList.add("drag-over");
+                    });
+                });
+
+                ["dragleave", "drop"].forEach(eventName => {
+                    uploadZone.addEventListener(eventName, event => {
+                        event.preventDefault();
+                        uploadZone.classList.remove("drag-over");
+                    });
+                });
+
+                uploadZone.addEventListener("drop", event => {
+                    const file = event.dataTransfer.files && event.dataTransfer.files[0];
+                    if (file) loadLocalFile(file);
+                });
+
+                async function initMolstar() {
+                    try {
+                        if (!window.molstar || !window.molstar.Viewer) {
+                            throw new Error("Mol* 脚本未加载完成");
+                        }
+
+                        viewer = await window.molstar.Viewer.create("molstarViewer", {
+                            layoutIsExpanded: false,
+                            layoutShowControls: true,
+                            layoutShowRemoteState: false,
+                            layoutShowSequence: false,
+                            layoutShowLog: false,
+                            layoutShowLeftPanel: true,
+                            collapseLeftPanel: true,
+                            collapseRightPanel: false,
+                            viewportShowExpand: true,
+                            viewportShowControls: true,
+                            viewportShowSettings: true,
+                            viewportShowSelectionMode: true,
+                            viewportShowAnimation: true,
+                            pdbProvider: "rcsb",
+                            emdbProvider: "rcsb"
+                        });
+
+                        syncPlaceholderWithExpandedViewport();
+                        setStatus("Mol* 已就绪，请上传结构文件。", "success");
+                    } catch (error) {
+                        setStatus("Mol* 组件加载失败，请检查网络或 CDN 访问状态。", "error");
+                        console.error(error);
+                    }
+                }
+
+                function syncPlaceholderWithExpandedViewport() {
+                    const update = () => {
+                        const isExpanded = Boolean(viewerHost.querySelector(".msp-layout-expanded"));
+                        placeholder.classList.toggle("expanded", isExpanded);
+                        document.documentElement.classList.toggle("structure-viewer-expanded", isExpanded);
+                        updateExpandedViewportOffset();
+                    };
+
+                    update();
+                    new MutationObserver(update).observe(viewerHost, {
+                        attributes: true,
+                        childList: true,
+                        subtree: true,
+                        attributeFilter: ["class"]
+                    });
+                }
+
+                function updateExpandedViewportOffset() {
+                    const nav = document.querySelector("nav");
+                    const isExpanded = document.documentElement.classList.contains("structure-viewer-expanded");
+                    const height = nav && !isExpanded ? Math.ceil(nav.getBoundingClientRect().height) : 0;
+                    document.documentElement.style.setProperty("--viewer-expanded-top", `${height}px`);
+                }
+
+                async function loadLocalFile(file) {
+                    if (!viewer) {
+                        setStatus("Mol* 尚未就绪，请稍后再试。", "error");
+                        return;
+                    }
+
+                    const format = detectFormat(file.name);
+                    if (!format) {
+                        setStatus("暂不支持该文件格式，请上传 .cif、.mmcif、.bcif 或 .pdb 文件。", "error");
+                        return;
+                    }
+
+                    try {
+                        setStatus(`正在读取 ${file.name} ...`);
+                        const data = format === "bcif" ? await file.arrayBuffer() : await file.text();
+                        await viewer.plugin.clear();
+                        await viewer.loadStructureFromData(data, format, { dataLabel: file.name });
+                        placeholder.classList.add("hidden");
+                        setStatus(`已加载：${file.name}`, "success");
+                    } catch (error) {
+                        setStatus("结构文件解析失败，请确认文件内容完整且格式正确。", "error");
+                        console.error(error);
+                    }
+                }
+
+                function detectFormat(fileName) {
+                    const name = fileName.toLowerCase();
+                    if (name.endsWith(".bcif")) return "bcif";
+                    if (name.endsWith(".cif") || name.endsWith(".mmcif")) return "mmcif";
+                    if (name.endsWith(".pdb") || name.endsWith(".ent")) return "pdb";
+                    return "";
+                }
+
+                function setStatus(message, type = "") {
+                    statusEl.className = `viewer-status${type ? ` ${type}` : ""}`;
+                    statusEl.textContent = message;
+                }
+            });
+        </script>
+    </body>
+</html>
