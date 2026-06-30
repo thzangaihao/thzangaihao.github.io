@@ -221,6 +221,7 @@
                 color: var(--text-main);
                 font: inherit;
                 cursor: pointer;
+                touch-action: manipulation;
             }
 
             .example-select:focus-visible {
@@ -416,6 +417,7 @@
                     if (fileInput.files && fileInput.files[0]) loadLocalFile(fileInput.files[0]);
                 });
                 exampleSelect.addEventListener("change", updateExampleDescription);
+                exampleSelect.addEventListener("pointerdown", openExamplePickerOnFirstTouch);
                 loadExampleBtn.addEventListener("click", loadSelectedExample);
 
                 clearBtn.addEventListener("click", async () => {
@@ -452,7 +454,7 @@
 
                         viewer = await window.molstar.Viewer.create("molstarViewer", {
                             layoutIsExpanded: false,
-                            layoutShowControls: true,
+                            layoutShowControls: false,
                             layoutShowRemoteState: false,
                             layoutShowSequence: false,
                             layoutShowLog: false,
@@ -537,6 +539,17 @@
                 function updateExampleDescription() {
                     const example = examples[Number(exampleSelect.value)];
                     exampleDescription.textContent = example ? example.description : "";
+                }
+
+                function openExamplePickerOnFirstTouch(event) {
+                    if (event.pointerType !== "touch" || typeof exampleSelect.showPicker !== "function") return;
+
+                    try {
+                        exampleSelect.showPicker();
+                        event.preventDefault();
+                    } catch (error) {
+                        // Older Safari versions fall back to the select element's native behavior.
+                    }
                 }
 
                 async function loadSelectedExample() {
