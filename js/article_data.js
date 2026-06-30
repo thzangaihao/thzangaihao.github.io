@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/06/22_22:36:51
-// 文章总数: 62
+// 生成时间: 2026/06/29_19:53:15
+// 文章总数: 64
 
 window.ARTICLE_DATABASE = [
     {
@@ -138,6 +138,14 @@ window.ARTICLE_DATABASE = [
         "summary": "载体分类、用途",
         "path": "articles/wet_lab/03. 载体设计/01. 载体基本原理与分类/01. 载体基本原理与分类.html",
         "featured": false
+    },
+    {
+        "title": "01. 酵母双杂交实验原理",
+        "collection": "yeast",
+        "date": "2026-06-29",
+        "summary": "酵母双杂是如何查看两个蛋白是否互作？",
+        "path": "articles/wet_lab/02. 酵母菌基因工程/01. 酵母双杂交实验原理/01. 酵母双杂交实验原理.html",
+        "featured": true
     },
     {
         "title": "01. 隐马尔可夫模型",
@@ -281,6 +289,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-04-13",
         "summary": "基因组拼接算法原理浅析",
         "path": "articles/dry_lab/algorithm/03. 基因组组装算法/03. 基因组组装算法.html",
+        "featured": false
+    },
+    {
+        "title": "03. 标准组装流程",
+        "collection": "assemble",
+        "date": "2026-06-23",
+        "summary": "标准化组装流程",
+        "path": "articles/dry_lab/assemble/03. 标准组装流程/03. 标准组装流程.html",
         "featured": false
     },
     {

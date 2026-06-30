@@ -7,10 +7,18 @@
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" href="../../../css/global.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/molstar@4.11.0/build/viewer/molstar.css">
+        <!-- Prefer the CDN, but keep the viewer usable when it is unavailable. -->
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/molstar@4.11.0/build/viewer/molstar.css"
+            onerror="this.onerror=null; this.href='vendor/molstar/4.11.0/molstar.css';"
+        >
 
         <script src="../../../js/global.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/molstar@4.11.0/build/viewer/molstar.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/molstar@4.11.0/build/viewer/molstar.js"
+            onerror="this.onerror=null; this.src='vendor/molstar/4.11.0/molstar.js';"
+        ></script>
         <script>window.footerPath = '../../../footer.html';</script>
 
         <style>
@@ -47,6 +55,8 @@
             }
 
             .structure-panel {
+                display: flex;
+                flex-direction: column;
                 padding: 1.4rem;
             }
 
@@ -92,6 +102,18 @@
 
             .file-input {
                 display: none;
+            }
+
+            .sr-only {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
             }
 
             .viewer-actions {
@@ -169,6 +191,55 @@
                 width: 18px;
                 color: var(--accent-color);
                 text-align: center;
+            }
+
+            .example-loader {
+                margin-top: auto;
+                padding-top: 1.25rem;
+                border-top: 1px solid #e8edf2;
+            }
+
+            .example-loader h3 {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin: 0 0 0.75rem;
+                color: var(--primary-color);
+                font-size: 1rem;
+            }
+
+            .example-loader h3 i {
+                color: var(--accent-color);
+            }
+
+            .example-select {
+                width: 100%;
+                border: 1px solid #cfd8e3;
+                border-radius: 6px;
+                padding: 0.7rem 2.25rem 0.7rem 0.75rem;
+                background: #ffffff;
+                color: var(--text-main);
+                font: inherit;
+                cursor: pointer;
+            }
+
+            .example-select:focus-visible {
+                border-color: var(--accent-color);
+                outline: 3px solid rgba(52, 152, 219, 0.18);
+            }
+
+            .example-description {
+                min-height: 3.9em;
+                margin: 0.65rem 0 0.75rem;
+                color: #6f7f8a;
+                font-size: 0.84rem;
+                line-height: 1.55;
+            }
+
+            .example-loader .viewer-btn:disabled {
+                background: #cbd5dc;
+                cursor: wait;
+                transform: none;
             }
 
             .viewer-panel {
@@ -261,13 +332,23 @@
                         </button>
                     </div>
 
-                    <div class="viewer-status" id="viewerStatus">正在加载 Mol* 可视化组件...</div>
+                    <div class="viewer-status" id="viewerStatus" role="status" aria-live="polite">正在加载 Mol* 可视化组件...</div>
 
                     <ul class="format-list">
                         <li><i class="fa-solid fa-check"></i> 推荐格式：<code>.cif</code> / <code>.mmcif</code></li>
                         <li><i class="fa-solid fa-check"></i> 兼容格式：<code>.pdb</code> / <code>.bcif</code></li>
                         <li><i class="fa-solid fa-shield-halved"></i> 本地预览：结构内容不会离开当前浏览器</li>
                     </ul>
+
+                    <section class="example-loader" aria-labelledby="exampleLoaderTitle">
+                        <h3 id="exampleLoaderTitle"><i class="fa-solid fa-flask-vial"></i> 加载示例模型</h3>
+                        <label class="sr-only" for="exampleSelect">选择示例模型</label>
+                        <select class="example-select" id="exampleSelect"></select>
+                        <p class="example-description" id="exampleDescription"></p>
+                        <button class="viewer-btn secondary" type="button" id="loadExampleBtn" disabled>
+                            <i class="fa-solid fa-play"></i> 加载所选示例
+                        </button>
+                    </section>
                 </aside>
 
                 <section class="viewer-panel" aria-label="蛋白质三维结构预览">
@@ -293,8 +374,39 @@
                 const statusEl = document.getElementById("viewerStatus");
                 const placeholder = document.getElementById("viewerPlaceholder");
                 const viewerHost = document.getElementById("molstarViewer");
+                const exampleSelect = document.getElementById("exampleSelect");
+                const exampleDescription = document.getElementById("exampleDescription");
+                const loadExampleBtn = document.getElementById("loadExampleBtn");
+                const examples = [
+                    {
+                        name: "血红蛋白（3GOU）",
+                        file: "example/hemoglobin_3GOU.cif",
+                        description: "犬血红蛋白四聚体，适合观察 α/β 亚基、血红素辅基与氧运输蛋白的经典构型。"
+                    },
+                    {
+                        name: "TFIIA–TBP–DNA 复合物（1NVP）",
+                        file: "example/TFIIA_1NVP.cif",
+                        description: "人源 TFIIA、TBP 与 DNA 的复合物，适合观察转录因子如何识别并弯曲启动子 DNA。"
+                    },
+                    {
+                        name: "B-DNA 双螺旋（1BNA）",
+                        file: "example/1BNA.cif",
+                        description: "经典的 B-DNA 十二聚体，适合观察双螺旋、碱基配对以及 DNA 的大沟与小沟。"
+                    },
+                    {
+                        name: "绿色荧光蛋白 GFP（1EMA）",
+                        file: "example/1EMA.cif",
+                        description: "维多利亚多管发光水母的绿色荧光蛋白，适合观察紧凑的 β 桶结构及其内部发色团。"
+                    },
+                    {
+                        name: "核小体核心颗粒（1AOI）",
+                        file: "example/1AOI.cif",
+                        description: "组蛋白八聚体与 146 bp DNA 组成的核小体核心，适合观察染色质最基本的 DNA 包装方式。"
+                    }
+                ];
                 let viewer = null;
 
+                renderExampleOptions();
                 updateExpandedViewportOffset();
                 window.addEventListener("resize", updateExpandedViewportOffset);
                 initMolstar();
@@ -303,6 +415,8 @@
                 fileInput.addEventListener("change", () => {
                     if (fileInput.files && fileInput.files[0]) loadLocalFile(fileInput.files[0]);
                 });
+                exampleSelect.addEventListener("change", updateExampleDescription);
+                loadExampleBtn.addEventListener("click", loadSelectedExample);
 
                 clearBtn.addEventListener("click", async () => {
                     fileInput.value = "";
@@ -355,9 +469,10 @@
                         });
 
                         syncPlaceholderWithExpandedViewport();
+                        loadExampleBtn.disabled = false;
                         setStatus("Mol* 已就绪，请上传结构文件。", "success");
                     } catch (error) {
-                        setStatus("Mol* 组件加载失败，请检查网络或 CDN 访问状态。", "error");
+                        setStatus("Mol* 在线组件与本地备用组件均加载失败，请检查文件是否完整。", "error");
                         console.error(error);
                     }
                 }
@@ -401,14 +516,61 @@
                     try {
                         setStatus(`正在读取 ${file.name} ...`);
                         const data = format === "bcif" ? await file.arrayBuffer() : await file.text();
-                        await viewer.plugin.clear();
-                        await viewer.loadStructureFromData(data, format, { dataLabel: file.name });
-                        placeholder.classList.add("hidden");
+                        await displayStructure(data, format, file.name);
                         setStatus(`已加载：${file.name}`, "success");
                     } catch (error) {
                         setStatus("结构文件解析失败，请确认文件内容完整且格式正确。", "error");
                         console.error(error);
                     }
+                }
+
+                function renderExampleOptions() {
+                    exampleSelect.replaceChildren(...examples.map((example, index) => {
+                        const option = document.createElement("option");
+                        option.value = String(index);
+                        option.textContent = example.name;
+                        return option;
+                    }));
+                    updateExampleDescription();
+                }
+
+                function updateExampleDescription() {
+                    const example = examples[Number(exampleSelect.value)];
+                    exampleDescription.textContent = example ? example.description : "";
+                }
+
+                async function loadSelectedExample() {
+                    if (!viewer) {
+                        setStatus("Mol* 尚未就绪，请稍后再试。", "error");
+                        return;
+                    }
+
+                    const example = examples[Number(exampleSelect.value)];
+                    if (!example) return;
+
+                    loadExampleBtn.disabled = true;
+                    setStatus(`正在加载示例：${example.name} ...`);
+
+                    try {
+                        const response = await fetch(example.file);
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        const format = detectFormat(example.file);
+                        const data = format === "bcif" ? await response.arrayBuffer() : await response.text();
+                        await displayStructure(data, format, example.name);
+                        fileInput.value = "";
+                        setStatus(`已加载示例：${example.name}`, "success");
+                    } catch (error) {
+                        setStatus("示例模型加载失败，请检查文件路径或网络状态。", "error");
+                        console.error(error);
+                    } finally {
+                        loadExampleBtn.disabled = false;
+                    }
+                }
+
+                async function displayStructure(data, format, label) {
+                    await viewer.plugin.clear();
+                    await viewer.loadStructureFromData(data, format, { dataLabel: label });
+                    placeholder.classList.add("hidden");
                 }
 
                 function detectFormat(fileName) {

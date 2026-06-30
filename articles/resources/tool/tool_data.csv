@@ -2,3 +2,5 @@ id,name,script_path,description
 1,基因序列抓取,./scripts/基因序列抓取.py,"提供基因组 <code>.fasta</code> 文件和相关注释文件，提取目的基因的核苷酸序列（全长/CDS）或蛋白质序列（最长转录本/所有转录本）。支持列表式目的基因高通量输入。"
 2,染色体序列提取,./scripts/染色体序列提取.py,"提供基因组 <code>.fasta</code> 文件和相关注释文件，提取目的染色体序列和注释相关文件。支持大批量提取。"
 3,RSEM 定量分析,./scripts/RSEM_定量分析.py,"提供转录组测序数据，参考基因组及注释文件，进行 RSEM 定量分析，输出基因表达量矩阵。"
+4,fastq 文件合并,./scripts/fastq_merge.py,"提供多个 fastq 文件，按样本合并为一个 fastq 文件。"
+5,fastq 双端测序文件合并,./scripts/fastq_merge_pairend.py,"针对双端测序优化：提供多个 fastq 双端测序文件，按样本 R1/R2 合并为总 R1/R2 fastq 文件。"
