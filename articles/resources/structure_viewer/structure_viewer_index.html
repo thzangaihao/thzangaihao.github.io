@@ -7,17 +7,18 @@
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" href="../../../css/global.css">
+        <script>window.molstarAssetSources = { css: "online", js: "online" };</script>
         <!-- Prefer the CDN, but keep the viewer usable when it is unavailable. -->
         <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/molstar@4.11.0/build/viewer/molstar.css"
-            onerror="this.onerror=null; this.href='vendor/molstar/4.11.0/molstar.css';"
+            onerror="window.molstarAssetSources.css='offline'; this.onerror=null; this.href='vendor/molstar/4.11.0/molstar.css';"
         >
 
         <script src="../../../js/global.js"></script>
         <script
             src="https://cdn.jsdelivr.net/npm/molstar@4.11.0/build/viewer/molstar.js"
-            onerror="this.onerror=null; this.src='vendor/molstar/4.11.0/molstar.js';"
+            onerror="window.molstarAssetSources.js='offline'; this.onerror=null; this.src='vendor/molstar/4.11.0/molstar.js';"
         ></script>
         <script>window.footerPath = '../../../footer.html';</script>
 
@@ -472,11 +473,20 @@
 
                         syncPlaceholderWithExpandedViewport();
                         loadExampleBtn.disabled = false;
-                        setStatus("Mol* 已就绪，请上传结构文件。", "success");
+                        setStatus(`Mol* 已就绪（${getMolstarComponentSourceLabel()}），请上传结构文件。`, "success");
                     } catch (error) {
                         setStatus("Mol* 在线组件与本地备用组件均加载失败，请检查文件是否完整。", "error");
                         console.error(error);
                     }
+                }
+
+                function getMolstarComponentSourceLabel() {
+                    const sources = window.molstarAssetSources || {};
+                    const jsSource = sources.js === "offline" ? "离线" : "在线";
+                    const cssSource = sources.css === "offline" ? "离线" : "在线";
+
+                    if (jsSource === cssSource) return `${jsSource}组件`;
+                    return `混合组件：JS ${jsSource}，CSS ${cssSource}`;
                 }
 
                 function syncPlaceholderWithExpandedViewport() {

@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/06/29_19:53:15
-// 文章总数: 64
+// 生成时间: 2026/06/30_22:29:40
+// 文章总数: 66
 
 window.ARTICLE_DATABASE = [
     {
@@ -28,11 +28,11 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
-        "title": "01. Pymol常用指令汇总",
-        "collection": "pymol",
+        "title": "01. Pymol 常用指令汇总",
+        "collection": "Mol",
         "date": "2026-01-20",
         "summary": "如何使你的图变得专业好看？",
-        "path": "articles/dry_lab/pymol/01. Pymol常用指令汇总/01. Pymol常用指令汇总.html",
+        "path": "articles/dry_lab/结构可视化/01. Pymol常用指令汇总/01. Pymol常用指令汇总.html",
         "featured": false
     },
     {
@@ -172,6 +172,14 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
+        "title": "02. Molstar 简介",
+        "collection": "Mol",
+        "date": "2026-06-30",
+        "summary": "基于 Web 的分子可视化工具",
+        "path": "articles/dry_lab/结构可视化/02. Molstar 简介/02. Molstar 简介.html",
+        "featured": false
+    },
+    {
         "title": "02. OrthoFinder 建树",
         "collection": "classification",
         "date": "2026-03-23",
@@ -265,6 +273,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-28",
         "summary": "变异数据结构，分析依赖软件",
         "path": "articles/dry_lab/gwas/03. GWAS 分析基础/03. GWAS 分析基础.html",
+        "featured": false
+    },
+    {
+        "title": "03. Mlostar 动画",
+        "collection": "Mol",
+        "date": "2026-07-01",
+        "summary": "蛋白质旋转一小时",
+        "path": "articles/dry_lab/结构可视化/03. Mlostar 动画/03. Mlostar 动画.html",
         "featured": false
     },
     {
