@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>03. 基因组组装标准流程 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="assemble"> 
+        <meta name="collection-title" content="基因组组装">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-07-01">
+        <meta name="description" content="标准化快速组装流程">
+        <meta name="featured" content="true">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>03. 基因组组装标准流程</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                    <p>这篇博客是对之前的博客内容进行汇总，梳理与完善。准备了功能完整的批量运行脚本，另外附上了脚本所依赖的 conda 环境。</p>
+                <h2>数据质检</h2>
+                    <p>根据测序合同、所选技术策略、测序物种，我们要确定以下几个关键参数。</p>
+                    <ul>
+                        <li>测序物种：你至少知道测序的是什么东西吧！</li>
+                        <li>测序物种倍型：根据倍型选取拼接策略。</li>
+                        <li>测序物种基因组预估大小：基于数据库或其它方法估算。</li>
+                        <li>测序读段平均长度：基于此参数，我们将其分为二代测序/三代测序。</li>
+                        <li>测序深度：用测序总数据量除以测序物种基因组预估大小即可估算深度。</li>
+                    </ul>
+                    <blockquote>一般测序公司收费是按照“建库+测序量”来计费的。例如单个测序样本建库 60 块钱，1G 测序量收费 7 块钱。我们要根据目的测序深度去估算测序总量。</blockquote>
+                    <p>使用 fastp 或 fastQC 进行质检，不过现在这一步测序公司基本都会帮我们做了。但是这里提供 fastp 质检的环境依赖和批量运行脚本：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>fastp</h5>
+                                <span>文件格式：.py | 大小：7.9 KB</span>
+                            </div>
+                        </div>
+                        <a href="./fastp_batch_clean.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                    <p>依赖环境库：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>fastp_env</h5>
+                                <span>文件格式：.yml | 大小：1.5 KB</span>
+                            </div>
+                        </div>
+                        <a href="./fastp_env.yml" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+
+
+                <h2>组装策略</h2>
+                    <p>基于我们的测序策略，我们会选用不同的组装流程：</p>
+                    <h3>二代测序</h3>
+                        <p>二代测序的读长在 200-800bp 之间，我们会使用 SPAdes 进行组装：</p>
+
+
+                    <h3>三代测序</h3>
+                        <p>三代测序的策略一般由以下几种读长策略：</p>
+                        <ul>
+                            <li>10,000bp 的高精度长测序组</li>
+                            <li>10,000bp 的高精度长测序组 + 100,000bp 的超长长度测序组</li>
+                            <li>10,000bp 的高精度长测序组 + 100,000bp 的超长长度测序组 + 高通量染色体构象数据（Hi-C）</li>
+                        </ul>
+                        <p>在组装之前，我们还要确定组装倍型策略：</p>
+                        <ul>
+                            <li>单倍体/纯合模式：义如其名。</li>
+                            <li>主-副组装模式：本质还是单倍体，只不过多了一份注解来标明等位基因，主组装是父母本序列的随机嵌合体。</li>
+                            <li>二倍体分型模式：超长读长测序带来的优势，得到两套物理上真实的独立单倍型序列。测序数据充足时，选用此模式更好。</li>
+                        </ul>
+                        <p>我们使用 Hifiasm 进行组装：</p>
+                            <div class="download-card">
+                                <div class="download-info">
+                                    <i class="fas fa-file-code"></i> <div class="file-details">
+                                        <h5>hifi_assemble</h5>
+                                        <span>文件格式：.py | 大小：9.6 KB</span>
+                                    </div>
+                                </div>
+                                <a href="./hifi_assemble.py" download class="download-btn">
+                                    <i class="fas fa-cloud-download-alt"></i>
+                                </a>
+                            </div>
+                        <p>依赖环境库：</p>
+                            <div class="download-card">
+                                <div class="download-info">
+                                    <i class="fas fa-file-code"></i> <div class="file-details">
+                                        <h5>assemble_env</h5>
+                                        <span>文件格式：.yml | 大小：7.1 KB</span>
+                                    </div>
+                                </div>
+                                <a href="./assemble_env.yml" download class="download-btn">
+                                    <i class="fas fa-cloud-download-alt"></i>
+                                </a>
+                            </div>
+                <h2>组装质检</h2>
+                    <h3>QUAST 连续性评估</h3>
+                        <a href="..\..\..\resources\software\06. QUAST\06. QUAST.html" class="related-article" target="_blank">
+                            <div class="related-article-icon">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            
+                            <div class="related-article-content">
+                                <div class="related-article-title">06. QUAST</div>
+                                <div class="related-article-desc">基因组组装连续性评估</div>
+                            </div>
+                            
+                            <div class="related-article-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    <h3>BUSCO 完整性评估</h3>
+                        <a href="..\..\..\resources\software\04. BUSCO\04. BUSCO.html" class="related-article" target="_blank">
+                            <div class="related-article-icon">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            
+                            <div class="related-article-content">
+                                <div class="related-article-title">04. BUSCO</div>
+                                <div class="related-article-desc">基因组组装完整性评估</div>
+                            </div>
+                            
+                            <div class="related-article-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    <h3>端粒可能性评估</h3>
+                        <p>只需要准备好拼接好后的 <code>.fasta</code> 文件即可。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>telomere</h5>
+                                    <span>文件格式：.py | 大小：9.7 KB</span>
+                                </div>
+                            </div>
+                            <a href="../02. PacBio CSS HiFi 三代组装项目/telomere.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+
+            </div>
+        </div>
+         
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

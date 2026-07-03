@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/06/30_22:29:40
-// 文章总数: 66
+// 生成时间: 2026/07/02_21:37:26
+// 文章总数: 68
 
 window.ARTICLE_DATABASE = [
     {
@@ -32,7 +32,7 @@ window.ARTICLE_DATABASE = [
         "collection": "Mol",
         "date": "2026-01-20",
         "summary": "如何使你的图变得专业好看？",
-        "path": "articles/dry_lab/结构可视化/01. Pymol常用指令汇总/01. Pymol常用指令汇总.html",
+        "path": "articles/dry_lab/mol/01. Pymol常用指令汇总/01. Pymol常用指令汇总.html",
         "featured": false
     },
     {
@@ -124,14 +124,6 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
-        "title": "01. 转录组分析系列：富集分析",
-        "collection": "rnaseq",
-        "date": "2025-11-25",
-        "summary": "了解改变的基因具体影响了哪些生物学功能",
-        "path": "articles/dry_lab/rnaseq/enrichment_analysis/enrichment_analysis.html",
-        "featured": true
-    },
-    {
         "title": "01. 载体基本原理与分类",
         "collection": "vec",
         "date": "2026-04-15",
@@ -145,7 +137,7 @@ window.ARTICLE_DATABASE = [
         "date": "2026-06-29",
         "summary": "酵母双杂是如何查看两个蛋白是否互作？",
         "path": "articles/wet_lab/02. 酵母菌基因工程/01. 酵母双杂交实验原理/01. 酵母双杂交实验原理.html",
-        "featured": true
+        "featured": false
     },
     {
         "title": "01. 隐马尔可夫模型",
@@ -176,7 +168,7 @@ window.ARTICLE_DATABASE = [
         "collection": "Mol",
         "date": "2026-06-30",
         "summary": "基于 Web 的分子可视化工具",
-        "path": "articles/dry_lab/结构可视化/02. Molstar 简介/02. Molstar 简介.html",
+        "path": "articles/dry_lab/mol/02. Molstar 简介/02. Molstar 简介.html",
         "featured": false
     },
     {
@@ -252,6 +244,14 @@ window.ARTICLE_DATABASE = [
         "featured": true
     },
     {
+        "title": "02. 酵母双杂交实验流程",
+        "collection": "yeast",
+        "date": "2026-07-01",
+        "summary": "酵母双杂交标准实验流程",
+        "path": "articles/wet_lab/02. 酵母菌基因工程/02. 酵母双杂交实验流程/02. 酵母双杂交实验流程.html",
+        "featured": false
+    },
+    {
         "title": "03. AlphaFold系列",
         "collection": "python",
         "date": "2026-01-21",
@@ -280,7 +280,7 @@ window.ARTICLE_DATABASE = [
         "collection": "Mol",
         "date": "2026-07-01",
         "summary": "蛋白质旋转一小时",
-        "path": "articles/dry_lab/结构可视化/03. Mlostar 动画/03. Mlostar 动画.html",
+        "path": "articles/dry_lab/mol/03. Mlostar 动画/03. Mlostar 动画.html",
         "featured": false
     },
     {
@@ -300,19 +300,19 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
+        "title": "03. 基因组组装标准流程",
+        "collection": "assemble",
+        "date": "2026-07-01",
+        "summary": "标准化快速组装流程",
+        "path": "articles/dry_lab/assemble/03. 基因组组装标准流程/03. 基因组组装标准流程.html",
+        "featured": true
+    },
+    {
         "title": "03. 基因组组装算法",
         "collection": "algorithm",
         "date": "2026-04-13",
         "summary": "基因组拼接算法原理浅析",
         "path": "articles/dry_lab/algorithm/03. 基因组组装算法/03. 基因组组装算法.html",
-        "featured": false
-    },
-    {
-        "title": "03. 标准组装流程",
-        "collection": "assemble",
-        "date": "2026-06-23",
-        "summary": "标准化组装流程",
-        "path": "articles/dry_lab/assemble/03. 标准组装流程/03. 标准组装流程.html",
         "featured": false
     },
     {
@@ -329,6 +329,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-04-17",
         "summary": "（核酸-蛋白）核酸基序-蛋白互作能力严重与基序扫描",
         "path": "articles/dry_lab/docking/03. 蛋白质-核酸互作/03. 蛋白质-核酸互作.html",
+        "featured": false
+    },
+    {
+        "title": "03. 转录组分析系列：富集分析",
+        "collection": "rnaseq",
+        "date": "2025-11-25",
+        "summary": "了解改变的基因具体影响了哪些生物学功能",
+        "path": "articles/dry_lab/rnaseq/3. 富集分析/enrichment_analysis.html",
         "featured": false
     },
     {
@@ -412,6 +420,14 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
+        "title": "05. JCVI 染色体共线性分析",
+        "collection": "compare",
+        "date": "2026-05-16",
+        "summary": "基因的染色体共线性分析",
+        "path": "articles/dry_lab/compare/05. JCVI 染色体共线性分析/05. JCVI 染色体共线性分析.html",
+        "featured": false
+    },
+    {
         "title": "05. RT qPCR",
         "collection": "pcr",
         "date": "2026-06-15",
@@ -436,14 +452,6 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
-        "title": "05. 染色体共线性分析",
-        "collection": "compare",
-        "date": "2026-05-16",
-        "summary": "染色体共线性分析",
-        "path": "articles/dry_lab/compare/05. 染色体共线性分析/05. 染色体共线性分析.html",
-        "featured": false
-    },
-    {
         "title": "05. 染色体层级图",
         "collection": "figure",
         "date": "2026-03-21",
@@ -465,6 +473,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-04-04",
         "summary": "mapping 可视化",
         "path": "articles/resources/gallery/06. Gviz/06. Gviz.html",
+        "featured": false
+    },
+    {
+        "title": "06. MUMmer 染色体共线性分析",
+        "collection": "compare",
+        "date": "2026-07-02",
+        "summary": "序列的染色体共线性分析",
+        "path": "articles/dry_lab/compare/06. MUMmer 染色体共线性分析/06. MUMmer 染色体共线性分析.html",
         "featured": false
     },
     {
