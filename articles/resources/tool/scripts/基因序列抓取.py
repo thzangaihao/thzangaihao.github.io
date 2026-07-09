@@ -183,11 +183,15 @@ def get_target_genes(base_dir):
     print("\n--- 输入目标基因 ---")
     print("  [1] 手动输入基因 ID，多个 ID 用逗号分隔")
     print("  [2] 从 csv/tsv/txt 文件批量读取")
-    input_mode = input("请选择输入方式 (1/2) [默认 2]: ").strip()
-    if input_mode not in {"1", "2"}:
-        input_mode = "2"
+    print("  [3] 提取注释文件中的所有基因")
+    input_mode = input("请选择输入方式 (1/2/3) [默认 3]: ").strip()
+    if input_mode not in {"1", "2", "3"}:
+        input_mode = "3"
 
-    if input_mode == "1":
+    if input_mode == "3":
+        targets = None
+        print("已选择: 提取注释文件中的所有基因。")
+    elif input_mode == "1":
         genes_input = input("请输入基因 ID: ").strip()
         targets = [clean_feature_id(g) for g in re.split(r"[,，\s;；]+", genes_input) if g.strip()]
     else:
@@ -198,11 +202,12 @@ def get_target_genes(base_dir):
             targets.extend(read_gene_ids_from_file(path))
         targets = list(dict.fromkeys(targets))
 
-    if not targets:
+    if targets is not None and not targets:
         print("未读取到任何基因 ID，程序退出。")
         sys.exit(0)
 
-    print(f"已读取 {len(targets)} 个目标 ID。")
+    if targets is not None:
+        print(f"已读取 {len(targets)} 个目标 ID。")
 
     print("\n--- 选择输出类型 ---")
     print("  [1] 仅输出基因全长核苷酸序列 (DNA)")
@@ -222,7 +227,7 @@ def get_target_genes(base_dir):
         if protein_mode not in {"1", "2", "3"}:
             protein_mode = "3"
 
-    return set(targets), output_mode, protein_mode
+    return (None if targets is None else set(targets)), output_mode, protein_mode
 
 
 def parse_annotation(gff_file):
@@ -294,7 +299,126 @@ def parse_annotation(gff_file):
     return genes, transcripts, cds_records
 
 
+def choose_record_id(primary_id, aliases, fallback):
+    if primary_id:
+        return primary_id
+    aliases = sorted(alias for alias in aliases if alias)
+    return aliases[0] if aliases else fallback
+
+
+def finalize_found_genes(found):
+    valid = {}
+    for target, info in found.items():
+        cds_coords = [coord for tx in info["transcripts"].values() for coord in tx["cds_coords"]]
+        if not info.get("chrom") and info["transcripts"]:
+            first_tx = next(iter(info["transcripts"].values()))
+            info["chrom"] = first_tx["chrom"]
+            info["strand"] = first_tx["strand"]
+        if not info.get("gene_coord") and cds_coords:
+            info["gene_coord"] = (min(c[0] for c in cds_coords), max(c[1] for c in cds_coords))
+        if info.get("chrom") or cds_coords:
+            valid[target] = info
+    return valid
+
+
+def parse_gff_for_all_genes(gff_file):
+    print("\n正在解析注释文件并定位所有基因/转录本...")
+    genes, transcripts, cds_records = parse_annotation(gff_file)
+
+    found = {}
+    gene_alias_to_id = {}
+    transcript_owner = {}
+
+    for index, gene in enumerate(genes, 1):
+        gene_id = choose_record_id(gene["id"], gene["aliases"], f"gene_{index}")
+        found.setdefault(gene_id, {
+            "chrom": gene["chrom"],
+            "strand": gene["strand"],
+            "gene_coord": gene["coord"],
+            "transcripts": {},
+        })
+        aliases = set(gene["aliases"])
+        aliases.add(gene_id)
+        for alias in aliases:
+            if alias:
+                gene_alias_to_id.setdefault(alias, gene_id)
+
+    for index, tx in enumerate(transcripts, 1):
+        tx_aliases = set(tx["aliases"])
+        if tx["id"]:
+            tx_aliases.add(tx["id"])
+
+        gene_id = None
+        for parent in tx["parent_aliases"]:
+            if parent in gene_alias_to_id:
+                gene_id = gene_alias_to_id[parent]
+                break
+        if gene_id is None:
+            gene_id = choose_record_id("", tx["parent_aliases"], f"gene_from_transcript_{index}")
+
+        tx_id = choose_record_id(tx["id"], tx_aliases, f"{gene_id}.transcript_{index}")
+        found.setdefault(gene_id, {
+            "chrom": tx["chrom"],
+            "strand": tx["strand"],
+            "gene_coord": tx["coord"],
+            "transcripts": {},
+        })
+        if not found[gene_id].get("gene_coord"):
+            found[gene_id]["gene_coord"] = tx["coord"]
+        found[gene_id]["transcripts"].setdefault(tx_id, {
+            "chrom": tx["chrom"],
+            "strand": tx["strand"],
+            "coord": tx["coord"],
+            "cds_coords": [],
+        })
+
+        for alias in tx_aliases:
+            if alias:
+                transcript_owner[alias] = (gene_id, tx_id)
+        for parent in tx["parent_aliases"]:
+            if parent:
+                gene_alias_to_id.setdefault(parent, gene_id)
+
+    for index, cds in enumerate(cds_records, 1):
+        owners = []
+        for parent in cds["parents"]:
+            if parent in transcript_owner:
+                owners.append(transcript_owner[parent])
+
+        if not owners:
+            for parent in cds["parents"]:
+                if parent in gene_alias_to_id:
+                    gene_id = gene_alias_to_id[parent]
+                    owners.append((gene_id, parent))
+
+        if not owners:
+            gene_id = choose_record_id("", cds["parents"], f"cds_parent_{index}")
+            owners.append((gene_id, gene_id))
+
+        for gene_id, tx_id in dict.fromkeys(owners):
+            found.setdefault(gene_id, {
+                "chrom": cds["chrom"],
+                "strand": cds["strand"],
+                "gene_coord": None,
+                "transcripts": {},
+            })
+            found[gene_id]["transcripts"].setdefault(tx_id, {
+                "chrom": cds["chrom"],
+                "strand": cds["strand"],
+                "coord": None,
+                "cds_coords": [],
+            })
+            found[gene_id]["transcripts"][tx_id]["cds_coords"].append(cds["coord"])
+
+    valid = finalize_found_genes(found)
+    print(f"在注释文件中定位到 {len(valid)} 个可提取的基因/基因样记录。")
+    return valid
+
+
 def parse_gff_for_targets(gff_file, target_genes):
+    if target_genes is None:
+        return parse_gff_for_all_genes(gff_file)
+
     print("\n正在解析注释文件并定位目标基因/转录本...")
     genes, transcripts, cds_records = parse_annotation(gff_file)
 
@@ -385,17 +509,7 @@ def parse_gff_for_targets(gff_file, target_genes):
             })
             found[target]["transcripts"][target]["cds_coords"].append(cds["coord"])
 
-    valid = {}
-    for target, info in found.items():
-        cds_coords = [coord for tx in info["transcripts"].values() for coord in tx["cds_coords"]]
-        if not info.get("chrom") and info["transcripts"]:
-            first_tx = next(iter(info["transcripts"].values()))
-            info["chrom"] = first_tx["chrom"]
-            info["strand"] = first_tx["strand"]
-        if not info.get("gene_coord") and cds_coords:
-            info["gene_coord"] = (min(c[0] for c in cds_coords), max(c[1] for c in cds_coords))
-        if info.get("chrom") or cds_coords:
-            valid[target] = info
+    valid = finalize_found_genes(found)
 
     print(f"共输入 {len(target_genes)} 个目标 ID，在注释文件中定位到 {len(valid)} 个。")
     missing = target_genes - set(valid.keys())

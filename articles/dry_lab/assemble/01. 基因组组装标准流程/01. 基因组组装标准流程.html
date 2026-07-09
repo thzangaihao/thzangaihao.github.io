@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
     <head>
-        <title>03. 基因组组装标准流程 - 海钊知识港</title>
+        <title>01. 基因组组装标准流程 - 海钊知识港</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -33,11 +33,9 @@
         </nav>
 
         <div class="article-container">
-            <h1>03. 基因组组装标准流程</h1>
+            <h1>01. 基因组组装标准流程</h1>
             
             <div class="content">
-                <h2>前言</h2>
-                    <p>这篇博客是对之前的博客内容进行汇总，梳理与完善。准备了功能完整的批量运行脚本，另外附上了脚本所依赖的 conda 环境。</p>
                 <h2>数据质检</h2>
                     <p>根据测序合同、所选技术策略、测序物种，我们要确定以下几个关键参数。</p>
                     <ul>
@@ -59,9 +57,7 @@
                         <a href="./fastp_batch_clean.py" download class="download-btn">
                             <i class="fas fa-cloud-download-alt"></i>
                         </a>
-                    </div>
-                    <p>依赖环境库：</p>
-                    <div class="download-card">
+
                         <div class="download-info">
                             <i class="fas fa-file-code"></i> <div class="file-details">
                                 <h5>fastp_env</h5>
@@ -72,28 +68,34 @@
                             <i class="fas fa-cloud-download-alt"></i>
                         </a>
                     </div>
+                    
+                <h2>组装软件</h2>
+                    <p>基于我们的测序策略，物种，组装策略，我们会使用不同的软件和参数组，以下是笔者常用的组装软件：</p>
+                    <h3>SPAdes</h3>
+                        <p>SPAdes 是我常用的 illumina 二代测序 500bp reads 的数据主力组装软件，由于现在做全基因组测序二代</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>SPAdes</h5>
+                                    <span>文件格式：.py | 大小：8.1 KB</span>
+                                </div>
+                            </div>
+                            <a href="./De novo 组装 (SPAdes).py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
 
-
-                <h2>组装策略</h2>
-                    <p>基于我们的测序策略，我们会选用不同的组装流程：</p>
-                    <h3>二代测序</h3>
-                        <p>二代测序的读长在 200-800bp 之间，我们会使用 SPAdes 进行组装：</p>
-
-
-                    <h3>三代测序</h3>
-                        <p>三代测序的策略一般由以下几种读长策略：</p>
-                        <ul>
-                            <li>10,000bp 的高精度长测序组</li>
-                            <li>10,000bp 的高精度长测序组 + 100,000bp 的超长长度测序组</li>
-                            <li>10,000bp 的高精度长测序组 + 100,000bp 的超长长度测序组 + 高通量染色体构象数据（Hi-C）</li>
-                        </ul>
-                        <p>在组装之前，我们还要确定组装倍型策略：</p>
-                        <ul>
-                            <li>单倍体/纯合模式：义如其名。</li>
-                            <li>主-副组装模式：本质还是单倍体，只不过多了一份注解来标明等位基因，主组装是父母本序列的随机嵌合体。</li>
-                            <li>二倍体分型模式：超长读长测序带来的优势，得到两套物理上真实的独立单倍型序列。测序数据充足时，选用此模式更好。</li>
-                        </ul>
-                        <p>我们使用 Hifiasm 进行组装：</p>
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>assemble_env</h5>
+                                    <span>文件格式：.yml | 大小：7.1 KB</span>
+                                </div>
+                            </div>
+                            <a href="./assemble_env.yml" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                    <h3>Hifiasm</h3>
+                        <p>Hifiasm 是我常用的 Pacbio 三代测序 10k Hifi reads 的数据主力组装软件，其同时支持 Nanopore 100k 超长读长的辅助证据共同组装。这个也是目前批量交互式脚本搭建最完善的软件流程：</p>
                             <div class="download-card">
                                 <div class="download-info">
                                     <i class="fas fa-file-code"></i> <div class="file-details">
@@ -104,9 +106,7 @@
                                 <a href="./hifi_assemble.py" download class="download-btn">
                                     <i class="fas fa-cloud-download-alt"></i>
                                 </a>
-                            </div>
-                        <p>依赖环境库：</p>
-                            <div class="download-card">
+
                                 <div class="download-info">
                                     <i class="fas fa-file-code"></i> <div class="file-details">
                                         <h5>assemble_env</h5>
@@ -117,6 +117,55 @@
                                     <i class="fas fa-cloud-download-alt"></i>
                                 </a>
                             </div>
+                        <p>Hifiasm 支持倍型策略：</p>
+                        <table><thead><tr><th>倍型策略</th><th>使用情形</th></tr></thead><tbody><tr><td>单倍体/纯合模式</td><td>就是单倍体组装，也可把多倍型按照单倍型组装，只得到支持率最高的结果（父母本嵌合体）。</td></tr><tr><td>主-副组装模式</td><td>本质还是单倍体，只不过多了一份注解来标明等位基因，主组装是父母本序列的随机嵌合体。</td></tr><tr><td>二倍体分型模式</td><td>超长读长测序带来的优势，得到两套物理上真实的独立单倍型序列。测序数据充足时，选用此模式。</td></tr></tbody></table>
+                    <h3>Hicanu</h3>
+                        <p>Hifiasm 是基于主流 DBG 图算法的软件，而 Hicanu 是基于 OLC 算法的组装工具，组装效果也不错，但是时间长一点，另外精度有一些差异，详情请见算法浅析。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>hicanu_assemble</h5>
+                                    <span>文件格式：.py | 大小：9.6 KB</span>
+                                </div>
+                            </div>
+                            <a href="./hicanu_assemble.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>assemble_env</h5>
+                                    <span>文件格式：.yml | 大小：7.1 KB</span>
+                                </div>
+                            </div>
+                            <a href="./assemble_env.yml" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                    <h3>Flye</h3>
+                        <p>Flye 主要是针对 Nanopore 的组装软件，我只用过对其 100k 的超长读长 reads 进行组装过。且 Nanopore 的超长读长因为精度问题我们也很少作为主力读段数据。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>nanopore_assemble</h5>
+                                    <span>文件格式：.py | 大小：9.6 KB</span>
+                                </div>
+                            </div>
+                            <a href="./nanopore_assemble.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>assemble_env</h5>
+                                    <span>文件格式：.yml | 大小：7.1 KB</span>
+                                </div>
+                            </div>
+                            <a href="./flye_env.yml" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+
                 <h2>组装质检</h2>
                     <h3>QUAST 连续性评估</h3>
                         <a href="..\..\..\resources\software\06. QUAST\06. QUAST.html" class="related-article" target="_blank">
@@ -157,7 +206,7 @@
                                     <span>文件格式：.py | 大小：9.7 KB</span>
                                 </div>
                             </div>
-                            <a href="../02. PacBio CSS HiFi 三代组装项目/telomere.py" download class="download-btn">
+                            <a href="./telomere.py" download class="download-btn">
                                 <i class="fas fa-cloud-download-alt"></i>
                             </a>
                         </div>

@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/07/02_21:37:26
-// 文章总数: 68
+// 生成时间: 2026/07/08_22:37:42
+// 文章总数: 69
 
 window.ARTICLE_DATABASE = [
     {
@@ -44,14 +44,6 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
-        "title": "01. illumina 二代组装项目",
-        "collection": "assemble",
-        "date": "2026-03-10",
-        "summary": "fastp清洗、spades组装、quast质控真菌组装流程化",
-        "path": "articles/dry_lab/assemble/01. illumina 二代组装项目/01. illumina 二代组装项目.html",
-        "featured": false
-    },
-    {
         "title": "01. 全基因组关联分析基础原理",
         "collection": "gwas",
         "date": "2025-11-28",
@@ -66,6 +58,14 @@ window.ARTICLE_DATABASE = [
         "summary": "基因组上基因的预测",
         "path": "articles/dry_lab/gene/01. 基因组基因预测/01. 基因组基因预测.html",
         "featured": false
+    },
+    {
+        "title": "01. 基因组组装标准流程",
+        "collection": "assemble",
+        "date": "2026-07-01",
+        "summary": "标准化快速组装流程",
+        "path": "articles/dry_lab/assemble/01. 基因组组装标准流程/01. 基因组组装标准流程.html",
+        "featured": true
     },
     {
         "title": "01. 多聚酶链式反应基本原理",
@@ -180,14 +180,6 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
-        "title": "02. PacBio CSS HiFi 三代组装项目",
-        "collection": "assemble",
-        "date": "2026-04-29",
-        "summary": "Hifiasm 组装 PacBio CSS HiFi 数据流程化及端粒识别",
-        "path": "articles/dry_lab/assemble/02. PacBio CSS HiFi 三代组装项目/02. PacBio CSS HiFi 三代组装项目.html",
-        "featured": false
-    },
-    {
         "title": "02. interproscan",
         "collection": "software",
         "date": "2026-03-15",
@@ -225,6 +217,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-22",
         "summary": "多维数据的良好展现方式",
         "path": "articles/resources/gallery/02. 热图/02. 热图.html",
+        "featured": false
+    },
+    {
+        "title": "02. 细胞器基因组筛查",
+        "collection": "assemble",
+        "date": "2026-07-06",
+        "summary": "基因组拼装打磨：剔除细胞器染色体",
+        "path": "articles/dry_lab/assemble/02. 基因组打磨/02. 基因组打磨.html",
         "featured": false
     },
     {
@@ -298,14 +298,6 @@ window.ARTICLE_DATABASE = [
         "summary": "基因注释文件的操作",
         "path": "articles/resources/software/03. gffread/03. gffread.html",
         "featured": false
-    },
-    {
-        "title": "03. 基因组组装标准流程",
-        "collection": "assemble",
-        "date": "2026-07-01",
-        "summary": "标准化快速组装流程",
-        "path": "articles/dry_lab/assemble/03. 基因组组装标准流程/03. 基因组组装标准流程.html",
-        "featured": true
     },
     {
         "title": "03. 基因组组装算法",
@@ -524,6 +516,14 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
+        "title": "07. 常用概率分布",
+        "collection": "algorithm",
+        "date": "2026-06-06",
+        "summary": "数学的直觉",
+        "path": "articles/dry_lab/algorithm/07. 常用概率分布/07. 常用概率分布.html",
+        "featured": false
+    },
+    {
         "title": "07. 爬虫",
         "collection": "python",
         "date": "2026-04-18",
@@ -545,6 +545,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-06-15",
         "summary": "pLDDT 得分线性可视化",
         "path": "articles/resources/gallery/09. pLDDT 线性图/09. pLDDT 线性图.html",
+        "featured": false
+    },
+    {
+        "title": "10. 直方图",
+        "collection": "figure",
+        "date": "2026-07-08",
+        "summary": "分箱可视化",
+        "path": "articles/resources/gallery/10. 直方图/10. 直方图.html",
         "featured": false
     }
 ];

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>02. 细胞器基因组筛查 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="assemble"> 
+        <meta name="collection-title" content="基因组组装">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-07-06">
+        <meta name="description" content="基因组拼装打磨：剔除细胞器染色体">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>02. 细胞器基因组筛查</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                    <p>核基因组组装中经常混入线粒体或叶绿体序列。我的处理思路不是让脚本直接删除 contig，而是先将每条 contig 与多个细胞器参考基因组进行 BLAST 比对，汇总成矩阵并计算候选评分，最后结合生物学背景人工判断。这样既适合批量处理，也能避免仅凭单次短片段命中误删核基因组序列。</p>
+
+                    <h2>准备参考基因组</h2>
+                    <p>可在 NCBI 中检索并下载一个或多个近缘物种的 FASTA 文件。建议同时准备多个参考，以降低单一参考质量或系统发育距离造成的偏差。</p>
+                    <ul>
+                        <li>线粒体：<code>[物种名或属名] AND mitochondrion</code></li>
+                        <li>叶绿体：<code>[物种名或属名] AND chloroplast</code></li>
+                    </ul>
+
+                    <h2>批量筛查脚本</h2>
+                        <p>脚本依赖 NCBI BLAST+ 中的 <code>makeblastdb</code> 和 <code>blastn</code>。准备好多个组装 FASTA 与多个细胞器参考 FASTA 后，在包含这些文件的目录中运行脚本，并按照提示完成交互式选择即可。</p>
+                            <div class="download-card">
+                                <div class="download-info">
+                                    <i class="fas fa-file-code"></i> <div class="file-details">
+                                        <h5>organelle_contig_screen</h5>
+                                        <span>文件格式：.py | 大小：13.1 KB</span>
+                                    </div>
+                                </div>
+                                <a href="./organelle_contig_screen.py" download class="download-btn">
+                                    <i class="fas fa-cloud-download-alt"></i>
+                                </a>
+                            </div>
+                        <h2>运行逻辑与输出</h2>
+                        <p>脚本先为每个参考基因组分别运行 <code>makeblastdb</code>，再将每份组装结果依次与所有参考运行 <code>blastn</code>。每份组装结果都会输出一个独立的 TSV 矩阵；数据库、压缩文件的解压副本和原始 BLAST 表也全部保存在指定的输出文件夹中。</p>
+                        <p>矩阵每一行代表一条 contig，概览字段如下：</p>
+                            <table><thead><tr><th>字段</th><th>含义</th></tr></thead><tbody><tr><td>assembly</td><td>该 contig 所属组装 FASTA 的绝对路径。</td></tr><tr><td>contig</td><td>FASTA 标题中第一个空格前的 contig 名称。</td></tr><tr><td>contig_length</td><td>contig 总长度，单位为 bp。</td></tr><tr><td>best_reference</td><td>该 contig 得分最高的细胞器参考基因组；无命中时为空。</td></tr><tr><td>best_reference_type</td><td>最佳参考的类型：<code>mitochondrion</code>、<code>chloroplast</code> 或 <code>other</code>。</td></tr><tr><td>organelle_score</td><td>该 contig 在所有参考中取得的最高启发式评分，范围为 0–1。它不是统计学概率。</td></tr></tbody></table>
+                        <p>每个细胞器的参考基因组还会生成一组以 <code>参考名称__</code> 开头的字段：</p>
+                            <table><thead><tr><th>后缀</th><th>含义</th></tr></thead><tbody><tr><td>aligned_bp</td><td>BLAST 命中在 contig 上覆盖的非重复碱基数；彼此重叠的 HSP 不重复计数。</td></tr><tr><td>query_coverage_pct</td><td>contig 被参考序列覆盖的百分比，即 <code>aligned_bp / contig_length × 100</code>。</td></tr><tr><td>identity_pct</td><td>全部 HSP 按比对长度加权计算的平均序列一致性。</td></tr><tr><td>bitscore</td><td>全部 HSP 的 bitscore 总和；越高表示累计比对证据越强。</td></tr><tr><td>evalue</td><td>全部 HSP 中最小的 E-value；越接近 0，随机产生该命中的可能性越低。</td></tr><tr><td>hsp_count</td><td>BLAST 高分片段对数量。多个 HSP 可能来自分段命中、结构差异或重复区域。</td></tr><tr><td>organelle_score</td><td>该 contig 针对当前参考的启发式候选评分，范围为 0–1。</td></tr></tbody></table>
+
+                        <h2>从 BLAST 结果到评分</h2>
+                        <p>这个评分是本流程为了排序候选 contig 而设计的经验函数，并非 BLAST 官方指标，也不是经过阳性、阴性数据训练和校准的概率模型。为避免误解，字段使用 <code>organelle_score</code>。</p>
+                        <p>参与计算的主要原始字段如下：</p>
+                        <table><thead><tr><th>BLAST 字段</th><th>含义</th><th>在本流程中的用途</th></tr></thead><tbody><tr><td>qlen</td><td>query，也就是 contig 的总长度</td><td>随原始 BLAST 表输出；实际计算时脚本直接从 FASTA 读取 contig 长度作为覆盖度分母。</td></tr><tr><td>length</td><td>一个 HSP 的比对长度，包含比对中的 gap</td><td>作为平均一致性的权重。</td></tr><tr><td>pident</td><td>一个 HSP 内完全匹配碱基所占的百分比</td><td>计算加权平均一致性。</td></tr><tr><td>qstart、qend</td><td>一个 HSP 在 contig 上的起止坐标</td><td>合并重叠区间，计算实际覆盖的非重复碱基数。</td></tr><tr><td>evalue</td><td>随机获得当前或更好匹配的期望值</td><td>矩阵保留所有 HSP 中的最小值，供人工判断；当前不进入评分公式。</td></tr><tr><td>bitscore</td><td>标准化后的比对得分</td><td>矩阵记录所有 HSP 的总和，供人工判断；当前不进入评分公式。</td></tr></tbody></table>
+
+                        <h4>第一步：合并 HSP，计算非重复覆盖长度</h4>
+                        <p>同一条 contig 可能产生多个 HSP，而且这些 HSP 在 contig 上可能相互重叠。因此脚本先把每个 HSP 的 <code>qstart–qend</code> 转成闭区间，再合并重叠或首尾相邻的区间。设合并后共有 \(m\) 个互不重叠的区间，第 \(j\) 个区间起止位置为 \(a_j\) 和 \(b_j\)，则：</p>
+                        <p>\[L_{\mathrm{covered}}=\sum_{j=1}^{m}(b_j-a_j+1)\]</p>
+                        <p>这个 \(L_{\mathrm{covered}}\) 就是矩阵中的 <code>aligned_bp</code>。因为之前合并了坐标区间，所以重叠区域就只计算了一次。</p>
+
+                        <h4>第二步：计算 contig 覆盖度</h4>
+                        <p>设 contig 总长度为 \(L_{\mathrm{contig}}\)，则 0–1 范围内的覆盖度 \(C\) 为：</p>
+                        <p>\[C=\frac{L_{\mathrm{covered}}}{L_{\mathrm{contig}}}\]</p>
+                        <p>矩阵以百分数显示该值：</p>
+                        <p>\[\mathrm{query\_coverage\_pct}=100\times C\]</p>
+
+                        <h4>第三步：计算加权平均一致性</h4>
+                        <p>设共有 \(n\) 个 HSP，第 \(i\) 个 HSP 的 BLAST <code>pident</code> 为 \(P_i\)（百分数），比对长度为 \(L_i\)，则：</p>
+                        <p>\[\mathrm{identity\_pct}=\frac{\sum_{i=1}^{n}P_iL_i}{\sum_{i=1}^{n}L_i}\]</p>
+                        <p>长 HSP 因而比短 HSP 具有更大的权重。计算评分时再将其除以 100，得到 0–1 范围内的一致性 \(I\)：</p>
+                        <p>\[I=\frac{\mathrm{identity\_pct}}{100}\]</p>
+                        <p>需要注意，当前实现会分别使用每个 HSP 的完整比对长度计算一致性；若 HSP 在 contig 上重叠，重叠部分在覆盖度中不会重复计算，但可能在加权平均一致性中重复贡献权重。</p>
+
+                        <h4>第四步：合成证据量</h4>
+                        <p>将覆盖度和一致性组合为中间量 \(E\)：</p>
+                        <p>\[E=C\times I^2\]</p>
+                        <p>覆盖度决定证据覆盖了多少 contig；一致性的平方则加强对低一致性命中的惩罚。这里没有加入 E-value 和 bitscore，因为它们与比对长度、数据库规模等因素相关，也会与覆盖度和一致性提供部分重复信息。本流程将它们保留为人工复核指标。</p>
+
+                        <h4>第五步：映射为 0–1 评分</h4>
+                        <p>最后使用指数饱和函数把 \(E\) 映射到 0–1：</p>
+                        <p>\[\mathrm{organelle\_score}=1-e^{-6E}\]</p>
+                        <p>常数 6 是经验缩放系数，只控制评分随证据增长的速度，不具有统计学概率含义。若一条 contig 对多个细胞器参考都有命中，脚本分别完成上述计算，并把最高分写入行首的 <code>organelle_score</code>；对应参考写入 <code>best_reference</code>。</p>
+
+                        <h4>计算示例</h4>
+                        <p>假设一条 contig 长 10,000 bp，有两个 HSP：HSP 1 覆盖 1–4,000 bp，<code>pident=95%</code>、<code>length=4,000</code>；HSP 2 覆盖 3,501–6,000 bp，<code>pident=90%</code>、<code>length=2,500</code>。</p>
+                        <ol>
+                            <li>两个坐标区间有 500 bp 重叠，合并后为 1–6,000，因此 <code>aligned_bp</code> 为 6,000 bp。</li>
+                            <li>覆盖度：\(C=6000/10000=0.6\)，所以 <code>query_coverage_pct=60%</code>。</li>
+                            <li>加权平均一致性：\(\mathrm{identity\_pct}=(95\times4000+90\times2500)/(4000+2500)=93.0769\%\)，因此 \(I=0.930769\)。</li>
+                            <li>中间证据量：\(E=0.6\times0.930769^2=0.519799\)。</li>
+                            <li>最终评分：\(1-e^{-6\times0.519799}=0.955789\)。</li>
+                        </ol>
+                        <p>这个结果只能解释为“该 contig 是一个很强的细胞器候选，应优先人工检查”，不能解释为“它有 95.58% 的概率来自细胞器”。</p>
+
+                        <h2>人工判断</h2>
+                        <p>建议先按 <code>organelle_score</code> 从高到低排序，再同时查看覆盖度、contig 长度、命中是否连续以及多个参考是否给出一致结果。短而高度保守的基因、重复序列，以及 NUMT/NUPT 等转移到核基因组中的细胞器片段，都可能产生真实但不应直接删除的命中。因此，本脚本只标记候选，不会自动删除任何 contig。</p>
+
+
+            </div>
+        </div>
+         
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
