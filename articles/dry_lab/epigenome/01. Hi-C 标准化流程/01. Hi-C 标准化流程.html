@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>01. Hi-C 标准化流程 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="epig"> 
+        <meta name="collection-title" content="表观组学">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-07-18">
+        <meta name="description" content="从 Hi-C 双端测序数据构建多分辨率染色质互作矩阵并绘制全基因组接触图">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>01. Hi-C 标准化流程</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                    <p>DNA 虽然是一条线性分子，却会在细胞核内折叠成有层次的三维结构。这种折叠并非完全随机：同一条染色体上相邻的区域通常更容易接触，远距离调控元件也可能通过染色质环与靶基因靠近。Hi-C（High-throughput Chromosome Conformation Capture）利用交联、酶切、邻近连接和双端测序，捕获这些空间上相邻的 DNA 片段。</p>
+                    <img src="./1.png" alt="Hi-C 实验原理示意图">
+                    <p>每个有效 read pair 的两端分别定位到参考基因组的两个位置，因而可以记作一次空间接触。将基因组划分为固定大小的区间（bin），再统计任意两个 bin 之间的有效 read pairs，就得到 Hi-C 接触矩阵。矩阵中的每个像素表示两个区域的接触强度。</p>
+
+                <h2>IO 与分析流程</h2>
+                    <h3>输入文件</h3>
+                    <table>
+                        <thead><tr><th>输入</th><th>示例</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td>最终参考基因组</td><td><code>hic_scaffolds_final.fa</code></td><td>需要研究的参考基因组文件。</td></tr>
+                            <tr><td>Hi-C R1</td><td><code>HIC_L1_R1.fastq.gz</code></td><td>每个 lane 的正向 reads。</td></tr>
+                            <tr><td>Hi-C R2</td><td><code>HIC_L1_R2.fastq.gz</code></td><td>必须与同一 lane 的 R1 一一配对。</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>计算流程</h3>
+                    <pre><code class="language-txt">Hi-C FASTQ ── FastQC ── MultiQC
+      │
+      ├── lane 1 ── BWA-MEM -5SP ── pairtools parse/sort ── lane1.pairs.gz
+      ├── lane 2 ── BWA-MEM -5SP ── pairtools parse/sort ── lane2.pairs.gz
+      └── lane n ── BWA-MEM -5SP ── pairtools parse/sort ── lanen.pairs.gz
+                                                        │
+                                                        ▼
+                     pairtools merge ── dedup ── select UU
+                                                        │
+                                                        ▼
+最终 scaffold FASTA ── chrom.sizes ── cooler cload ── contacts.cool
+                                                        │
+                                      balance / zoomify ▼
+                                                  contacts.mcool</code></pre>
+
+                    <h3>各步骤的作用</h3>
+                    <ol>
+                        <li><strong>FastQC/MultiQC：</strong>汇总原始 reads 的质量、GC、接头和重复水平，只做质控，不修改 FASTQ。</li>
+                        <li><strong>BWA-MEM：</strong>以 <code>-5SP</code> 模式将每组 paired-end reads 比对至最终 scaffold，并保留 Hi-C 嵌合 reads 的合理比对。</li>
+                        <li><strong>pairtools parse/sort：</strong>从 SAM 流中提取两端坐标，按参考序列过滤并生成排序后的 <code>.pairs.gz</code>。</li>
+                        <li><strong>merge/dedup/select：</strong>合并 lane，以 3 bp 容差识别重复，并选择两端均唯一比对的 <code>UU</code> contacts。</li>
+                        <li><strong>cooler：</strong>按 bin 汇总有效 contacts，构建基础分辨率 <code>.cool</code>，执行矩阵平衡并生成多分辨率 <code>.mcool</code>。</li>
+                    </ol>
+                    <p><code>--mapq</code> 默认设为 30，用于降低多重比对的影响；<code>--bin-size</code> 默认 10 kb，是基础矩阵分辨率。分辨率越高，所需有效 contacts 和计算资源越多。全基因组总览通常选用 50–500 kb，局部结构分析才使用更细的 bin。</p>
+
+                    <h3>输出文件</h3>
+                    <table>
+                        <thead><tr><th>文件</th><th>用途</th><th>类型</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>qc/multiqc_report.html</code></td><td>所有 FASTQ 的汇总质控报告。</td><td>质控</td></tr>
+                            <tr><td><code>pairs/all.dedup.pairs.gz</code></td><td>去除重复后的 Hi-C contacts。</td><td>中间文件</td></tr>
+                            <tr><td><code>pairs/all.valid.UU.pairs.gz</code></td><td>两端均唯一比对、用于建矩阵的有效 contacts。</td><td>关键中间文件</td></tr>
+                            <tr><td><code>pairs/dedup.stats.txt</code></td><td>重复识别统计。</td><td>质控</td></tr>
+                            <tr><td><code>pairs/valid.stats.txt</code></td><td>有效 contacts 的配对类型、顺反式距离等统计。</td><td>质控</td></tr>
+                            <tr><td><code>cool/contacts.10000.cool</code></td><td>默认 10 kb 基础分辨率矩阵。</td><td>核心结果</td></tr>
+                            <tr><td><code>cool/contacts.mcool</code></td><td>包含多个分辨率的矩阵，可用于交互式浏览和绘图。</td><td><strong>最终结果</strong></td></tr>
+                            <tr><td><code>cool/contacts.resolutions.txt</code></td><td>记录 <code>.mcool</code> 中实际可用的分辨率。</td><td>索引信息</td></tr>
+                            <tr><td><code>pipeline.log</code></td><td>完整命令及报错信息。</td><td>运行记录</td></tr>
+                        </tbody>
+                    </table>
+
+                <h2>脚本与环境</h2>
+                    <p>下载环境文件后可使用 mamba 或 conda 创建环境。环境名称为 <code>hic-contact</code>，主要依赖包括 BWA、samtools、pairtools、cooler、FastQC、MultiQC、NumPy 和 Matplotlib。</p>
+                    <pre><code class="language-bash">mamba env create -f environment.yaml
+conda activate hic-contact
+
+python hic_contact_map.py \
+    --search-dir /path/to/HIC_FASTQ \
+    --fasta /path/to/hic_scaffolds_final.fa \
+    --outdir /path/to/hic_contact_result \
+    --threads 32 \
+    --mapq 30 \
+    --bin-size 10000 \
+    --zoom-resolutions 10000N</code></pre>
+                    <p><code>10000N</code> 表示 cooler 从 10 kb 开始自动生成一组常用的整数倍分辨率。可用 <code>cooler ls hic_contact_result/cool/contacts.mcool</code> 查看结果。若数据不适合矩阵平衡，可添加 <code>--no-balance</code>；若已单独完成原始数据质控，可添加 <code>--skip-fastqc</code>。</p>
+
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>Hi-C 互作矩阵流程</h5>
+                                <span>文件格式：.py | 大小：19.3 KB</span>
+                            </div>
+                        </div>
+                        <a href="./hic_contact_map.py" download class="download-btn"><i class="fas fa-cloud-download-alt"></i></a>
+
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>Conda 环境</h5>
+                                <span>文件格式：.yaml | 大小：10.3 KB</span>
+                            </div>
+                        </div>
+                        <a href="./environment.yaml" download class="download-btn"><i class="fas fa-cloud-download-alt"></i></a>
+                    </div>
+
+                    <h3>断点恢复</h3>
+                    <p>再次运行脚本并指定相同输入和 <code>--outdir</code>，流程会通过完成标记和非空结果文件跳过已经成功的步骤，从首个未完成步骤继续。不要在恢复时更换 FASTA、FASTQ、bin size 或输出目录；若确实要改变关键参数，建议使用新的输出目录，避免旧结果被误用。</p>
+
+                <h2>可视化绘图</h2>
+                    <p>目录中的绘图脚本会读取 <code>.mcool</code> 的指定分辨率，将所有染色体或 scaffold 拼接成一个全基因组矩阵，对信号执行 <code>log1p</code> 变换，并输出 SVG、PNG 或 PDF。先修改脚本顶部的用户配置区：</p>
+                    <pre><code class="language-python">MCOOL = "./hic_contact_result/cool/contacts.mcool"
+RESOLUTION = 100_000
+OUTPUT_FILE = "contact_map.whole_genome.100kb.svg"
+CHROMS = None
+BALANCED = True</code></pre>
+                    <pre><code class="language-bash">python plot_mcool_whole_genome.py</code></pre>
+                    <p><code>RESOLUTION</code> 必须是 <code>contacts.resolutions.txt</code> 中已有的分辨率。若提示缺少 weight，可将 <code>BALANCED</code> 改为 <code>False</code>。大基因组在细分辨率下会产生巨大的稠密矩阵；脚本默认在超过 15,000 bins 时停止并提示更合适的分辨率，以避免内存耗尽。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>全基因组接触图脚本</h5>
+                                <span>文件格式：.py | 大小：6.3 KB</span>
+                            </div>
+                        </div>
+                        <a href="./plot_mcool_whole_genome.py" download class="download-btn"><i class="fas fa-cloud-download-alt"></i></a>
+                    </div>
+
+                <h2>结果检查与解释</h2>
+                    <p>正常的染色体级接触图应在每条染色体内部呈现连续、较强的主对角线，且信号通常随线性距离增加而衰减；不同染色体之间的互作背景应明显更弱。若用于检查组装，主对角线突然中断、远离对角线的强矩形块、蝴蝶形或交叉信号，可能提示 scaffold 的错误连接、倒置或排序问题。</p>
+                    <p>热图只能提供证据，不能单独证明组装正确。应同时检查有效 contacts 数、唯一比对率、重复率、cis/trans 比例和不同距离区间的接触衰减，并结合预期染色体数、共线性、遗传图谱或其他物种学证据判断。高分辨率矩阵出现空洞不一定是结构异常，也可能只是测序深度不足或该区域可比对性较差。</p>
+            </div>
+        </div>
+         
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

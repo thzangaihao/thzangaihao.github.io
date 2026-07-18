@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/07/08_22:37:42
-// 文章总数: 69
+// 生成时间: 2026/07/18_20:19:00
+// 文章总数: 71
 
 window.ARTICLE_DATABASE = [
     {
@@ -20,10 +20,18 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
+        "title": "01. Hi-C 标准化流程",
+        "collection": "epig",
+        "date": "2026-07-18",
+        "summary": "从 Hi-C 双端测序数据构建多分辨率染色质互作矩阵并绘制全基因组接触图",
+        "path": "articles/dry_lab/epigenome/01. Hi-C 标准化流程/01. Hi-C 标准化流程.html",
+        "featured": false
+    },
+    {
         "title": "01. Kraken 2 自建库及鉴定",
         "collection": "classification",
         "date": "2026-03-09",
-        "summary": "Kraken 2 寻找亲缘关系最近的物种",
+        "summary": "Kraken 2 自建数据库、TaxID 映射与物种鉴定交互式流程",
         "path": "articles/dry_lab/classification/01. Kraken2 物种鉴定/01. Kraken2 物种鉴定.html",
         "featured": false
     },
@@ -308,6 +316,14 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
+        "title": "03. 染色体构象证据 (Hic)",
+        "collection": "assemble",
+        "date": "2026-07-18",
+        "summary": "使用 Hi-C、BWA-MEM 和 YaHS 将 contig 自动挂载至染色体级 scaffold",
+        "path": "articles/dry_lab/assemble/03. 染色体构象证据 (Hic)/03. 染色体构象证据 (Hic).html",
+        "featured": false
+    },
+    {
         "title": "03. 火山图",
         "collection": "figure",
         "date": "2026-01-22",
@@ -519,7 +535,7 @@ window.ARTICLE_DATABASE = [
         "title": "07. 常用概率分布",
         "collection": "algorithm",
         "date": "2026-06-06",
-        "summary": "数学的直觉",
+        "summary": "数学的直觉：找规律",
         "path": "articles/dry_lab/algorithm/07. 常用概率分布/07. 常用概率分布.html",
         "featured": false
     },

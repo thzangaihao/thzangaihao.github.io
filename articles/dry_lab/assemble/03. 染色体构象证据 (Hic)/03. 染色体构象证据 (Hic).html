@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>03. 染色体构象证据（Hi-C）- 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="assemble"> 
+        <meta name="collection-title" content="基因组组装">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-07-18">
+        <meta name="description" content="使用 Hi-C、BWA-MEM 和 YaHS 将 contig 自动挂载至染色体级 scaffold">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>03. 染色体构象证据（Hi-C）</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                    <p>高通量染色体构象捕获（High-throughput Chromosome Conformation Capture，Hi-C）通过交联、酶切、邻近连接和高通量测序，记录细胞核内不同 DNA 片段的空间接触。位于同一条染色体且线性距离较近的区域通常具有更强的接触信号，因此这些数据不仅能研究染色质三维结构，也能为基因组组装提供远距离连接证据。</p>
+                    <p>常规 Hi-C 使用双端测序：同一 read pair 中的 R1 和 R2 分别比对到组装序列，两端的基因组坐标共同构成一条 Hi-C 联系。将一对 reads 的两端独立比对，跨过连接位点的嵌合 read 则可能产生软剪切或分段比对。</p>
+                    <p>本文使用 BWA-MEM、samtools、Picard 和 YaHS，将长读长组装得到的 contig 自动聚类、排序、定向并连接为 scaffold。该过程称为 <strong>scaffolding（挂载）</strong>，并不校正 contig 内部的碱基错误。</p>
+
+                <h2>IO 与分析流程</h2>
+                    <h3>输入文件</h3>
+                    <table>
+                        <thead>
+                            <tr><th>输入</th><th>示例</th><th>说明</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>组装 FASTA</td><td><code>assembly.fa</code></td><td>待挂载的 contig/scaffold 组装。</td></tr>
+                            <tr><td>Hi-C R1</td><td><code>HIC_L1_1.fq.gz</code></td><td>每个 lane 的正向 reads。</td></tr>
+                            <tr><td>Hi-C R2</td><td><code>HIC_L1_2.fq.gz</code></td><td>必须与相同 lane 的 R1 一一配对。</td></tr>
+                            <tr><td>酶切基序</td><td><code>GATC</code></td><td>可选；DpnII/MboI 常见为 GATC，未知或 Omni-C 文库可留空。</td></tr>
+                        </tbody>
+                    </table>
+                    <p>多个测序 lane 不必先合并为巨大的 FASTQ。脚本分别比对生成 BAM，再在 BAM 层面统一合并和标记重复，既节省磁盘，也保留 read group 信息。</p>
+
+                    <h3>计算流程</h3>
+                    <pre><code class="language-txt">Hi-C FASTQ ── FastQC ── MultiQC
+      │
+      ├── L1 R1/R2 ── BWA-MEM -5SP ── samtools view/sort ── L1.sorted.bam
+      ├── L2 R1/R2 ── BWA-MEM -5SP ── samtools view/sort ── L2.sorted.bam
+      ├── L3 R1/R2 ── BWA-MEM -5SP ── samtools view/sort ── L3.sorted.bam
+      └── L4 R1/R2 ── BWA-MEM -5SP ── samtools view/sort ── L4.sorted.bam
+                                                │
+                                                ▼
+                                             samtools merge
+                                                │
+                                                ▼
+                                             Picard MarkDuplicates
+                                                │
+                                                ▼
+组装 FASTA ── samtools faidx / bwa index      hic.dedup.bam
+                         │                     │
+                         └──────── YaHS ───────┘
+                                      │
+                                      ├── hic_scaffolds_final.fa
+                                      └── hic_scaffolds_final.agp</code></pre>
+
+                    <h3>各步骤的作用</h3>
+                    <ol>
+                        <li><strong>FastQC/MultiQC：</strong>汇总 read 长度、碱基质量、GC、接头及重复水平，只做质控，不修改原始 FASTQ。</li>
+                        <li><strong>BWA-MEM：</strong>使用 <code>-5SP</code> 将每组 Hi-C paired-end reads 比对到原始组装，并写入 lane 级 read group。</li>
+                        <li><strong>samtools：</strong>过滤 unmapped、secondary 和 supplementary alignment，按坐标排序后合并所有 lane。</li>
+                        <li><strong>Picard：</strong>统一标记 PCR/光学重复。脚本设置 <code>REMOVE_DUPLICATES=false</code>，即保留记录但添加 duplicate flag。</li>
+                        <li><strong>YaHS：</strong>依据 contig 间 Hi-C 联系完成错误连接检查、聚类、排序、定向和 scaffold 构建。</li>
+                    </ol>
+
+                    <h3>输出文件</h3>
+                    <table>
+                        <thead>
+                            <tr><th>文件</th><th>用途</th><th>是否为核心结果</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>qc/multiqc_report.html</code></td><td>全部 FASTQ 的汇总质控报告。</td><td>质控</td></tr>
+                            <tr><td><code>bam/hic.merged.sorted.bam</code></td><td>所有 lane 合并后的坐标排序比对。</td><td>中间文件</td></tr>
+                            <tr><td><code>bam/hic.dedup.bam</code></td><td>完成重复标记、供 YaHS 使用的 Hi-C 比对。</td><td>关键中间文件</td></tr>
+                            <tr><td><code>bam/hic.duplicate_metrics.txt</code></td><td>Picard 重复统计。</td><td>质控</td></tr>
+                            <tr><td><code>bam/hic.dedup.flagstat.txt</code></td><td>比对、配对和重复标记概况。</td><td>质控</td></tr>
+                            <tr><td><code>yahs/hic_scaffolds_final.fa</code></td><td>YaHS 自动挂载后的 scaffold FASTA。</td><td><strong>最终结果</strong></td></tr>
+                            <tr><td><code>yahs/hic_scaffolds_final.agp</code></td><td>记录每个原始 contig 在 scaffold 中的位置、顺序、方向和间隙。</td><td><strong>最终结果</strong></td></tr>
+                            <tr><td><code>pipeline.log</code></td><td>完整命令、时间与报错信息，用于复现和调试。</td><td>运行记录</td></tr>
+                        </tbody>
+                    </table>
+                    <p>最终 FASTA 通常通过若干个 <code>N</code> 连接原始 contig；AGP 则是追踪这些连接关系的权威记录。原始 FASTQ 和原始 FASTA 均不会被修改。</p>
+
+                <h2>脚本及环境</h2>
+                    <p>交互式脚本会递归搜索 <code>.fq/.fastq</code> 及其 gzip 文件，识别 <code>R1/R2</code>、<code>READ1/READ2</code> 或 <code>_1/_2</code> 命名，列出配对后供用户选择。脚本支持断点恢复：已经完整生成的 lane BAM、合并 BAM 和最终 YaHS 结果会被跳过；Picard 只有成功结束后才写入完成标记，避免将 OOM 后的残缺 BAM 当成有效结果。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>流程化脚本</h5>
+                                <span>文件格式：.py | 大小：16 KB</span>
+                            </div>
+                        </div>
+                        <a href="./hic_scaffold.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>环境依赖</h5>
+                                <span>文件格式：.yml | 大小：6.9 KB</span>
+                            </div>
+                        </div>
+                        <a href="./environment.yml" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+
+                    <h3>断点恢复</h3>
+                    <p>流程意外中断后，不需要专门指定“恢复模式”。再次运行同一脚本，选择相同的 FASTQ 配对和参考 FASTA，并将 <code>--outdir</code> 指向上一次的输出目录，脚本就会检查已有结果并从第一个未完成步骤继续。</p>
+                    <pre><code class="language-bash">conda activate hic-scaffold
+
+python hic_scaffold.py \
+    --search-dir /path/to/HIC \
+    --fasta /path/to/assembly.fa \
+    --outdir /home/thz/Analysis/2026_06_22_rice/04_hic \
+    --threads 64 \
+    --java-memory 64g \
+    --motif GATC</code></pre>
+                    <p>恢复时必须保持输入数据、FASTA 和输出目录一致。脚本会按照以下规则判断是否跳过：</p>
+                    <ul>
+                        <li>参考序列的 <code>.fai</code> 和 BWA 索引存在时，不再建立索引。</li>
+                        <li><code>qc/.multiqc_complete</code> 存在时，不再运行 FastQC/MultiQC。</li>
+                        <li>某个 <code>bam/*HIC_L*.sorted.bam</code> 存在且非空时，跳过对应 lane 的比对。</li>
+                        <li><code>bam/hic.merged.sorted.bam</code> 存在且非空时，跳过 BAM 合并。</li>
+                        <li>只有 <code>bam/.hic_dedup_complete</code> 存在时，才认为 Picard 已完整成功；若上次因 OOM 中断且没有该标记，脚本会清理残缺的 dedup 输出并重新运行 Picard。</li>
+                        <li><code>yahs/hic_scaffolds_final.fa</code> 存在且非空时，认为 YaHS 已完成，否则重新运行 YaHS。</li>
+                    </ul>
+
+                <h2>结果检查与解释</h2>
+                    <p>YaHS 输出的是自动推断的 scaffold，并不意味着每条 scaffold 已经可以直接命名为某条染色体。应结合预期染色体数、scaffold 长度、Hi-C 接触图、共线性或遗传图谱检查是否存在错误连接、倒置和错误拆分。还应在挂载前后比较总长度、N50/L50、BUSCO 完整度和序列条数；scaffolding 通常提高连续性，但不应凭空增加大量非 N 碱基。</p>
+
+                <h2>Hi-C 互作分析</h2>
+                    <p>自动挂载与互作矩阵分析应拆成两个可独立复现的流程。挂载以原始 contig FASTA 为参考，目标是推断 contig 之间的组织关系；互作分析则以最终 <code>hic_scaffolds_final.fa</code> 为坐标，目标是生成 scaffold 层级接触矩阵并检查主对角线是否连续。</p>
+                    <p>正式留档时可以将 Hi-C FASTQ 重新比对到最终 FASTA，再使用 pairtools、cooler 或 Juicer Tools 生成 <code>.mcool</code>/<code>.hic</code>。若只需快速检查，也可以复用 YaHS 产生的 <code>.bin</code>、最终 <code>.agp</code> 和原始 FASTA 的 <code>.fai</code>，通过 YaHS 附带的 <code>juicer pre</code> 完成坐标转换，无需重新比对。</p>
+                    <pre><code class="language-txt">方案 A（正式、坐标直观）
+Hi-C FASTQ + hic_scaffolds_final.fa
+        └── BWA → pairtools → cooler → final.mcool → HiGlass
+
+方案 B（快速复用 YaHS 中间结果）
+hic.bin + hic_scaffolds_final.agp + assembly.fa.fai
+        └── juicer pre → Juicer Tools → final.hic → Juicebox</code></pre>
+                    <p>理想热图在每条主要 scaffold 内具有连续且强的主对角线，信号随线性距离增加而衰减，不同染色体之间的背景较弱。明显的断点、蝴蝶形、交叉或远离对角线的异常块状信号通常值得进一步人工检查。</p>
+
+            </div>
+        </div>
+         
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

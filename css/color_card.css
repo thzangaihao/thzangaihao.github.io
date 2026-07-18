@@ -125,23 +125,32 @@
 
 .color-strip {
     display: grid;
-    grid-template-columns: repeat(var(--color-count), minmax(0, 1fr));
-    min-height: 86px;
+    grid-template-columns: repeat(var(--color-columns), minmax(0, 1fr));
+    height: 86px;
     border-radius: 8px;
     overflow: visible;
     gap: 0;
     margin-bottom: 1rem;
 }
 
+.color-column {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 .color-swatch {
     min-width: 0;
+    min-height: 0;
+    flex: 1 1 0;
     border: none;
     cursor: copy;
     position: relative;
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    padding: 0.5rem 0.25rem;
+    padding: 0;
     color: var(--label-color);
     font-family: Consolas, Monaco, monospace;
     font-size: 0.74rem;
@@ -154,12 +163,20 @@
     outline-offset: -3px;
 }
 
-.color-swatch:first-child {
-    border-radius: 8px 0 0 8px;
+.color-column:first-child .color-swatch:first-child {
+    border-top-left-radius: 8px;
 }
 
-.color-swatch:last-child {
-    border-radius: 0 8px 8px 0;
+.color-column:last-child .color-swatch:first-child {
+    border-top-right-radius: 8px;
+}
+
+.color-column:first-child .color-swatch:last-child {
+    border-bottom-left-radius: 8px;
+}
+
+.color-column:last-child .color-swatch:last-child {
+    border-bottom-right-radius: 8px;
 }
 
 .color-swatch:hover {

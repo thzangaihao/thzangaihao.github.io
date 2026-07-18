@@ -130,7 +130,7 @@
                     return {
                         id: (row.id || "").trim(),
                         name: (row.name || "").trim(),
-                        colors: parseColorList(row.colors || "").slice(0, 6)
+                        colors: parseColorList(row.colors || "")
                     };
                 }
 
@@ -190,17 +190,29 @@
                         const card = document.createElement("article");
                         card.className = "color-palette-card";
 
-                        const strip = palette.colors.map(hex => {
-                            const style = getTextStyle(hex);
-                            return `
-                                <button
-                                    type="button"
-                                    class="color-swatch"
-                                    style="background: ${hex}; --label-color: ${style.color}; --label-shadow: ${style.shadow};"
-                                    data-copy-value="${getDisplayValue(hex)}"
-                                    title="复制 ${getDisplayValue(hex)}"
-                                    aria-label="复制 ${getDisplayValue(hex)}"></button>
-                            `;
+                        const colorColumns = Math.min(palette.colors.length, 6);
+                        const colorsPerColumn = Math.floor(palette.colors.length / colorColumns);
+                        const extraColors = palette.colors.length % colorColumns;
+                        let colorIndex = 0;
+                        const strip = Array.from({ length: colorColumns }, (_, columnIndex) => {
+                            const columnSize = colorsPerColumn + (columnIndex < extraColors ? 1 : 0);
+                            const columnColors = palette.colors.slice(colorIndex, colorIndex + columnSize);
+                            colorIndex += columnSize;
+
+                            const swatches = columnColors.map(hex => {
+                                const style = getTextStyle(hex);
+                                return `
+                                    <button
+                                        type="button"
+                                        class="color-swatch"
+                                        style="background: ${hex}; --label-color: ${style.color}; --label-shadow: ${style.shadow};"
+                                        data-copy-value="${getDisplayValue(hex)}"
+                                        title="复制 ${getDisplayValue(hex)}"
+                                        aria-label="复制 ${getDisplayValue(hex)}"></button>
+                                `;
+                            }).join("");
+
+                            return `<div class="color-column">${swatches}</div>`;
                         }).join("");
 
                         const list = palette.colors.map(hex => `
@@ -210,7 +222,7 @@
                         card.innerHTML = `
                             <h3>${escapeHtml(palette.name || palette.id)}</h3>
                             <div class="color-palette-id">${escapeHtml(palette.id)} · ${palette.colors.length} 色</div>
-                            <div class="color-strip" style="--color-count: ${palette.colors.length};">
+                            <div class="color-strip" style="--color-columns: ${colorColumns};">
                                 ${strip}
                             </div>
                             <ul class="color-list">${list}</ul>
