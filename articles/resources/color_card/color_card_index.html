@@ -79,7 +79,7 @@
 
             <div class="preview-panel">
                 <div class="preview-heading">
-                    <div><p class="preview-kicker" id="previewKicker">离散配色</p><h2 id="previewTitle">Cell Paper · 6 色</h2></div>
+                    <div><p class="preview-kicker" id="previewKicker"></p><h2 id="previewTitle" aria-live="polite"></h2></div>
                     <button id="reverseButton" class="ghost-button" type="button"><i class="fas fa-right-left"></i> 反转</button>
                 </div>
                 <div id="palettePreview" class="palette-preview discrete" aria-label="配色预览"></div>
@@ -126,7 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const $ = id => document.getElementById(id);
-    let state = { tab:'discrete', format:'hex', family:'cell', count:6, chroma:100, sampling:0, reversed:false, linear:false };
+    const firstDiscreteFamily = Object.keys(discreteFamilies)[0];
+    const firstContinuousFamily = Object.keys(continuousFamilies)[0];
+    let state = { tab:'discrete', format:'hex', family:firstDiscreteFamily, count:6, chroma:100, sampling:0, reversed:false, linear:false };
 
     document.querySelectorAll('[data-tab]').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
     document.querySelectorAll('[data-format]').forEach(btn => btn.addEventListener('click', () => {
@@ -154,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab===tab));
         $('generatorPanel').hidden=tab==='themes'; $('themesPanel').hidden=tab!=='themes';
         if(tab!=='themes') {
-            state.family=tab==='discrete'?'cell':'viridis';
+            state.family=tab==='discrete'?firstDiscreteFamily:firstContinuousFamily;
             resetSettings(false); configureControls(); render();
         }
         else renderThemes();
@@ -227,7 +229,9 @@ document.addEventListener('DOMContentLoaded', () => {
             labs.forEach((lab,i)=>{ if(chosen.includes(i)) return; const d=Math.min(...chosen.map(j=>distance(lab,labs[j]))); if(d>score){score=d;best=i;} });
             chosen.push(best);
         }
-        return chosen.map(i=>colors[i]);
+        // 选色依据感知距离，但展示顺序始终遵循母色系的原始列表。
+        // 因此增加色数时只会插入新颜色，不会重排已经出现的颜色。
+        return chosen.sort((a,b)=>a-b).map(i=>colors[i]);
     }
     function sampleGradient(stops,n,bias) {
         return Array.from({length:n},(_,i)=>{
