@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="科研与生物信息学常用速查表合集。">
+    <title>速查表 - 海钊知识港</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/global.css">
+    <link rel="stylesheet" href="../../../css/cheat-sheet.css">
+    <script src="../../../js/global.js"></script>
+    <script>window.footerPath = '../../../footer.html';</script>
+</head>
+<body class="category-page cheat-sheet-page">
+    <nav>
+        <div class="logo"><a href="../../../index.html">海钊知识港</a></div>
+        <div class="nav-links">
+            <a href="../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+            <a href="../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+            <a href="../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+            <a href="../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+        </div>
+    </nav>
+
+    <main class="cheat-shell">
+        <header class="cheat-hero">
+            <div class="hero-copy">
+                <a href="../resources_index.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回资源站</a>
+                <p class="eyebrow">CHEAT SHEET</p>
+                <h1>速查表</h1>
+                <p class="resource-hero-description">培养基、绘图色系名称、内切酶等等实验室常用速查表。</p>
+            </div>
+            <div class="hero-mark" aria-hidden="true">
+                <span class="mark-key">⌘</span>
+                <span class="mark-slash">/</span>
+            </div>
+        </header>
+
+        <section class="cheat-toolbar" aria-label="搜索速查表">
+            <label class="cheat-search" for="sheetSearch">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input id="sheetSearch" type="search" placeholder="搜索速查表名称…" autocomplete="off">
+                <kbd>/</kbd>
+            </label>
+        </section>
+
+        <section class="sheet-grid" id="sheetGrid" aria-label="速查表列表">
+            <article class="sheet-card" data-title="matplotlib 速查表">
+                <div class="card-accent accent-blue"></div>
+                <div class="sheet-icon blue-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="sheet-copy">
+                    <h2>Matplotlib 速查表</h2>
+                    <p>常用图形、坐标轴、图例、样式与布局参数。</p>
+                </div>
+                <div class="card-actions">
+                    <a class="primary-action" href="matplotlib速查表.pdf" target="_blank" rel="noopener"><i class="far fa-eye"></i> 在线查看</a>
+                    <a class="icon-action" href="matplotlib速查表.pdf" download title="下载 Matplotlib 速查表" aria-label="下载 Matplotlib 速查表"><i class="fas fa-download"></i></a>
+                </div>
+            </article>
+
+            <article class="sheet-card" data-title="生化知识大全">
+                <div class="card-accent accent-blue"></div>
+                <div class="sheet-icon blue-icon"><i class="fas fa-atom"></i></div>
+                <div class="sheet-copy">
+                    <h2>生化知识大全</h2>
+                    <p>集中整理实验与学习中常用的生物化学知识点。</p>
+                </div>
+                <div class="card-actions">
+                    <a class="primary-action" href="生化知识大全.pdf" target="_blank" rel="noopener"><i class="far fa-eye"></i> 在线查看</a>
+                    <a class="icon-action" href="生化知识大全.pdf" download title="下载生化知识大全" aria-label="下载生化知识大全"><i class="fas fa-download"></i></a>
+                </div>
+            </article>
+        </section>
+
+        <div class="empty-state" id="emptyState" hidden>
+            <i class="fas fa-magnifying-glass"></i>
+            <h2>没有找到匹配的速查表</h2>
+            <p>换个关键词后再试。</p>
+            <button type="button" id="resetFilters">清除搜索</button>
+        </div>
+
+    </main>
+
+    <div id="footer-placeholder"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const search = document.getElementById('sheetSearch');
+            const cards = [...document.querySelectorAll('.sheet-card')];
+            const resultCount = document.getElementById('resultCount');
+            const emptyState = document.getElementById('emptyState');
+
+            function updateResults() {
+                const query = search.value.trim().toLowerCase();
+                let visible = 0;
+                cards.forEach(card => {
+                    const show = !query || card.dataset.title.includes(query);
+                    card.hidden = !show;
+                    if (show) visible++;
+                });
+                if (resultCount) resultCount.textContent = visible;
+                emptyState.hidden = visible !== 0;
+            }
+
+            search.addEventListener('input', updateResults);
+            document.addEventListener('keydown', event => {
+                if (event.key === '/' && document.activeElement !== search) {
+                    event.preventDefault();
+                    search.focus();
+                }
+                if (event.key === 'Escape' && document.activeElement === search) {
+                    search.value = '';
+                    search.blur();
+                    updateResults();
+                }
+            });
+            document.getElementById('resetFilters').addEventListener('click', () => {
+                search.value = '';
+                updateResults();
+                search.focus();
+            });
+        });
+    </script>
+</body>
+</html>

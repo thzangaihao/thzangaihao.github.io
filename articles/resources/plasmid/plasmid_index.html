@@ -8,13 +8,14 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" href="../../../css/global.css">
         <link rel="stylesheet" href="../../../css/plasmid.css">
+        <link rel="stylesheet" href="../../../css/cheat-sheet.css">
 
         <script src="../../../js/global.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
         <script>window.footerPath = '../../../footer.html';</script>
     </head>
 
-    <body class="category-page">
+    <body class="category-page cheat-sheet-page resource-unified">
         <nav>
             <div class="logo"><a href="../../../index.html">海钊知识港</a></div>
             <div class="nav-links">
@@ -25,24 +26,29 @@
             </div>
         </nav>
 
-        <div class="container" style="flex-direction: column;">
-            <div class="list-header" style="margin-bottom: 2rem;">
-                <a href="../resources_index.html" class="back-link" style="margin-bottom: 1rem;"><i class="fas fa-arrow-left"></i> 返回资源站</a>
-                <h2><i class="fa-solid fa-circle-notch fa-rotate-by" style="--fa-rotate-angle: 45deg;"></i> 质粒数据库</h2>
-                <p>实验室常用质粒信息、图谱与序列存档。</p>
-            </div>
+        <main class="cheat-shell">
+            <header class="cheat-hero">
+                <div class="hero-copy">
+                    <a href="../resources_index.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回资源站</a>
+                    <p class="eyebrow">PLASMID LIBRARY</p>
+                    <h1>质粒数据库</h1>
+                    <p class="resource-hero-description">实验室常用质粒信息、图谱与序列存档。</p>
+                </div>
+                <div class="hero-mark resource-mark" aria-hidden="true"><i class="fa-solid fa-circle-notch fa-rotate-by" style="--fa-rotate-angle:45deg"></i></div>
+            </header>
 
-            <div class="plasmid-header">
-                <div class="plasmid-search-bar">
+            <div class="cheat-toolbar">
+                <label class="cheat-search" for="searchInput">
                     <i class="fas fa-search"></i>
                     <input type="text" id="searchInput" placeholder="搜索质粒名称、抗性或分类...">
-                </div>
+                    <kbd>/</kbd>
+                </label>
             </div>
 
             <div class="plasmid-grid" id="plasmidGrid">
                 <!-- 质粒卡片由JS动态生成 -->
             </div>
-        </div>
+        </main>
 
         <div id="footer-placeholder"></div>
 
@@ -76,6 +82,13 @@
                         (p.description && p.description.toLowerCase().includes(term))
                     );
                     renderGrid(filtered);
+                });
+
+                document.addEventListener('keydown', event => {
+                    if (event.key === '/' && document.activeElement !== searchInput) {
+                        event.preventDefault();
+                        searchInput.focus();
+                    }
                 });
 
                 // 渲染网格
