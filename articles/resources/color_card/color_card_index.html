@@ -1,276 +1,264 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>配色卡 - 海钊知识港</title>
-        
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" href="../../../css/global.css">
-        <link rel="stylesheet" href="../../../css/color_card.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配色工具 - 海钊知识港</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/global.css">
+    <link rel="stylesheet" href="../../../css/color_card.css">
+    <script src="../../../js/global.js"></script>
+    <script>window.footerPath = '../../../footer.html';</script>
+</head>
+<body class="category-page">
+    <nav>
+        <div class="logo"><a href="../../../index.html">海钊知识港</a></div>
+        <div class="nav-links">
+            <a href="../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+            <a href="../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+            <a href="../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+            <a href="../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+        </div>
+    </nav>
 
-        <script src="../../../js/global.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-        <script>window.footerPath = '../../../footer.html';</script>
-    </head>
+    <main class="container palette-page">
+        <header class="list-header palette-intro">
+            <a href="../resources_index.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回资源站</a>
+            <p class="eyebrow">COLOR LAB</p>
+            <h1>配色工具</h1>
+            <p>选择色系与数量，生成恰好需要的颜色。点击单个色块复制，或一次复制整组色值。</p>
+        </header>
 
-    <body class="category-page">
-        <nav>
-            <div class="logo"><a href="../../../index.html">海钊知识港</a></div>
-            <div class="nav-links">
-                <a href="../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
-                <a href="../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
-                <a href="../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
-                <a href="../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+        <div class="palette-toolbar">
+            <div class="palette-tabs" role="tablist" aria-label="配色类型">
+                <button class="active" data-tab="discrete" role="tab"><i class="fas fa-shapes"></i> 离散配色</button>
+                <button data-tab="continuous" role="tab"><i class="fas fa-wave-square"></i> 连续配色</button>
+                <button data-tab="themes" role="tab"><i class="fas fa-bookmark"></i> 固定主题</button>
             </div>
-        </nav>
-
-        <div class="container" style="flex-direction: column;">
-            <div class="list-header" style="margin-bottom: 2rem;">
-                <a href="../resources_index.html" class="back-link" style="margin-bottom: 1rem;"><i class="fas fa-arrow-left"></i> 返回资源站</a>
-                <h2><i class="fa-solid fa-palette"></i> 配色卡</h2>
-                <p>常用科研绘图与网页配色方案，点击色块即可复制颜色值。</p>
-            </div>
-
-            <div class="color-card-header">
-                <div class="color-card-search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="搜索配色名称、ID 或颜色值...">
-                </div>
-
-                <div style="display: flex; gap: 0.75rem; align-items: center;">
-                    <div class="color-count-filter" aria-label="按色数筛选">
-                        <button type="button" class="active" data-count="all">全部</button>
-                        <button type="button" data-count="2">2色</button>
-                        <button type="button" data-count="3">3色</button>
-                        <button type="button" data-count="4">4色</button>
-                        <button type="button" data-count="5">5色</button>
-                        <button type="button" data-count="6+">6色及以上</button>
-                    </div>
-
-                    <div class="color-mode-toggle" aria-label="颜色显示模式">
-                        <button type="button" class="active" data-mode="hex">HEX</button>
-                        <button type="button" data-mode="rgb">RGB</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="color-card-grid" id="colorCardGrid">
-                <!-- 配色卡由 JS 动态生成 -->
+            <div class="format-toggle" aria-label="颜色格式">
+                <button class="active" data-format="hex">HEX</button>
+                <button data-format="rgb">RGB</button>
             </div>
         </div>
 
-        <div id="footer-placeholder"></div>
+        <section id="generatorPanel" class="generator-shell">
+            <aside class="control-panel">
+                <div class="settings-heading">
+                    <span>生成设置</span>
+                    <button id="resetButton" type="button"><i class="fas fa-rotate-left"></i> 恢复默认</button>
+                </div>
+                <div class="control-group">
+                    <label for="familySelect">母色系</label>
+                    <select id="familySelect"></select>
+                    <p id="familyNote" class="control-note"></p>
+                </div>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                let colorCardData = [];
-                let displayMode = "hex";
-                let colorCountFilter = "all";
+                <div class="control-group">
+                    <div class="control-label-row"><label for="countRange">色数</label><output id="countOutput">6 色</output></div>
+                    <input id="countRange" type="range" min="2" max="12" value="6">
+                    <div class="range-scale"><span>2 色</span><span id="countMaxLabel">12 色</span></div>
+                </div>
 
-                Papa.parse("color_card_data.csv", {
-                    download: true,
-                    header: true,
-                    skipEmptyLines: true,
-                    encoding: "UTF-8",
-                    complete: function(results) {
-                        colorCardData = results.data
-                            .map(normalizePalette)
-                            .filter(palette => palette.colors.length > 0);
-                        renderGrid(getVisibleData());
-                    },
-                    error: function() {
-                        document.getElementById("colorCardGrid").innerHTML = '<p style="color: red;">数据加载失败，请检查 CSV 文件。</p>';
-                    }
-                });
+                <div class="control-group">
+                    <div class="control-label-row"><label for="chromaRange">鲜艳度</label><output id="chromaOutput">标准</output></div>
+                    <input id="chromaRange" type="range" min="50" max="150" value="100">
+                    <div class="range-scale"><span>50%</span><span>原色 100%</span><span>150%</span></div>
+                </div>
 
-                document.getElementById("searchInput").addEventListener("input", () => {
-                    renderGrid(getVisibleData());
-                });
+                <div id="samplingGroup" class="control-group" hidden>
+                    <div class="control-label-row"><label for="samplingRange">取样分布</label><output id="samplingOutput">均匀</output></div>
+                    <input id="samplingRange" type="range" min="-100" max="100" value="0">
+                    <div class="range-scale"><span>偏低值</span><span>均匀</span><span>偏高值</span></div>
+                </div>
 
-                document.querySelectorAll(".color-mode-toggle button").forEach(button => {
-                    button.addEventListener("click", () => {
-                        displayMode = button.dataset.mode;
-                        document.querySelectorAll(".color-mode-toggle button").forEach(item => item.classList.remove("active"));
-                        button.classList.add("active");
-                        renderGrid(getVisibleData());
-                    });
-                });
+                <label id="safeModeRow" class="check-row" hidden>
+                    <input id="safeMode" type="checkbox" checked>
+                    <span><strong>保持色盲友好原色</strong><small>启用后不调整 Okabe–Ito 鲜艳度</small></span>
+                </label>
+            </aside>
 
-                document.querySelectorAll(".color-count-filter button").forEach(button => {
-                    button.addEventListener("click", () => {
-                        colorCountFilter = button.dataset.count;
-                        document.querySelectorAll(".color-count-filter button").forEach(item => item.classList.remove("active"));
-                        button.classList.add("active");
-                        renderGrid(getVisibleData());
-                    });
-                });
+            <div class="preview-panel">
+                <div class="preview-heading">
+                    <div><p class="preview-kicker" id="previewKicker">离散配色</p><h2 id="previewTitle">Cell Paper · 6 色</h2></div>
+                    <button id="reverseButton" class="ghost-button" type="button"><i class="fas fa-right-left"></i> 反转</button>
+                </div>
+                <div id="palettePreview" class="palette-preview discrete" aria-label="配色预览"></div>
+                <ol id="valueList" class="value-list"></ol>
+                <div class="preview-actions">
+                    <button id="copyAllButton" class="primary-button" type="button"><i class="far fa-copy"></i> 复制整组</button>
+                    <span id="copyHint" aria-live="polite">可直接粘贴到 R、Python 或绘图软件</span>
+                </div>
+            </div>
+        </section>
 
-                function getVisibleData() {
-                    const term = document.getElementById("searchInput").value.trim().toLowerCase();
-                    return colorCardData.filter(palette => {
-                        const haystack = [palette.id, palette.name, ...palette.colors].join(" ").toLowerCase();
-                        const matchesTerm = !term || haystack.includes(term);
+        <section id="themesPanel" class="themes-panel" hidden>
+            <div class="section-heading"><div><p class="preview-kicker">CURATED THEMES</p><h2>固定主题配色</h2></div><p>国旗、品牌和特殊绘图语义保留原始色值，不参与参数生成。</p></div>
+            <div id="themeGrid" class="theme-grid"></div>
+        </section>
+    </main>
+    <div id="toast" class="copy-toast" role="status" aria-live="polite"></div>
+    <div id="footer-placeholder"></div>
 
-                        let matchesCount = true;
-                        if (colorCountFilter === 'all') {
-                            matchesCount = true;
-                        } else if (colorCountFilter === '6+') {
-                            matchesCount = palette.colors.length >= 6;
-                        } else {
-                            const need = parseInt(colorCountFilter, 10);
-                            matchesCount = palette.colors.length === need;
-                        }
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const discreteFamilies = {
+        okabe: { name: 'Okabe–Ito', note: '经过验证的色盲友好方案；建议保持原色，最多 8 色。', max: 8, colors: ['#0072B2','#E69F00','#009E73','#D55E00','#CC79A7','#56B4E9','#F0E442','#4D4D4D'] },
+        tableau: { name: 'Tableau 10', note: '经典 Tableau 10 色，Nature 建议配色，低刺激、印刷友好的自然系论文配色。', colors: ['#4E79A7','#F28E2B','#59A14F','#E15759','#B07AA1','#9C755F','#76B7B2','#EDC948','#FF9DA7','#BAB0AC'] },
+        cell: { name: 'Cell Paper', note: 'Tableau 变体色，沉稳的科研论文常用色，兼顾冷暖与较长色序列。', colors: ['#3B6EA8','#D34E4E','#63A375','#E0A458','#6C5B7B','#2A9D8F','#E76F51','#F28482','#84A59D','#264653','#A8DADC','#F4C95D'] },
+        bold: { name: '高对比', note: '适合投影、深浅背景和需要快速区分类别的图表。', colors: ['#3366CC','#DC3912','#109618','#FF9900','#990099','#0099C6','#DD4477','#66AA00','#B82E2E','#316395','#994499','#22AA99'] }
+    };
+    const continuousFamilies = {
+        viridis: { name: '经典 Viridis', note: '感知均匀、色盲友好，适合绝大多数连续数值。', stops: ['#440154','#414487','#2A788E','#22A884','#7AD151','#FDE725'] },
+        magma: { name: '岩浆 Magma', note: '暗部细节丰富，适合热图与深色背景。', stops: ['#000004','#3B0F70','#8C2981','#DE4968','#FE9F6D','#FCFDBF'] },
+        ocean: { name: '深海 Deep Ocean', note: '起源于岩浆 Magma，由深蓝过渡至珊瑚红的多色连续带。', stops: ['#003F5C','#2F4B7C','#665191','#A05195','#D45087','#F95D6A'] },
+        forest: { name: '复古秋日 Retro Autumn', note: '木色至林绿色的自然系多段连续带。', stops: ['#7A3E2E','#B85C38','#E0A458','#F2D492','#7EA16B','#4D7C8A'] },
+        bluewhiteRed: { name: '蓝–白–红', note: '以浅色为中心的发散色带，适合展示相对零点的偏离。', stops: ['#313695','#74ADD1','#F7F7F7','#F46D43','#A50026'] },
+        blueyellowRed: { name: '蓝–黄–红', note: '以浅色为中心的发散色带，适合展示相对零点的偏离。', stops: ['#2C7BB6','#ABD9E9','#FFFFBF','#FDAE61','#D7191C'] },
+        chip: { name: '芯片风 Chip', note: '老牌经典生物信息热图配色。在早期微阵列芯片文章中极为常见。默认色做了欠饱和处理。', stops: ['#1A9850','#111111','#D73027'] },
+        modern_chip: { name: '现代芯片风 Modern Chip', note: '浅色系为主的现代芯片风。', stops: ['#1A9850', '#A6D96A', '#FFFFBF', '#FDAE61', '#D73027'] },
+        Anthropic: { name: 'Anthropic', note: 'Anthropic 公司网页设计经典配色。', stops: ['#F0EEE6','#E3DACC','#D8B5A4','#C18064','#141413'] }
+    };
+    const themes = [
+        { name:'瑞典国旗', tag:'国家', colors:['#006AA7','#FECC02'] },
+        { name:'樱花青提', tag:'双配色', colors:['#F9A4A2','#61A8AD'] },
+        { name:'德系配色', tag:'主题', colors:['#FFD460','#F07B3F','#EA5455','#2D4059'] },
+        { name:'法系配色', tag:'主题', colors:['#283C63','#928A97','#FBE8D3','#F2545B'] }
+    ];
 
-                        return matchesTerm && matchesCount;
-                    });
-                }
+    const $ = id => document.getElementById(id);
+    let state = { tab:'discrete', format:'hex', family:'cell', count:6, chroma:100, sampling:0, reversed:false, linear:false };
 
-                function normalizePalette(row) {
-                    return {
-                        id: (row.id || "").trim(),
-                        name: (row.name || "").trim(),
-                        colors: parseColorList(row.colors || "")
-                    };
-                }
+    document.querySelectorAll('[data-tab]').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+    document.querySelectorAll('[data-format]').forEach(btn => btn.addEventListener('click', () => {
+        state.format = btn.dataset.format;
+        document.querySelectorAll('[data-format]').forEach(x => x.classList.toggle('active', x === btn));
+        render(); renderThemes();
+    }));
+    $('familySelect').addEventListener('change', e => { state.family=e.target.value; state.reversed=false; state.linear=false; configureControls(); render(); });
+    $('countRange').addEventListener('input', e => {
+        const value=+e.target.value;
+        state.linear=state.tab==='continuous'&&value===+e.target.max;
+        if(!state.linear) state.count=value;
+        render();
+    });
+    $('chromaRange').addEventListener('input', e => { state.chroma=+e.target.value; render(); });
+    $('samplingRange').addEventListener('input', e => { state.sampling=+e.target.value; render(); });
+    $('safeMode').addEventListener('change', render);
+    $('reverseButton').addEventListener('click', () => { state.reversed=!state.reversed; render(); });
+    $('resetButton').addEventListener('click', resetSettings);
+    $('copyAllButton').addEventListener('click', () => copyText(currentColors().map(formatColor).join(', '), '整组颜色已复制'));
+    $('palettePreview').addEventListener('click', e => { const b=e.target.closest('[data-color]'); if(b) copyText(formatColor(b.dataset.color), `${formatColor(b.dataset.color)} 已复制`); });
 
-                function parseColorList(value) {
-                    const jsonLike = value.trim().replace(/'/g, '"');
-                    try {
-                        const colors = JSON.parse(jsonLike);
-                        if (Array.isArray(colors)) {
-                            return colors.map(normalizeHex).filter(Boolean);
-                        }
-                    } catch (error) {
-                        return [];
-                    }
-                    return [];
-                }
+    function switchTab(tab) {
+        state.tab=tab; state.reversed=false;
+        document.querySelectorAll('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab===tab));
+        $('generatorPanel').hidden=tab==='themes'; $('themesPanel').hidden=tab!=='themes';
+        if(tab!=='themes') {
+            state.family=tab==='discrete'?'cell':'viridis';
+            resetSettings(false); configureControls(); render();
+        }
+        else renderThemes();
+    }
 
-                function normalizeHex(value) {
-                    const color = String(value).trim().toUpperCase();
-                    if (/^#[0-9A-F]{6}$/.test(color)) return color;
-                    if (/^[0-9A-F]{6}$/.test(color)) return `#${color}`;
-                    return "";
-                }
+    function resetSettings(shouldRender=true) {
+        state.count=6; state.chroma=100; state.sampling=0; state.reversed=false; state.linear=false;
+        $('chromaRange').value=100; $('samplingRange').value=0; $('safeMode').checked=true;
+        configureControls();
+        if(shouldRender) { render(); showToast('已恢复默认设置'); }
+    }
 
-                function hexToRgb(hex) {
-                    const value = hex.replace("#", "");
-                    const red = parseInt(value.slice(0, 2), 16);
-                    const green = parseInt(value.slice(2, 4), 16);
-                    const blue = parseInt(value.slice(4, 6), 16);
-                    return `rgb(${red}, ${green}, ${blue})`;
-                }
+    function configureControls() {
+        const families=state.tab==='discrete'?discreteFamilies:continuousFamilies;
+        $('familySelect').innerHTML=Object.entries(families).map(([id,f])=>`<option value="${id}" ${id===state.family?'selected':''}>${f.name}</option>`).join('');
+        const family=families[state.family];
+        const discreteMax=family.max||family.colors?.length||12;
+        // 连续色的最后一个滑块档位代表完整的线性渐变。
+        $('countRange').max=state.tab==='discrete'?discreteMax:13;
+        $('countMaxLabel').textContent=state.tab==='discrete'?`${discreteMax} 色`:'线性渐变';
+        if(state.tab==='discrete'&&state.count>discreteMax) state.count=discreteMax;
+        $('countRange').value=state.linear?$('countRange').max:state.count;
+        $('samplingGroup').hidden=state.tab!=='continuous';
+        $('safeModeRow').hidden=!(state.tab==='discrete'&&state.family==='okabe');
+        $('chromaRange').disabled=state.family==='okabe'&&$('safeMode').checked;
+    }
 
-                function getDisplayValue(hex) {
-                    return displayMode === "rgb" ? hexToRgb(hex) : hex;
-                }
+    function currentColors() {
+        const family=state.tab==='discrete'?discreteFamilies[state.family]:continuousFamilies[state.family];
+        let colors;
+        if(state.tab==='discrete') colors=bestSubset(family.colors, state.count);
+        else colors=state.linear?family.stops.slice():sampleGradient(family.stops, state.count, state.sampling);
+        if(!(state.family==='okabe'&&$('safeMode').checked)) colors=colors.map(c=>adjustChroma(c,state.chroma/100));
+        return state.reversed?colors.reverse():colors;
+    }
 
-                function getTextStyle(hex) {
-                    const value = hex.replace("#", "");
-                    const red = parseInt(value.slice(0, 2), 16);
-                    const green = parseInt(value.slice(2, 4), 16);
-                    const blue = parseInt(value.slice(4, 6), 16);
-                    const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
-                    return luminance > 0.62
-                        ? { color: "#263238", shadow: "0 1px 0 rgba(255,255,255,0.3)" }
-                        : { color: "#ffffff", shadow: "0 1px 2px rgba(0,0,0,0.35)" };
-                }
+    function render() {
+        if(state.tab==='themes') return;
+        configureControls();
+        const family=(state.tab==='discrete'?discreteFamilies:continuousFamilies)[state.family];
+        const colors=currentColors();
+        $('familyNote').textContent=family.note;
+        $('countOutput').textContent=state.linear?'线性渐变':`${state.count} 色`;
+        $('chromaOutput').textContent=`${state.chroma}%${state.chroma===100?' · 原色':''}`;
+        $('samplingOutput').textContent=state.sampling===0?'均匀':state.sampling<0?'偏低值':'偏高值';
+        $('previewKicker').textContent=state.tab==='discrete'?'离散配色':'连续配色';
+        $('previewTitle').textContent=`${family.name} · ${state.linear?'线性渐变':state.count+' 色'}`;
+        $('palettePreview').className=`palette-preview ${state.tab}${state.linear?' linear':''}`;
+        if(state.linear) {
+            $('palettePreview').style.background=`linear-gradient(90deg, ${colors.join(', ')})`;
+            $('palettePreview').innerHTML='<span class="linear-label">完整连续色带</span>';
+        } else {
+            $('palettePreview').style.background='';
+            $('palettePreview').innerHTML=colors.map((c,i)=>`<button type="button" data-color="${c}" style="--swatch:${c}" aria-label="复制 ${formatColor(c)}"><span>${i+1}</span></button>`).join('');
+        }
+        $('valueList').innerHTML=colors.map((c,i)=>`<li><span class="number">${String(i+1).padStart(2,'0')}</span><i style="--dot:${c}"></i><code>${formatColor(c)}</code></li>`).join('');
+    }
 
-                function renderGrid(data) {
-                    const grid = document.getElementById("colorCardGrid");
-                    grid.innerHTML = "";
+    function renderThemes() {
+        $('themeGrid').innerHTML=themes.map((t,idx)=>`<article class="theme-card"><div class="theme-card-title"><div><span>${t.tag}</span><h3>${t.name}</h3></div><button data-theme-copy="${idx}" aria-label="复制整组"><i class="far fa-copy"></i></button></div><div class="theme-strip">${t.colors.map(c=>`<button data-theme-color="${c}" style="--swatch:${c}" title="${formatColor(c)}"></button>`).join('')}</div><p>${t.colors.map(formatColor).join(' · ')}</p></article>`).join('');
+        document.querySelectorAll('[data-theme-copy]').forEach(b=>b.onclick=()=>copyText(themes[+b.dataset.themeCopy].colors.map(formatColor).join(', '),'整组颜色已复制'));
+        document.querySelectorAll('[data-theme-color]').forEach(b=>b.onclick=()=>copyText(formatColor(b.dataset.themeColor),`${formatColor(b.dataset.themeColor)} 已复制`));
+    }
 
-                    if (data.length === 0) {
-                        grid.innerHTML = '<p style="color: #999;">没有找到匹配的配色卡。</p>';
-                        return;
-                    }
-
-                    data.forEach(palette => {
-                        const card = document.createElement("article");
-                        card.className = "color-palette-card";
-
-                        const colorColumns = Math.min(palette.colors.length, 6);
-                        const colorsPerColumn = Math.floor(palette.colors.length / colorColumns);
-                        const extraColors = palette.colors.length % colorColumns;
-                        let colorIndex = 0;
-                        const strip = Array.from({ length: colorColumns }, (_, columnIndex) => {
-                            const columnSize = colorsPerColumn + (columnIndex < extraColors ? 1 : 0);
-                            const columnColors = palette.colors.slice(colorIndex, colorIndex + columnSize);
-                            colorIndex += columnSize;
-
-                            const swatches = columnColors.map(hex => {
-                                const style = getTextStyle(hex);
-                                return `
-                                    <button
-                                        type="button"
-                                        class="color-swatch"
-                                        style="background: ${hex}; --label-color: ${style.color}; --label-shadow: ${style.shadow};"
-                                        data-copy-value="${getDisplayValue(hex)}"
-                                        title="复制 ${getDisplayValue(hex)}"
-                                        aria-label="复制 ${getDisplayValue(hex)}"></button>
-                                `;
-                            }).join("");
-
-                            return `<div class="color-column">${swatches}</div>`;
-                        }).join("");
-
-                        const list = palette.colors.map(hex => `
-                            <li><span class="color-dot" style="background: ${hex};"></span>${getDisplayValue(hex)}</li>
-                        `).join("");
-
-                        card.innerHTML = `
-                            <h3>${escapeHtml(palette.name || palette.id)}</h3>
-                            <div class="color-palette-id">${escapeHtml(palette.id)} · ${palette.colors.length} 色</div>
-                            <div class="color-strip" style="--color-columns: ${colorColumns};">
-                                ${strip}
-                            </div>
-                            <ul class="color-list">${list}</ul>
-                        `;
-                        grid.appendChild(card);
-                    });
-                }
-
-                document.getElementById("colorCardGrid").addEventListener("click", async (event) => {
-                    const swatch = event.target.closest(".color-swatch");
-                    if (!swatch) return;
-
-                    const value = swatch.dataset.copyValue;
-                    try {
-                        await copyText(value);
-                        swatch.classList.add("copied");
-                        setTimeout(() => swatch.classList.remove("copied"), 900);
-                    } catch (error) {
-                        alert("复制失败，请手动复制色块上的颜色值。");
-                    }
-                });
-
-                function copyText(value) {
-                    if (navigator.clipboard && window.isSecureContext) {
-                        return navigator.clipboard.writeText(value);
-                    }
-
-                    const textarea = document.createElement("textarea");
-                    textarea.value = value;
-                    textarea.style.position = "fixed";
-                    textarea.style.opacity = "0";
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    const success = document.execCommand("copy");
-                    textarea.remove();
-                    return success ? Promise.resolve() : Promise.reject();
-                }
-
-                function escapeHtml(value) {
-                    return String(value).replace(/[&<>"']/g, char => ({
-                        "&": "&amp;",
-                        "<": "&lt;",
-                        ">": "&gt;",
-                        '"': "&quot;",
-                        "'": "&#039;"
-                    }[char]));
-                }
-            });
-        </script>
-    </body>
+    function bestSubset(colors,n) {
+        if(n>=colors.length) return colors.slice(0,n);
+        const labs=colors.map(hexToOklab), chosen=[0];
+        while(chosen.length<n) {
+            let best=-1,score=-1;
+            labs.forEach((lab,i)=>{ if(chosen.includes(i)) return; const d=Math.min(...chosen.map(j=>distance(lab,labs[j]))); if(d>score){score=d;best=i;} });
+            chosen.push(best);
+        }
+        return chosen.map(i=>colors[i]);
+    }
+    function sampleGradient(stops,n,bias) {
+        return Array.from({length:n},(_,i)=>{
+            let t=n===1?.5:i/(n-1); const gamma=Math.pow(2,bias/100); t=Math.pow(t,gamma);
+            const p=t*(stops.length-1), a=Math.floor(p), b=Math.min(stops.length-1,a+1), f=p-a;
+            return mixOklab(stops[a],stops[b],f);
+        });
+    }
+    function adjustChroma(hex,mult) { const [L,a,b]=hexToOklab(hex); return oklabToHex([L,a*mult,b*mult]); }
+    function mixOklab(a,b,t) { const x=hexToOklab(a),y=hexToOklab(b); return oklabToHex(x.map((v,i)=>v+(y[i]-v)*t)); }
+    function distance(a,b){ return Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]); }
+    function hexToOklab(hex) {
+        const rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));
+        const l=.4122214708*rgb[0]+.5363325363*rgb[1]+.0514459929*rgb[2], m=.2119034982*rgb[0]+.6806995451*rgb[1]+.1073969566*rgb[2], s=.0883024619*rgb[0]+.2817188376*rgb[1]+.6299787005*rgb[2];
+        const l3=Math.cbrt(l),m3=Math.cbrt(m),s3=Math.cbrt(s);
+        return [.2104542553*l3+.793617785*m3-.0040720468*s3,1.9779984951*l3-2.428592205*m3+.4505937099*s3,.0259040371*l3+.7827717662*m3-.808675766*s3];
+    }
+    function oklabToHex([L,a,b]) {
+        const l=Math.pow(L+.3963377774*a+.2158037573*b,3),m=Math.pow(L-.1055613458*a-.0638541728*b,3),s=Math.pow(L-.0894841775*a-1.291485548*b,3);
+        const lin=[4.0767416621*l-3.3077115913*m+.2309699292*s,-1.2684380046*l+2.6097574011*m-.3413193965*s,-.0041960863*l-.7034186147*m+1.707614701*s];
+        const rgb=lin.map(v=>Math.max(0,Math.min(1,v<=.0031308?12.92*v:1.055*Math.pow(v,1/2.4)-.055)));
+        return '#'+rgb.map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('').toUpperCase();
+    }
+    function formatColor(hex) { if(state.format==='hex') return hex.toUpperCase(); const v=hex.match(/[A-F\d]{2}/gi).map(x=>parseInt(x,16)); return `rgb(${v.join(', ')})`; }
+    async function copyText(text,message) {
+        try { if(navigator.clipboard&&window.isSecureContext) await navigator.clipboard.writeText(text); else { const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove(); } showToast(message); }
+        catch(e){ showToast('复制失败，请手动复制'); }
+    }
+    function showToast(message){ const t=$('toast');t.textContent=message;t.classList.add('show');clearTimeout(t.timer);t.timer=setTimeout(()=>t.classList.remove('show'),1600); }
+    configureControls(); render(); renderThemes();
+});
+</script>
+</body>
 </html>

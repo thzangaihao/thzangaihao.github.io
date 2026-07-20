@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
     <head>
-        <title>10. 直方图 - 海钊知识港</title>
+        <title>11. Hi-C 互作热图 - 海钊知识港</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -9,8 +9,8 @@
         <meta name="collection-title" content="图廊">
         <meta name="parent-path" content="../../resources_index.html">
         <meta name="parent-title" content="资源站">
-        <meta name="date" content="2026-07-08">
-        <meta name="description" content="分箱可视化">
+        <meta name="date" content="2026-07-19">
+        <meta name="description" content="染色体互作强度可视化">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" href="../../../../css/global.css">
@@ -33,25 +33,42 @@
         </nav>
 
         <div class="article-container">
-            <h1>10. 直方图</h1>
+            <h1>11. Hi-C 互作热图</h1>
             
             <div class="content">
-                <h2>分箱脚本</h2>
+                <h2>脚本</h2>
+                <p>根据互作分析，我们得到的核心文件是 <code>.mcool</code>。这是一个二进制文件，对它的解析必须要依赖环境中的软件。因此，我们采用 python matplotlib 进行绘图，这样可以避免繁重的 R 依赖。</p>
+                <a href="..\..\..\dry_lab\epigenome\01. Hi-C 标准化流程\01. Hi-C 标准化流程.html" class="related-article" target="_blank">
+                    <div class="related-article-icon">
+                        <i class="fas fa-link"></i>
+                    </div>
+
+                    <div class="related-article-content">
+                        <div class="related-article-title">推荐阅读：01. Hi-C 标准化流程</div>
+                        <div class="related-article-desc">Hi-C 双端测序数据构建多分辨率染色质互作矩阵</div>
+                    </div>
+                    
+                    <div class="related-article-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+                <p>这个脚本可以选择目的染色体进行绘制，也可以选择全染色体进行绘制，在不同尺度下需要设置不同的分辨率，避免热图过大卡死。出于性能考虑，热图主体部分是经过栅格化嵌入到矢量图中的。</p>
+                <p>这个脚本和其它 python 脚本有区别，参数配置逻辑在文件头部位，逻辑和 R 语言一致，不再支持交互式。</p>
                 <div class="download-card">
                     <div class="download-info">
                         <i class="fas fa-file-code"></i> <div class="file-details">
-                            <h5>分箱脚本</h5>
-                            <span>文件格式：.py | 大小：7.3 KB</span>
+                            <h5>全矩阵</h5>
+                            <span>文件格式：.py | 大小：8.9 KB</span>
                         </div>
                     </div>
-                    <a href="./01_bin_histogram.py" download class="download-btn">
+                    <a href="./plot_mcool_whole_genome.py" download class="download-btn">
                         <i class="fas fa-cloud-download-alt"></i>
                     </a>
 
                     <div class="download-info">
                         <i class="fas fa-file-code"></i> <div class="file-details">
-                            <h5>通用环境依赖</h5>
-                            <span>文件格式：.yml | 大小：14.1 KB</span>
+                            <h5>环境依赖</h5>
+                            <span>文件格式：.yml | 大小：10.3 KB</span>
                         </div>
                     </div>
                     <a href="./environment.yml" download class="download-btn">
@@ -59,22 +76,21 @@
                     </a>
                 </div>
 
-                <h2>拟合脚本</h2>
                 <div class="download-card">
                     <div class="download-info">
                         <i class="fas fa-file-code"></i> <div class="file-details">
-                            <h5>拟合脚本</h5>
-                            <span>文件格式：.py | 大小：6.5 KB</span>
+                            <h5>三角矩阵</h5>
+                            <span>文件格式：.py | 大小：6.8 KB</span>
                         </div>
                     </div>
-                    <a href="./02_fit_histogram.py" download class="download-btn">
+                    <a href="./plot_mcool_triangle.py" download class="download-btn">
                         <i class="fas fa-cloud-download-alt"></i>
                     </a>
 
                     <div class="download-info">
                         <i class="fas fa-file-code"></i> <div class="file-details">
-                            <h5>通用环境依赖</h5>
-                            <span>文件格式：.yml | 大小：14.1 KB</span>
+                            <h5>环境依赖</h5>
+                            <span>文件格式：.yml | 大小：10.3 KB</span>
                         </div>
                     </div>
                     <a href="./environment.yml" download class="download-btn">
@@ -82,28 +98,7 @@
                     </a>
                 </div>
 
-                <h2>绘图脚本</h2>
-                <div class="download-card">
-                    <div class="download-info">
-                        <i class="fas fa-file-code"></i> <div class="file-details">
-                            <h5>绘图脚本</h5>
-                            <span>文件格式：.R | 大小：9.1 KB</span>
-                        </div>
-                    </div>
-                    <a href="./03_plot_histogram_fit.R" download class="download-btn">
-                        <i class="fas fa-cloud-download-alt"></i>
-                    </a>
 
-                    <div class="download-info">
-                        <i class="fas fa-file-code"></i> <div class="file-details">
-                            <h5>通用环境依赖</h5>
-                            <span>文件格式：.yml | 大小：14.1 KB</span>
-                        </div>
-                    </div>
-                    <a href="./environment.yml" download class="download-btn">
-                        <i class="fas fa-cloud-download-alt"></i>
-                    </a>
-                </div>
 
 
 

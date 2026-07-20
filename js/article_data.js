@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/07/18_20:19:00
-// 文章总数: 71
+// 生成时间: 2026/07/19_15:06:23
+// 文章总数: 72
 
 window.ARTICLE_DATABASE = [
     {
@@ -569,6 +569,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-07-08",
         "summary": "分箱可视化",
         "path": "articles/resources/gallery/10. 直方图/10. 直方图.html",
+        "featured": false
+    },
+    {
+        "title": "11. Hi-C 互作热图",
+        "collection": "figure",
+        "date": "2026-07-19",
+        "summary": "染色体互作强度可视化",
+        "path": "articles/resources/gallery/11. HiC 互作热图/11. HiC 互作热图.html",
         "featured": false
     }
 ];

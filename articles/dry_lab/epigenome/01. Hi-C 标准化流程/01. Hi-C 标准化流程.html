@@ -10,7 +10,7 @@
         <meta name="parent-path" content="../../dry_lab_index.html">
         <meta name="parent-title" content="干实验">
         <meta name="date" content="2026-07-18">
-        <meta name="description" content="从 Hi-C 双端测序数据构建多分辨率染色质互作矩阵并绘制全基因组接触图">
+        <meta name="description" content="Hi-C 双端测序数据构建多分辨率染色质互作矩阵">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" href="../../../../css/global.css">
@@ -130,23 +130,20 @@ python hic_contact_map.py \
                     <p>再次运行脚本并指定相同输入和 <code>--outdir</code>，流程会通过完成标记和非空结果文件跳过已经成功的步骤，从首个未完成步骤继续。不要在恢复时更换 FASTA、FASTQ、bin size 或输出目录；若确实要改变关键参数，建议使用新的输出目录，避免旧结果被误用。</p>
 
                 <h2>可视化绘图</h2>
-                    <p>目录中的绘图脚本会读取 <code>.mcool</code> 的指定分辨率，将所有染色体或 scaffold 拼接成一个全基因组矩阵，对信号执行 <code>log1p</code> 变换，并输出 SVG、PNG 或 PDF。先修改脚本顶部的用户配置区：</p>
-                    <pre><code class="language-python">MCOOL = "./hic_contact_result/cool/contacts.mcool"
-RESOLUTION = 100_000
-OUTPUT_FILE = "contact_map.whole_genome.100kb.svg"
-CHROMS = None
-BALANCED = True</code></pre>
-                    <pre><code class="language-bash">python plot_mcool_whole_genome.py</code></pre>
-                    <p><code>RESOLUTION</code> 必须是 <code>contacts.resolutions.txt</code> 中已有的分辨率。若提示缺少 weight，可将 <code>BALANCED</code> 改为 <code>False</code>。大基因组在细分辨率下会产生巨大的稠密矩阵；脚本默认在超过 15,000 bins 时停止并提示更合适的分辨率，以避免内存耗尽。</p>
-                    <div class="download-card">
-                        <div class="download-info">
-                            <i class="fas fa-file-code"></i> <div class="file-details">
-                                <h5>全基因组接触图脚本</h5>
-                                <span>文件格式：.py | 大小：6.3 KB</span>
-                            </div>
+                    <a href="..\..\..\resources\gallery\11. HiC 互作热图\11. HiC 互作热图.html" class="related-article" target="_blank">
+                        <div class="related-article-icon">
+                            <i class="fas fa-link"></i>
                         </div>
-                        <a href="./plot_mcool_whole_genome.py" download class="download-btn"><i class="fas fa-cloud-download-alt"></i></a>
-                    </div>
+
+                        <div class="related-article-content">
+                            <div class="related-article-title">推荐阅读：01. Hi-C 标准化流程</div>
+                            <div class="related-article-desc">Hi-C 双端测序数据构建多分辨率染色质互作矩阵</div>
+                        </div>
+                        
+                        <div class="related-article-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
 
                 <h2>结果检查与解释</h2>
                     <p>正常的染色体级接触图应在每条染色体内部呈现连续、较强的主对角线，且信号通常随线性距离增加而衰减；不同染色体之间的互作背景应明显更弱。若用于检查组装，主对角线突然中断、远离对角线的强矩形块、蝴蝶形或交叉信号，可能提示 scaffold 的错误连接、倒置或排序问题。</p>

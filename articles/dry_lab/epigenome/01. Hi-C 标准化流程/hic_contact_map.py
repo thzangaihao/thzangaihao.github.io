@@ -272,7 +272,7 @@ def main() -> None:
     selected = choose_pairs(pairs)
 
     fasta = args.fasta.expanduser().resolve() if args.fasta else ask_file(
-        "输入 YaHS 最终 scaffold FASTA 路径"
+        "参考基因组 FASTA 路径"
     )
     if not fasta.is_file():
         raise SystemExit(f"FASTA 不存在: {fasta}")
@@ -325,7 +325,7 @@ def main() -> None:
 
     print("\n分析配置：")
     print(f"  FASTQ 配对数: {len(selected)}")
-    print(f"  scaffold FASTA: {fasta}")
+    print(f"  参考基因组: {fasta}")
     print(f"  输出目录:       {outdir}")
     print(f"  线程数:         {args.threads}")
     print(f"  最低 MAPQ:      {args.mapq}")
