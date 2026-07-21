@@ -1,4 +1,4 @@
-.cheat-sheet-page { background: #f4f7fa; }
+.cheat-sheet-page { background-color: var(--primary-bg); }
 
 .cheat-shell { max-width: 1180px; margin: 0 auto; padding: 2rem 1.25rem 5rem; min-height: 80vh; }
 
@@ -21,13 +21,13 @@
 .cheat-toolbar { display: flex; align-items: center; gap: 1rem; margin: 2rem 0 1rem; }
 .cheat-search { position: relative; display: block; flex: 1; max-width: 520px; }
 .cheat-search i { position: absolute; top: 50%; left: 1rem; transform: translateY(-50%); color: #8b9bab; }
-.cheat-search input { width: 100%; height: 50px; padding: 0 3rem 0 2.9rem; border: 1px solid #dae2e9; border-radius: 14px; outline: none; background: #fff; color: #263b4d; font-size: .95rem; box-shadow: 0 5px 16px rgba(31,52,71,.04); transition: .2s ease; }
+.cheat-search input { width: 100%; height: 50px; padding: 0 3rem 0 2.9rem; border: 1px solid var(--border-color); border-radius: 14px; outline: none; background: var(--surface-1); color: var(--text-main); font-size: .95rem; box-shadow: 0 5px 16px var(--shadow-color); transition: .2s ease; }
 .cheat-search input:focus { border-color: #3498db; box-shadow: 0 0 0 4px rgba(52,152,219,.12); }
 .cheat-search kbd { position: absolute; top: 50%; right: .9rem; transform: translateY(-50%); min-width: 25px; padding: .1rem .35rem; border: 1px solid #dce4ea; border-bottom-width: 2px; border-radius: 6px; background: #f7f9fb; color: #789; text-align: center; font-family: inherit; }
 .result-line { margin: 1.2rem .15rem .8rem; color: #81909d; font-size: .83rem; }
 
 .sheet-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
-.sheet-card { position: relative; overflow: hidden; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .85rem; min-height: 92px; padding: .85rem 1rem; border: 1px solid #e0e7ed; border-radius: 14px; background: #fff; box-shadow: 0 4px 14px rgba(36,54,71,.045); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.sheet-card { position: relative; overflow: hidden; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .85rem; min-height: 92px; padding: .85rem 1rem; border: 1px solid var(--border-color); border-radius: 14px; background: var(--surface-1); box-shadow: 0 4px 14px var(--shadow-color); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .sheet-card:hover { transform: translateY(-2px); border-color: #cbdce7; box-shadow: 0 9px 22px rgba(36,54,71,.09); }
 .sheet-card[hidden] { display: none; }
 .card-accent { position: absolute; inset: 0 auto 0 0; width: 3px; }
@@ -37,8 +37,8 @@
 .blue-icon { color: #278fc7; background: #e8f5fc; }
 .green-icon { color: #29936c; background: #e7f7f0; }
 .sheet-copy { min-width: 0; }
-.sheet-card h2 { min-width: 0; margin: 0; color: #263b4d; font-size: 1rem; line-height: 1.35; }
-.sheet-copy p { overflow: hidden; margin: .22rem 0 0; color: #7d8b96; font-size: .75rem; line-height: 1.4; white-space: nowrap; text-overflow: ellipsis; }
+.sheet-card h2 { min-width: 0; margin: 0; color: var(--text-main); font-size: 1rem; line-height: 1.35; }
+.sheet-copy p { overflow: hidden; margin: .22rem 0 0; color: var(--text-muted); font-size: .75rem; line-height: 1.4; white-space: nowrap; text-overflow: ellipsis; }
 .card-actions { display: flex; align-items: center; gap: .4rem; margin: 0; padding: 0; border: 0; }
 .primary-action { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 36px; padding: 0 .75rem; border-radius: 9px; background: #2c3e50; color: #fff; font-size: .78rem; font-weight: 650; white-space: nowrap; }
 .primary-action:hover { background: #3498db; color: #fff; }
@@ -71,27 +71,49 @@
 .contribution-note p { margin: 0; font-size: .84rem; }
 .contribution-note strong { color: #334b5d; }
 
-@media (max-width: 850px) {
-    .cheat-shell { padding-top: 1rem; }
-    .cheat-hero { min-height: 0; padding: 2rem 1.5rem; border-radius: 18px; }
-    .cheat-hero .back-link { margin-bottom: 2rem; }
-    .hero-mark { display: none; }
-    .cheat-toolbar { align-items: stretch; flex-direction: column; }
-    .cheat-search { max-width: none; }
+/* 资源工具页暗色模式：覆盖旧组件中写死的浅色主题颜色。 */
+html.site-dark body.cheat-sheet-page {
+    --palette-ink: #e1ebf1;
+    --palette-muted: #a8b7c2;
+    --palette-line: #344553;
+    --palette-surface: #18232e;
+    --palette-soft: #111b24;
 }
+html.site-dark body.cheat-sheet-page :where(.plasmid-card, .sheet-card, .theme-card) {
+    border-color: #344553;
+}
+html.site-dark body.cheat-sheet-page :where(.plasmid-card h3, .sheet-card h2, .theme-card h3, .empty-state h2) {
+    color: var(--text-main);
+}
+html.site-dark body.cheat-sheet-page :where(.plasmid-card p, .plasmid-card .plasmid-meta, .tool-card p, .sheet-copy p, .theme-card > p, .result-line, .section-heading > p, .preview-actions span, .empty-state, .contribution-note) {
+    color: var(--text-secondary);
+}
+html.site-dark body.cheat-sheet-page .plasmid-card .plasmid-type {
+    background: #263746;
+    color: #b8c8d2;
+}
+html.site-dark body.cheat-sheet-page .plasmid-card .plasmid-meta,
+html.site-dark body.cheat-sheet-page .value-list li { border-color: #344553; }
+html.site-dark body.cheat-sheet-page :where(.palette-tabs button, .format-toggle button, .value-list code) { color: #b7c6d0; }
+html.site-dark body.cheat-sheet-page :where(.cheat-search kbd, .icon-action) {
+    border-color: #3b4c59;
+    background: #182630;
+    color: #aec0cc;
+}
+html.site-dark body.cheat-sheet-page .empty-state {
+    border-color: #405360;
+    background: rgba(17, 27, 36, .68);
+}
+html.site-dark body.cheat-sheet-page .contribution-note { background: #182a35; }
+html.site-dark body.cheat-sheet-page .contribution-note > div {
+    background: #223744;
+    color: #61b9e8;
+}
+html.site-dark body.cheat-sheet-page .contribution-note strong { color: #d5e2e9; }
 
-@media (max-width: 640px) {
-    .sheet-grid { grid-template-columns: 1fr; }
-    .sheet-card { min-height: 82px; padding: .7rem .75rem; gap: .65rem; }
-    .sheet-icon { width: 40px; height: 40px; }
-    .sheet-copy p { font-size: .7rem; }
-    .primary-action { width: 36px; padding: 0; font-size: 0; }
-    .primary-action i { font-size: .8rem; }
-    .hero-stats { gap: .45rem 1rem; }
-    .cheat-hero h1 { font-size: 2.7rem; }
-    .resource-unified .plasmid-grid { grid-template-columns: 1fr; }
-    .resource-unified .plasmid-card { min-height: 132px; }
-}
+
+
+
 
 @media (prefers-reduced-motion: reduce) {
     .sheet-card, .cheat-search input { transition: none; }

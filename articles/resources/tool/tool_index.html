@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>工具库 - 海钊知识港</title>
-        
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" href="../../../css/global.css">
         <link rel="stylesheet" href="../../../css/plasmid.css">
@@ -71,17 +71,9 @@
 
             .tool-download-btn { transform: translateY(-50%); }
 
-            @media (max-width: 1000px) {
-                #toolGrid {
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
-                }
-            }
 
-            @media (max-width: 640px) {
-                #toolGrid {
-                    grid-template-columns: 1fr;
-                }
-            }
+
+
         </style>
 
         <script src="../../../js/global.js"></script>
@@ -164,7 +156,7 @@
                 function renderGrid(data) {
                     const grid = document.getElementById('toolGrid');
                     grid.innerHTML = '';
-                    
+
                     if (data.length === 0) {
                         grid.innerHTML = '<p style="color: #999;">暂无工具条目。</p>';
                         return;
@@ -176,7 +168,7 @@
                         const downloadButton = t.script_path
                             ? `<a class="tool-download-btn" href="${t.script_path}" download title="下载脚本" aria-label="下载 ${t.name} 脚本"><i class="fas fa-download"></i></a>`
                             : `<span class="tool-download-btn disabled" title="暂无脚本" aria-label="暂无脚本"><i class="fas fa-download"></i></span>`;
-                        
+
                         card.innerHTML = `
                             ${downloadButton}
                             <h3>${t.name}</h3>

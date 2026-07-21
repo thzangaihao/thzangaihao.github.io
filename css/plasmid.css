@@ -16,7 +16,7 @@
 .plasmid-search-bar {
     display: flex;
     align-items: center;
-    background: white;
+    background: var(--surface-1);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 0.5rem 1rem;
@@ -35,7 +35,7 @@
 }
 
 .plasmid-search-bar i {
-    color: #999;
+    color: var(--text-muted);
 }
 
 /* 2. 质粒列表（网格视图） */
@@ -46,7 +46,7 @@
 }
 
 .plasmid-card {
-    background: white;
+    background: var(--surface-1);
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -75,7 +75,7 @@
     background: #eef2f3;
     padding: 3px 8px;
     border-radius: 4px;
-    color: #666;
+    color: var(--text-secondary);
     display: inline-block;
     margin-bottom: 1rem;
     align-self: flex-start;
@@ -94,7 +94,7 @@
 
 .plasmid-card .plasmid-meta {
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text-muted);
     display: flex;
     justify-content: space-between;
     border-top: 1px solid #eee;
@@ -103,7 +103,7 @@
 
 /* 3. 质粒详细信息页 */
 .plasmid-detail-container {
-    background: white;
+    background: var(--surface-1);
     border-radius: 12px;
     padding: 3rem;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
@@ -163,7 +163,7 @@
 }
 
 .info-item {
-    background: #f8f9fa;
+    background: var(--surface-2);
     padding: 1rem 1.5rem;
     border-radius: 8px;
     border-left: 4px solid var(--accent-color);
@@ -186,7 +186,7 @@
 .plasmid-description {
     font-size: 1rem;
     line-height: 1.8;
-    color: #555;
+    color: var(--text-secondary);
     margin-bottom: 2.5rem;
     text-align: justify;
 }
@@ -232,19 +232,4 @@
     background: #2980b9;
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
-}
-
-@media (max-width: 850px) {
-    .plasmid-layout {
-        flex-direction: column;
-        gap: 2rem;
-    }
-    
-    .plasmid-info-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .plasmid-detail-container {
-        padding: 1.5rem;
-    }
 }

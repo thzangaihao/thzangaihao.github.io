@@ -2,19 +2,19 @@
 <html lang="zh-CN">
     <head>
         <title>03. BLAST - 海钊知识港</title>
-        <meta name="collection" content="compare"> 
+        <meta name="collection" content="compare">
         <meta name="date" content="2026-04-08">
         <meta name="description" content="看看和谁像？">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" href="../../../../css/global.css">
-        
+
         <script>window.footerPath = '../../../../footer.html';</script>
         <script src="../../../../js/global.js"></script>
         <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        
+
         <style>
             /* --- 1. 强制清除博客主题自带的图片/链接样式干扰 --- */
             .blast-flex-wrapper a {
@@ -26,7 +26,7 @@
                 border: none !important;
                 text-decoration: none !important;
             }
-            
+
             .blast-flex-wrapper img {
                 display: block !important;
                 width: 100% !important;
@@ -38,45 +38,38 @@
                 margin: 0 !important;
                 border-radius: 0 !important; /* 官网图片自带边缘，不需要额外圆角 */
             }
-            
+
             /* --- 2. 布局和间距微调 --- */
             .my-blast-nav {
                 max-width: 800px; /* 限制最大宽度，让整体更紧凑，你可以根据需要调整 */
                 margin: 20px auto;
             }
-            
+
             .blast-flex-wrapper {
                 display: flex;
                 align-items: center; /* 垂直居中 */
                 justify-content: center;
                 gap: 8px; /* 【关键】控制左中右三大块的间距，调小使其贴合 */
             }
-            
+
             .blast-item {
                 flex: 1; /* 左右两块各占 1 份宽度 */
             }
-            
+
             .blast-middle-stack {
                 display: flex;
                 flex-direction: column;
                 gap: 6px; /* 【关键】控制上下两个箭头之间的间距，让它们“贴在一起” */
                 flex: 1.1; /* 中间部分稍微给宽一点点，匹配官网比例 */
             }
-            
+
             /* 悬停时的微弱反馈 */
             .blast-flex-wrapper a:hover img {
                 opacity: 0.85;
             }
-            
+
             /* 手机端适配保持不变 */
-            @media (max-width: 768px) {
-                .blast-flex-wrapper {
-                    flex-direction: column;
-                }
-                .blast-middle-stack {
-                    width: 100%;
-                }
-            }
+
             </style>
     </head>
 
@@ -132,12 +125,12 @@
                     <h3>NCBI 网页版</h3>
                         <p>我们可以点击这个网址进入 NCBI 提供的 BLAST 在线工具首页：<a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi" target="_blank" style="color: #3498db;">https://blast.ncbi.nlm.nih.gov/Blast.cgi</a></p>
                         <p>NCBI 在 Web BLAST 页提供了四种常用的 BLAST，你也可以直接点击跳转到对应页。</p>
-                            <div class="my-blast-nav">                                
+                            <div class="my-blast-nav">
                                 <div class="blast-flex-wrapper">
                                     <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch" class="blast-item" target="_blank">
                                         <img src="./images/nucleutide-blast-cover.png" alt="Nucleotide BLAST">
                                     </a>
-                            
+
                                     <div class="blast-middle-stack">
                                         <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastx&PAGE_TYPE=BlastSearch" target="_blank">
                                             <img src="./images/blastx-arrow.png" alt="blastx">
@@ -146,7 +139,7 @@
                                             <img src="./images/tblastn-arrow.png" alt="tblastn">
                                         </a>
                                     </div>
-                            
+
                                     <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastp&PAGE_TYPE=BlastSearch" class="blast-item" target="_blank">
                                         <img src="./images/protein-blast-cover.png" alt="Protein BLAST">
                                     </a>

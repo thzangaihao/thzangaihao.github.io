@@ -15,6 +15,33 @@ window.MathJax = {
     options: { ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
 };
 
+window.__siteGlobalScriptUrl = window.__siteGlobalScriptUrl || document.currentScript.src;
+function getSiteImageUrl(fileName) {
+    return new URL(`../img/${fileName}`, window.__siteGlobalScriptUrl).href;
+}
+
+// 在首次绘制前恢复外观，避免页面先显示浅色背景再跳变。
+(() => {
+    let backgroundMode = 'image';
+    let themeMode = 'system';
+    try {
+        backgroundMode = localStorage.getItem('site-background-mode') || 'image';
+        themeMode = localStorage.getItem('site-theme-mode') || 'system';
+    } catch (error) {}
+    const useDark = themeMode === 'dark' || (themeMode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('site-dark', useDark);
+    document.documentElement.classList.toggle('site-background-image', backgroundMode === 'image');
+    document.documentElement.style.colorScheme = useDark ? 'dark' : 'light';
+    const initialPoster = useDark ? '2.png' : '1.png';
+    [initialPoster].forEach(fileName => {
+        const preload = document.createElement('link');
+        preload.rel = 'preload';
+        preload.as = 'image';
+        preload.href = getSiteImageUrl(fileName);
+        document.head.appendChild(preload);
+    });
+})();
+
 /* ------------------------------------------------------------
    2. 全局工具函数 (Utilities)
    ------------------------------------------------------------ */
@@ -402,28 +429,132 @@ function generateTOC() {
 }
 
 /* ------------------------------------------------------------
-   8. 返回顶部按钮 (Back to Top)
+   8. 页面悬浮控制（外观设置与返回顶部）
    ------------------------------------------------------------ */
-function initBackToTop() {
-    const btn = document.createElement('button');
-    btn.id = 'back-to-top-btn';
-    btn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-    btn.title = '回到顶部';
-    document.body.appendChild(btn);
+function initPageControls() {
+    const backgroundStorageKey = 'site-background-mode';
+    const themeStorageKey = 'site-theme-mode';
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let backgroundMode = 'image';
+    let themeMode = 'system';
+    try {
+        backgroundMode = localStorage.getItem(backgroundStorageKey) || 'image';
+        themeMode = localStorage.getItem(themeStorageKey) || 'system';
+    } catch (error) {}
+
+    const controls = document.createElement('div');
+    controls.className = 'page-fab-group';
+    controls.setAttribute('aria-label', '页面显示控制');
+
+    const appearanceBtn = document.createElement('button');
+    appearanceBtn.id = 'appearance-btn';
+    appearanceBtn.className = 'page-fab';
+    appearanceBtn.innerHTML = '<i class="fas fa-circle-half-stroke"></i>';
+    appearanceBtn.title = '外观设置';
+    appearanceBtn.setAttribute('aria-label', '打开外观设置');
+    appearanceBtn.setAttribute('aria-expanded', 'false');
+
+    const panel = document.createElement('div');
+    panel.id = 'appearance-panel';
+    panel.className = 'appearance-panel';
+    panel.hidden = true;
+    panel.innerHTML = `
+        <div class="appearance-heading"><span>外观</span><small>即时生效</small></div>
+        <div class="appearance-setting">
+            <span class="appearance-label"><i class="fas fa-circle-half-stroke"></i> 主题</span>
+            <div class="appearance-options" data-setting="theme" role="group" aria-label="主题模式">
+                <button type="button" data-value="light">浅色</button>
+                <button type="button" data-value="dark">深色</button>
+                <button type="button" data-value="system">自动</button>
+            </div>
+        </div>
+        <div class="appearance-setting">
+            <span class="appearance-label"><i class="fas fa-panorama"></i> 背景</span>
+            <div class="appearance-options" data-setting="background" role="group" aria-label="背景模式">
+                <button type="button" data-value="image">图片</button>
+                <button type="button" data-value="solid">纯色</button>
+            </div>
+        </div>`;
+
+    const topBtn = document.createElement('button');
+    topBtn.id = 'back-to-top-btn';
+    topBtn.className = 'page-fab';
+    topBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    topBtn.title = '回到顶部';
+    topBtn.setAttribute('aria-label', '回到顶部');
+
+    function updateOptions() {
+        panel.querySelectorAll('[data-setting="theme"] button').forEach(button => {
+            button.classList.toggle('active', button.dataset.value === themeMode);
+        });
+        panel.querySelectorAll('[data-setting="background"] button').forEach(button => {
+            button.classList.toggle('active', button.dataset.value === backgroundMode);
+        });
+    }
+
+    let transitionTimer = null;
+    function applyAppearance(animate = false) {
+        const useImage = backgroundMode === 'image';
+        const useDark = themeMode === 'dark' || (themeMode === 'system' && systemTheme.matches);
+        if (animate && useImage && !reducedMotion.matches) {
+            document.documentElement.classList.remove('theme-transitioning');
+            void document.documentElement.offsetWidth;
+            document.documentElement.classList.add('theme-transitioning');
+            if (transitionTimer) clearTimeout(transitionTimer);
+            transitionTimer = setTimeout(() => document.documentElement.classList.remove('theme-transitioning'), 1250);
+        }
+        document.documentElement.classList.toggle('site-background-image', useImage);
+        document.documentElement.classList.toggle('site-dark', useDark);
+        document.documentElement.style.colorScheme = useDark ? 'dark' : 'light';
+        appearanceBtn.classList.toggle('active', useDark);
+        updateOptions();
+    }
+
+    applyAppearance();
+    panel.addEventListener('click', event => {
+        const option = event.target.closest('button[data-value]');
+        if (!option) return;
+        const setting = option.closest('[data-setting]').dataset.setting;
+        if (setting === 'theme') themeMode = option.dataset.value;
+        if (setting === 'background') backgroundMode = option.dataset.value;
+        try {
+            localStorage.setItem(themeStorageKey, themeMode);
+            localStorage.setItem(backgroundStorageKey, backgroundMode);
+        } catch (error) {}
+        applyAppearance(true);
+    });
+    systemTheme.addEventListener?.('change', () => { if (themeMode === 'system') applyAppearance(true); });
+
+    function closePanel() {
+        panel.hidden = true;
+        appearanceBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    appearanceBtn.addEventListener('click', event => {
+        event.stopPropagation();
+        panel.hidden = !panel.hidden;
+        appearanceBtn.setAttribute('aria-expanded', String(!panel.hidden));
+    });
+    document.addEventListener('click', event => { if (!controls.contains(event.target)) closePanel(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') closePanel(); });
+
+    controls.append(panel, appearanceBtn, topBtn);
+    document.body.appendChild(controls);
 
     let scrollTimeout;
     window.addEventListener('scroll', () => {
         if (scrollTimeout) cancelAnimationFrame(scrollTimeout);
         scrollTimeout = requestAnimationFrame(() => {
             if (window.scrollY > 300) {
-                btn.classList.add('show');
+                topBtn.classList.add('show');
             } else {
-                btn.classList.remove('show');
+                topBtn.classList.remove('show');
             }
         });
     });
 
-    btn.addEventListener('click', () => {
+    topBtn.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 }
@@ -467,7 +598,8 @@ function autoNumberHeadings() {
    ------------------------------------------------------------ */
 window.addEventListener('DOMContentLoaded', async () => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    
+    initPageControls();
+
     await loadFooter();
 
     if (document.body.classList.contains('category-page')) {
@@ -490,5 +622,5 @@ window.addEventListener('DOMContentLoaded', async () => {
     autoFillArticleInfo();
     autoNumberHeadings();
     generateTOC();
-    initBackToTop();
+
 });
