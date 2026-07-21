@@ -1,167 +1,334 @@
-import os
+#!/usr/bin/env python3
+"""Run AUGUSTUS with optional RNA-seq evidence from BAM or FASTQ files."""
+
 import glob
-import time
+import os
+import re
+import shutil
 import subprocess
 import sys
+import time
 from datetime import datetime
 
-# ==========================================
-# 1. 基础配置与辅助函数
-# ==========================================
+
+FASTQ_PATTERNS = (
+    "**/*.fastq", "**/*.fq", "**/*.fastq.gz", "**/*.fq.gz",
+    "**/*.fastq.bz2", "**/*.fq.bz2",
+)
+
+
 def log_info(message):
-    current_time = time.strftime('%Y-%m-%d %H:%M:%S')
-    print(f"[{current_time}] {message}")
+    print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] {message}")
 
-def check_dependencies():
-    for cmd in ["augustus", "bam2hints"]:
-        if subprocess.call(f"type {cmd}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) != 0:
-            log_info(f"严重错误：系统未找到命令 '{cmd}'。请确认已加载环境。")
-            sys.exit(1)
 
-# ==========================================
-# 2. 交互式选择菜单
-# ==========================================
-def select_file(prompt_msg, extensions, allow_skip=False):
-    """通用的交互式文件选择函数"""
+def require_commands(commands):
+    missing = [command for command in commands if shutil.which(command) is None]
+    if missing:
+        raise SystemExit("错误：未找到命令：" + ", ".join(missing))
+
+
+def find_files(patterns):
     files = []
-    for ext in extensions:
-        files.extend(glob.glob(ext, recursive=True))
-    files = sorted(list(set([f for f in files if not os.path.basename(f).startswith(".")])))
+    for pattern in patterns:
+        files.extend(glob.glob(pattern, recursive=True))
+    return sorted({f for f in files if not os.path.basename(f).startswith(".")})
 
+
+def select_file(prompt, patterns, allow_skip=False):
+    files = find_files(patterns)
     if not files:
-        print(f"\n未找到相关文件: {extensions}")
         if allow_skip:
             return None
-        sys.exit(0)
+        raise SystemExit(f"未找到相关文件：{', '.join(patterns)}")
 
-    print(f"\n{prompt_msg}")
+    print(f"\n{prompt}")
     if allow_skip:
-        print("  [0] 不选择 (跳过此步骤 / 纯算法预测)")
-        
-    for i, f in enumerate(files, 1):
-        # 如果是 BAM 文件，顺便打印下大小
-        size_str = ""
-        if f.endswith(".bam"):
-            size_mb = os.path.getsize(f) / (1024 * 1024)
-            size_str = f" ({size_mb:.1f} MB)"
-        print(f"  [{i}] {f}{size_str}")
+        print("  [0] 跳过")
+    for number, path in enumerate(files, 1):
+        size = os.path.getsize(path) / 1024 ** 2
+        print(f"  [{number}] {path} ({size:.1f} MB)")
 
     while True:
-        choice = input("\n请输入编号 >>> ").strip()
-        if allow_skip and choice == '0':
+        choice = input("请输入编号 >>> ").strip()
+        if allow_skip and choice == "0":
             return None
         try:
-            idx = int(choice) - 1
-            if 0 <= idx < len(files):
-                return files[idx]
-            else:
-                print("编号超出范围，请重试。")
+            index = int(choice) - 1
         except ValueError:
-            print("请输入有效的数字编号。")
+            print("请输入有效编号。")
+            continue
+        if 0 <= index < len(files):
+            return files[index]
+        print("请输入有效编号。")
 
-# ==========================================
-# 3. 主控制流
-# ==========================================
-if __name__ == "__main__":
-    print("="*60)
-    print("   AUGUSTUS 单样本精准交互预测 (支持 RNA-seq 共预测)")
-    print("="*60)
 
-    check_dependencies()
-
-    # --- 步骤 1: 选择 FASTA 基因组 ---
-    fasta_file = select_file(
-        "发现以下基因组文件，请选择你要预测的 FASTA:",
-        ["**/*.fasta", "**/*.fa", "**/*.fna", "**/*.p_ctg.fasta"]
-    )
-    
-    # 提取干净的样本名
-    sample_name = os.path.splitext(os.path.basename(fasta_file))[0]
-    for ext in [".p_ctg", ".ctg", ".hifi"]:
-        sample_name = sample_name.replace(ext, "")
-    log_info(f"已选择目标基因组: {fasta_file}")
-
-    # --- 步骤 2: 选择 BAM 转录组比对文件 (可选) ---
-    bam_file = select_file(
-        "发现以下 BAM 文件，请选择对应的转录组比对文件:",
-        ["**/*.bam", "**/*.sorted.bam"],
-        allow_skip=True
-    )
-    if bam_file:
-        log_info(f"已选择转录组证据: {bam_file}")
-    else:
-        log_info("已跳过转录组证据，将执行纯算法从头预测。")
-
-    # --- 步骤 3: 设定物种模型 ---
-    print("\n" + "-"*40)
-    print("请输入 AUGUSTUS 物种模型 (如: aspergillus_fumigatus, neurospora_crassa)")
-    species = input("物种模型 [必填] >>> ").strip()
-    if not species:
-        log_info("物种模型不能为空，程序退出。")
-        sys.exit(1)
-
-    # --- 步骤 4: 准备输出目录 ---
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_dir = os.path.abspath(f"augustus_{sample_name}_{timestamp}")
-    os.makedirs(out_dir, exist_ok=True)
-    out_gff = os.path.join(out_dir, f"{sample_name}.augustus.gff")
-    hints_gff = os.path.join(out_dir, f"{sample_name}.hints.gff")
-
-    print("\n" + "="*60)
-    log_info("任务配置确认:")
-    log_info(f"  基因组: {fasta_file}")
-    log_info(f"  转录组: {bam_file if bam_file else '无 (纯算法)'}")
-    log_info(f"  模  型: {species}")
-    log_info(f"  输出至: {out_dir}")
-    print("="*60)
-    
-    confirm = input("按回车键开始运行 (或输入 q 退出) >>> ").strip().lower()
-    if confirm == 'q':
-        sys.exit(0)
-
-    # --- 步骤 5: 执行核心逻辑 ---
-    start_t = time.time()
-    use_hints = False
-
-    # 阶段 A: 提取 Hints
-    if bam_file:
-        log_info(f">>> [1/2] 正在利用 bam2hints 提取转录组内含子特征...")
-        cmd_hints = ["bam2hints", f"--in={bam_file}", f"--out={hints_gff}"]
+def select_multiple(prompt, items, formatter=str, default_all=True):
+    """Select one or more items using comma-separated numbers or ``all``."""
+    if not items:
+        return []
+    print(f"\n{prompt}")
+    for number, item in enumerate(items, 1):
+        print(f"  [{number}] {formatter(item)}")
+    default = "all" if default_all else ""
+    while True:
+        choice = input(f"输入编号（逗号分隔）或 all [默认 {default or '无'}] >>> ").strip().lower()
+        if not choice and default_all:
+            return list(items)
+        if choice == "all":
+            return list(items)
         try:
-            subprocess.run(cmd_hints, check=True)
-            use_hints = True
-            log_info(f"    Hints 提取完成！")
-        except subprocess.CalledProcessError:
-            log_info(f"    严重警告: bam2hints 提取失败！可能是 BAM 未排序或损坏，将退回纯算法预测。")
-            use_hints = False
+            indexes = [int(value.strip()) - 1 for value in choice.split(",")]
+        except ValueError:
+            print("请输入有效编号，例如 1,3,5 或 all。")
+            continue
+        if indexes and len(set(indexes)) == len(indexes) and all(0 <= i < len(items) for i in indexes):
+            return [items[i] for i in indexes]
+        print("编号重复或超出范围，请重新输入。")
 
-    # 阶段 B: 执行 AUGUSTUS
-    cmd_aug = ["augustus", f"--species={species}"]
-    
-    if use_hints:
-        cmd_aug.append(f"--hintsfile={hints_gff}")
-        cmd_aug.append("--allow_hinted_splicesites=atac")
-        cmd_aug.append("--extrinsicCfgFile=extrinsic.M.RM.E.W.cfg")
-        log_info(f">>> [2/2] 开始基于 RNA-seq 的 AUGUSTUS 共预测 (请耐心等待)...")
+
+def ask_choice(prompt, choices, default):
+    labels = "/".join(choices)
+    while True:
+        answer = input(f"{prompt} [{labels}，默认 {default}] >>> ").strip().lower()
+        if not answer:
+            return default
+        if answer in choices:
+            return answer
+        print("请输入：" + "、".join(choices))
+
+
+def strip_fastq_suffix(path):
+    return re.sub(r"(?i)(?:\.fastq|\.fq)(?:\.gz|\.bz2)?$", "", path)
+
+
+def infer_fastq_pair(selected_read):
+    """Return an ordered (R1, R2) pair using only the final number before the suffix.
+
+    Examples: leaf_1_1.fq.gz <-> leaf_1_2.fq.gz and sample_R1.fastq
+    <-> sample_R2.fastq. Numbers earlier in the sample name are left untouched.
+    """
+    directory, filename = os.path.split(selected_read)
+    match = re.fullmatch(
+        r"(?i)(?P<prefix>.+)(?P<separator>[_\.-])(?P<read>R?[12])"
+        r"(?P<suffix>\.(?:fastq|fq)(?:\.(?:gz|bz2))?)",
+        filename,
+    )
+    if not match:
+        return None
+
+    read_token = match.group("read")
+    uses_r = read_token.lower().startswith("r")
+    read_number = read_token[-1]
+    mate_number = "2" if read_number == "1" else "1"
+    mate_token = (read_token[0] if uses_r else "") + mate_number
+    mate_name = "".join((
+        match.group("prefix"), match.group("separator"), mate_token,
+        match.group("suffix"),
+    ))
+    mate = os.path.join(directory, mate_name)
+    if not os.path.isfile(mate):
+        return None
+    return (selected_read, mate) if read_number == "1" else (mate, selected_read)
+
+
+def discover_fastq_datasets():
+    """Discover paired and unpaired FASTQ datasets and print the pairing result."""
+    files = find_files(FASTQ_PATTERNS)
+    used = set()
+    datasets = []
+    for path in files:
+        key = os.path.normcase(os.path.abspath(path))
+        if key in used:
+            continue
+        pair = infer_fastq_pair(path)
+        if pair:
+            read1, read2 = pair
+            used.update(os.path.normcase(os.path.abspath(p)) for p in pair)
+            datasets.append((read1, read2))
+        else:
+            used.add(key)
+            datasets.append((path, None))
+
+    print("\nFASTQ 自动配对结果：")
+    for number, (read1, read2) in enumerate(datasets, 1):
+        if read2:
+            print(f"  [{number}] 双端\n       R1: {read1}\n       R2: {read2}")
+        else:
+            print(f"  [{number}] 单端/未配对\n       SE: {read1}")
+    paired = sum(read2 is not None for _, read2 in datasets)
+    print(f"共发现 {len(datasets)} 个数据集：{paired} 个双端，{len(datasets) - paired} 个单端/未配对。")
+    return datasets
+
+
+def choose_fastq_datasets():
+    datasets = discover_fastq_datasets()
+    if not datasets:
+        raise SystemExit("错误：未发现 FASTQ 文件。")
+    return select_multiple(
+        "请选择用于整合预测的转录组数据集：",
+        datasets,
+        formatter=lambda reads: (
+            f"双端: {reads[0]} + {reads[1]}" if reads[1] else f"单端: {reads[0]}"
+        ),
+    )
+
+
+def run_checked(command, **kwargs):
+    log_info("执行：" + " ".join(map(str, command)))
+    subprocess.run(command, check=True, **kwargs)
+
+
+def build_and_align(reference, read1, read2, aligner, out_dir, threads):
+    """Build an index and stream alignments directly into coordinate-sorted BAM."""
+    require_commands([aligner, f"{aligner}-build", "samtools"])
+    index_dir = os.path.join(out_dir, f"{aligner}_index")
+    os.makedirs(index_dir, exist_ok=True)
+    prefix = os.path.join(index_dir, "genome")
+    bam = os.path.join(out_dir, f"{os.path.basename(strip_fastq_suffix(read1))}.{aligner}.sorted.bam")
+
+    index_suffixes = (".1.ht2", ".1.ht2l") if aligner == "hisat2" else (".1.bt2", ".1.bt2l")
+    if not any(os.path.isfile(prefix + suffix) for suffix in index_suffixes):
+        build = [f"{aligner}-build"]
+        if aligner == "hisat2":
+            build += ["-p", str(threads)]
+        build += [reference, prefix]
+        run_checked(build)
     else:
-        log_info(f">>> [1/1] 开始纯算法 AUGUSTUS 从头预测 (请耐心等待)...")
-        
-    cmd_aug.append(fasta_file)
-    
+        log_info(f"复用已建立的 {aligner} 索引：{prefix}")
+
+    align = [aligner, "-p", str(threads), "-x", prefix]
+    if aligner == "hisat2":
+        align.append("--dta")
+    if read2:
+        align += ["-1", read1, "-2", read2]
+    else:
+        align += ["-U", read1]
+
+    sort = ["samtools", "sort", "-@", str(threads), "-o", bam, "-"]
+    log_info("开始比对并直接生成坐标排序 BAM。")
+    align_process = subprocess.Popen(align, stdout=subprocess.PIPE)
     try:
-        # 重定向标准输出到文件，将错误输出打印到屏幕以便监控
-        with open(out_gff, "w") as f_out:
-            # 去除 stdout=subprocess.DEVNULL，让错误和警告直接显示在你的屏幕上
-            subprocess.run(cmd_aug, stdout=f_out, check=True, text=True)
-            
-        elapsed = (time.time() - start_t) / 60
-        print("\n" + "="*60)
-        log_info(f"🎉 预测圆满完成！耗时: {elapsed:.2f} 分钟。")
-        log_info(f"📁 最终 GFF 注释文件路径: {out_gff}")
-        if use_hints:
-            log_info(f"📁 提取的提示文件路径: {hints_gff}")
-            
-    except subprocess.CalledProcessError as e:
-        print("\n" + "="*60)
-        log_info(f"❌ 运行过程中发生错误，AUGUSTUS 异常退出。")
-        log_info("建议检查上方屏幕输出的错误日志。")
+        sort_process = subprocess.run(sort, stdin=align_process.stdout)
+    finally:
+        if align_process.stdout:
+            align_process.stdout.close()
+    align_code = align_process.wait()
+    if align_code or sort_process.returncode:
+        if os.path.exists(bam):
+            os.remove(bam)
+        raise subprocess.CalledProcessError(align_code or sort_process.returncode, align if align_code else sort)
+    run_checked(["samtools", "quickcheck", "-v", bam])
+    run_checked(["samtools", "index", "-@", str(threads), bam])
+    log_info(f"已生成 RNA-seq BAM：{bam}")
+    return bam
+
+
+def choose_rnaseq_evidence(reference, out_dir, threads):
+    bam_files = find_files(("**/*.bam",))
+    fastq_files = find_files(FASTQ_PATTERNS)
+    available = ["none"]
+    if bam_files:
+        available.insert(0, "bam")
+    if fastq_files:
+        available.insert(0, "fastq")
+    mode = ask_choice("RNA-seq 证据类型", available, available[0])
+    if mode == "none":
+        return []
+    if mode == "bam":
+        return select_multiple(
+            "请选择用于整合预测的 BAM：",
+            bam_files,
+            formatter=lambda path: f"{path} ({os.path.getsize(path) / 1024 ** 2:.1f} MB)",
+        )
+
+    datasets = choose_fastq_datasets()
+    aligner = ask_choice("序列比对工具（转录组推荐 hisat2）", ["hisat2", "bowtie2"], "hisat2")
+    if aligner == "bowtie2":
+        log_info("警告：bowtie2 不支持跨内含子剪接比对，真核 RNA-seq 通常应选择 hisat2。")
+    bam_files = []
+    for number, (read1, read2) in enumerate(datasets, 1):
+        log_info(f"处理转录组数据集 {number}/{len(datasets)}：{read1}")
+        bam_files.append(build_and_align(reference, read1, read2, aligner, out_dir, threads))
+    return bam_files
+
+
+def build_combined_hints(bam_files, out_dir, sample, threads):
+    """Merge all RNA-seq BAMs, then extract one integrated hints file."""
+    evidence_bam = bam_files[0]
+    if len(bam_files) > 1:
+        require_commands(["samtools"])
+        evidence_bam = os.path.join(out_dir, f"{sample}.rnaseq_merged.sorted.bam")
+        log_info(f"正在合并 {len(bam_files)} 个 RNA-seq BAM 用于整合预测。")
+        run_checked([
+            "samtools", "merge", "-@", str(threads), "-f", evidence_bam,
+            *bam_files,
+        ])
+        run_checked(["samtools", "quickcheck", "-v", evidence_bam])
+        run_checked(["samtools", "index", "-@", str(threads), evidence_bam])
+        log_info(f"整合 BAM：{evidence_bam}")
+
+    combined = os.path.join(out_dir, f"{sample}.combined.hints.gff")
+    run_checked(["bam2hints", f"--in={evidence_bam}", f"--out={combined}"])
+    log_info(f"已从 {len(bam_files)} 组 RNA-seq 数据生成整合 hints：{combined}")
+    return combined, evidence_bam
+
+
+def main():
+    print("=" * 64)
+    print("AUGUSTUS 基因预测（支持 BAM 或 FASTQ RNA-seq 证据）")
+    print("=" * 64)
+    require_commands(["augustus", "bam2hints"])
+
+    reference = select_file(
+        "请选择待预测的基因组 FASTA：",
+        ("**/*.fasta", "**/*.fa", "**/*.fna", "**/*.p_ctg.fasta"),
+    )
+    sample = os.path.splitext(os.path.basename(reference))[0]
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    out_dir = os.path.abspath(f"augustus_{sample}_{timestamp}")
+    os.makedirs(out_dir, exist_ok=True)
+
+    try:
+        threads = int(input(f"线程数 [默认 {os.cpu_count() or 1}] >>> ").strip() or (os.cpu_count() or 1))
+        if threads < 1:
+            raise ValueError
+    except ValueError:
+        raise SystemExit("错误：线程数必须是正整数。")
+
+    bam_files = choose_rnaseq_evidence(reference, out_dir, threads)
+    species = input("AUGUSTUS 物种模型（如 aspergillus_fumigatus）[必填] >>> ").strip()
+    if not species:
+        raise SystemExit("错误：物种模型不能为空。")
+
+    output = os.path.join(out_dir, f"{sample}.augustus.gff")
+    hints = None
+    evidence_bam = None
+    if bam_files:
+        print("\n参与整合预测的 RNA-seq BAM：")
+        for number, bam in enumerate(bam_files, 1):
+            print(f"  [{number}] {bam}")
+        hints, evidence_bam = build_combined_hints(bam_files, out_dir, sample, threads)
+
+    command = ["augustus", f"--species={species}"]
+    if hints:
+        command += [
+            f"--hintsfile={hints}",
+            "--allow_hinted_splicesites=atac",
+            "--extrinsicCfgFile=extrinsic.M.RM.E.W.cfg",
+        ]
+    command.append(reference)
+    log_info("开始 AUGUSTUS 预测。")
+    with open(output, "w", encoding="utf-8") as handle:
+        run_checked(command, stdout=handle, text=True)
+    log_info(f"预测完成：{output}")
+    if bam_files:
+        log_info(f"共整合 {len(bam_files)} 组 RNA-seq 证据。")
+        log_info(f"用于提取 Hints 的 BAM：{evidence_bam}")
+        log_info(f"整合 Hints 文件：{hints}")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except subprocess.CalledProcessError as error:
+        raise SystemExit(f"命令执行失败（退出码 {error.returncode}）：{error.cmd}")

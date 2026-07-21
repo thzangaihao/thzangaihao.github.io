@@ -202,20 +202,30 @@ a { text-decoration: none; color: inherit; transition: 0.2s; }
    2. 布局骨架 (Layout Skeleton)
    ============================================================ */
 nav { 
-    background: var(--nav-bg);
-    color: white; 
+    background: rgba(255, 255, 255, .78);
+    color: var(--text-main);
     padding: 1rem 2rem; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
     position: sticky; top: 0; z-index: 1000; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(44, 62, 80, .1);
+    box-shadow: 0 5px 22px rgba(31, 52, 71, .09);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+    backdrop-filter: blur(18px) saturate(130%);
     line-height: 1.6;
 }
-nav .logo a { font-size: 1.5rem; font-weight: bold; color: white; }
-nav .nav-links a { color: rgba(255,255,255,0.9); margin-left: 20px; font-size: 0.95rem; }
+nav .logo a { font-size: 1.5rem; font-weight: bold; color: var(--text-main); }
+nav .nav-links a { color: var(--text-secondary); margin-left: 20px; font-size: 0.95rem; }
 nav .nav-links a:hover, nav .nav-links a.active { color: var(--accent-color); font-weight: bold; }
 nav .nav-links i { margin-right: 5px; }
+html.site-background-image:not(.site-dark) nav { background: rgba(255, 255, 255, .62); }
+html.site-dark nav {
+    background: rgba(13, 23, 32, .78);
+    border-bottom-color: rgba(174, 199, 216, .12);
+    box-shadow: 0 5px 24px rgba(0, 0, 0, .24);
+}
+html.site-dark.site-background-image nav { background: rgba(13, 23, 32, .62); }
 
 .container { 
     max-width: 1200px; 
@@ -229,8 +239,12 @@ nav .nav-links i { margin-right: 5px; }
 .right-col { flex: 3; }
 
 .site-footer {
-    background: var(--nav-bg); color: white;
+    background: rgba(255, 255, 255, .78); color: var(--text-main);
     padding: 3rem 0 1rem; margin-top: 4rem; font-size: 0.95rem;
+    border-top: 1px solid rgba(44, 62, 80, .1);
+    box-shadow: 0 -5px 24px rgba(31, 52, 71, .08);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+    backdrop-filter: blur(18px) saturate(130%);
 }
 .footer-inner {
     max-width: 1200px; margin: 0 auto; padding: 0 2rem;
@@ -242,13 +256,20 @@ nav .nav-links i { margin-right: 5px; }
     padding-bottom: 0.5rem; margin-bottom: 1rem; display: inline-block;
 }
 .footer-links { display: flex; flex-direction: column; gap: 10px; }
-.footer-links a { color: rgba(255, 255, 255, 0.8); display: inline-flex; align-items: center; }
-.footer-links a:hover { color: white; transform: translateX(5px); }
+.footer-links a { color: var(--text-secondary); display: inline-flex; align-items: center; }
+.footer-links a:hover { color: var(--accent-color); transform: translateX(5px); }
 .footer-links i { margin-right: 10px; width: 20px; text-align: center; }
 .copyright-bar {
-    text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: 2rem; padding-top: 1.5rem; color: rgba(255, 255, 255, 0.5); font-size: 0.85rem;
+    text-align: center; border-top: 1px solid var(--border-color);
+    margin-top: 2rem; padding-top: 1.5rem; color: var(--text-muted); font-size: 0.85rem;
 }
+html.site-background-image:not(.site-dark) .site-footer { background: rgba(255, 255, 255, .62); }
+html.site-dark .site-footer {
+    background: rgba(13, 23, 32, .78);
+    border-top-color: rgba(174, 199, 216, .12);
+    box-shadow: 0 -5px 26px rgba(0, 0, 0, .22);
+}
+html.site-dark.site-background-image .site-footer { background: rgba(13, 23, 32, .62); }
 #footer-placeholder { min-height: 150px; display: block; }
 
 /* ============================================================
