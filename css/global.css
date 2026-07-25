@@ -369,6 +369,38 @@ html.site-dark.site-background-image .site-footer { background: rgba(13, 23, 32,
 .content h3 { margin: 2rem 0 1rem; color: var(--text-main); font-size: 1.3rem; scroll-margin-top: 100px; }
 .content p { margin-bottom: 1.2rem; text-align: justify; }
 .content img { display: block; max-width: 100%; height: auto; margin: 2rem auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+/* 左侧文字、右侧图片的通用图文布局 */
+.text-image-row {
+    --text-image-width: 320px;
+    --text-image-max-width: 40%;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+}
+.text-image-content { flex: 1; min-width: 0; }
+.text-image-content > :first-child { margin-top: 0; }
+.content .text-image-row > img {
+    width: var(--text-image-width);
+    max-width: var(--text-image-max-width);
+    height: auto;
+    object-fit: contain;
+    margin: 0;
+}
+.text-image-left > img { order: -1; }
+.text-image-right > img { order: 1; }
+.text-image-small { --text-image-width: 240px; }
+.text-image-medium { --text-image-width: 320px; }
+.text-image-large { --text-image-width: 420px; --text-image-max-width: 50%; }
+
+@media (max-width: 700px) {
+    .text-image-row { flex-direction: column; }
+    .content .text-image-row > img {
+        width: min(100%, var(--text-image-width));
+        max-width: 100%;
+    }
+}
+
 blockquote { margin: 2rem 0; padding: 1rem 1.5rem; background: var(--surface-2); border-left: 4px solid var(--accent-color); color: var(--text-secondary); border-radius: 0 8px 8px 0; }
 blockquote p { margin: 0; }
 

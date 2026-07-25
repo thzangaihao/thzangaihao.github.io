@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/07/19_15:06:23
-// 文章总数: 72
+// 生成时间: 2026/07/25_15:42:08
+// 文章总数: 74
 
 window.ARTICLE_DATABASE = [
     {
@@ -23,7 +23,7 @@ window.ARTICLE_DATABASE = [
         "title": "01. Hi-C 标准化流程",
         "collection": "epig",
         "date": "2026-07-18",
-        "summary": "从 Hi-C 双端测序数据构建多分辨率染色质互作矩阵并绘制全基因组接触图",
+        "summary": "Hi-C 双端测序数据构建多分辨率染色质互作矩阵",
         "path": "articles/dry_lab/epigenome/01. Hi-C 标准化流程/01. Hi-C 标准化流程.html",
         "featured": false
     },
@@ -129,6 +129,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-06-22",
         "summary": "我感到难过，不是因为你欺骗了我，而是因为我再也无法相信你了",
         "path": "articles/about/02. 笔语茶谈/01. 立木立信.html",
+        "featured": false
+    },
+    {
+        "title": "01. 质谱",
+        "collection": "analytical_chemistry",
+        "date": "2026-07-25",
+        "summary": "粒子的天平",
+        "path": "articles/wet_lab/04. 分析化学/01. 质谱/01. 质谱.html",
         "featured": false
     },
     {
@@ -578,5 +586,13 @@ window.ARTICLE_DATABASE = [
         "summary": "染色体互作强度可视化",
         "path": "articles/resources/gallery/11. HiC 互作热图/11. HiC 互作热图.html",
         "featured": false
+    },
+    {
+        "title": "12. 圈图",
+        "collection": "figure",
+        "date": "2026-07-22",
+        "summary": "圈图",
+        "path": "articles/resources/gallery/12. 圈图/12. 圈图.html",
+        "featured": true
     }
 ];

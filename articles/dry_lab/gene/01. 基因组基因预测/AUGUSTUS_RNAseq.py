@@ -223,7 +223,8 @@ def build_and_align(reference, read1, read2, aligner, out_dir, threads):
     return bam
 
 
-def choose_rnaseq_evidence(reference, out_dir, threads):
+def configure_rnaseq_evidence():
+    """Collect RNA-seq choices without starting any analysis commands."""
     bam_files = find_files(("**/*.bam",))
     fastq_files = find_files(FASTQ_PATTERNS)
     available = ["none"]
@@ -233,23 +234,64 @@ def choose_rnaseq_evidence(reference, out_dir, threads):
         available.insert(0, "fastq")
     mode = ask_choice("RNA-seq 证据类型", available, available[0])
     if mode == "none":
-        return []
+        return {"mode": "none", "bam_files": [], "datasets": [], "aligner": None}
     if mode == "bam":
-        return select_multiple(
+        selected_bams = select_multiple(
             "请选择用于整合预测的 BAM：",
             bam_files,
             formatter=lambda path: f"{path} ({os.path.getsize(path) / 1024 ** 2:.1f} MB)",
         )
+        return {"mode": "bam", "bam_files": selected_bams, "datasets": [], "aligner": None}
 
     datasets = choose_fastq_datasets()
     aligner = ask_choice("序列比对工具（转录组推荐 hisat2）", ["hisat2", "bowtie2"], "hisat2")
     if aligner == "bowtie2":
         log_info("警告：bowtie2 不支持跨内含子剪接比对，真核 RNA-seq 通常应选择 hisat2。")
+    return {"mode": "fastq", "bam_files": [], "datasets": datasets, "aligner": aligner}
+
+
+def prepare_rnaseq_evidence(config, reference, out_dir, threads):
+    """Execute the previously configured RNA-seq preparation steps."""
+    if config["mode"] != "fastq":
+        return list(config["bam_files"])
+
+    aligner = config["aligner"]
     bam_files = []
+    datasets = config["datasets"]
     for number, (read1, read2) in enumerate(datasets, 1):
         log_info(f"处理转录组数据集 {number}/{len(datasets)}：{read1}")
         bam_files.append(build_and_align(reference, read1, read2, aligner, out_dir, threads))
     return bam_files
+
+
+def show_augustus_species():
+    """Print the species models supplied by the installed AUGUSTUS version."""
+    print("\n" + "=" * 64)
+    print("当前 AUGUSTUS 可用物种模型（augustus --species=help）：")
+    print("=" * 64)
+    result = subprocess.run(["augustus", "--species=help"], text=True)
+    if result.returncode != 0:
+        log_info("警告：物种模型列表命令返回非零状态，请检查上方 AUGUSTUS 输出。")
+
+
+def print_configuration(reference, threads, rnaseq_config, species, out_dir):
+    print("\n" + "=" * 64)
+    print("参数配置汇总（确认后才开始运行）：")
+    print(f"  参考基因组：{reference}")
+    print(f"  线程数：{threads}")
+    print(f"  AUGUSTUS 物种模型：{species}")
+    print(f"  RNA-seq 输入类型：{rnaseq_config['mode']}")
+    if rnaseq_config["mode"] == "bam":
+        for number, bam in enumerate(rnaseq_config["bam_files"], 1):
+            print(f"    BAM {number}: {bam}")
+    elif rnaseq_config["mode"] == "fastq":
+        print(f"  比对工具：{rnaseq_config['aligner']}")
+        for number, (read1, read2) in enumerate(rnaseq_config["datasets"], 1):
+            print(f"    数据集 {number} R1/SE: {read1}")
+            if read2:
+                print(f"    数据集 {number} R2: {read2}")
+    print(f"  输出目录：{out_dir}")
+    print("=" * 64)
 
 
 def build_combined_hints(bam_files, out_dir, sample, threads):
@@ -283,11 +325,6 @@ def main():
         "请选择待预测的基因组 FASTA：",
         ("**/*.fasta", "**/*.fa", "**/*.fna", "**/*.p_ctg.fasta"),
     )
-    sample = os.path.splitext(os.path.basename(reference))[0]
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_dir = os.path.abspath(f"augustus_{sample}_{timestamp}")
-    os.makedirs(out_dir, exist_ok=True)
-
     try:
         threads = int(input(f"线程数 [默认 {os.cpu_count() or 1}] >>> ").strip() or (os.cpu_count() or 1))
         if threads < 1:
@@ -295,11 +332,29 @@ def main():
     except ValueError:
         raise SystemExit("错误：线程数必须是正整数。")
 
-    bam_files = choose_rnaseq_evidence(reference, out_dir, threads)
+    rnaseq_config = configure_rnaseq_evidence()
+    show_augustus_species()
     species = input("AUGUSTUS 物种模型（如 aspergillus_fumigatus）[必填] >>> ").strip()
     if not species:
         raise SystemExit("错误：物种模型不能为空。")
 
+    sample = os.path.splitext(os.path.basename(reference))[0]
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    out_dir = os.path.abspath(f"augustus_{sample}_{timestamp}")
+    print_configuration(reference, threads, rnaseq_config, species, out_dir)
+    confirmation = input("确认以上参数并开始运行？[Y/n] >>> ").strip().lower()
+    if confirmation in {"n", "no", "q", "quit"}:
+        raise SystemExit("已取消运行，未执行分析。")
+
+    # 从这里开始进入执行阶段，不再请求任何参数。
+    os.makedirs(out_dir, exist_ok=True)
+    if rnaseq_config["mode"] == "fastq":
+        aligner = rnaseq_config["aligner"]
+        require_commands([aligner, f"{aligner}-build", "samtools"])
+    elif len(rnaseq_config["bam_files"]) > 1:
+        require_commands(["samtools"])
+
+    bam_files = prepare_rnaseq_evidence(rnaseq_config, reference, out_dir, threads)
     output = os.path.join(out_dir, f"{sample}.augustus.gff")
     hints = None
     evidence_bam = None

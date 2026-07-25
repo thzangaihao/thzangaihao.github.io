@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>12. 圈图 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="figure"> 
+        <meta name="collection-title" content="图廊">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-07-22">
+        <meta name="description" content="圈图">
+        <meta name="featured" content="true">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>12. 圈图</h1>
+            <div class="content">
+                <h2>环境配置</h2>
+                    <p>绘图环境：</p>
+                    <pre><code class="language-bash">conda create -n circos_env \
+-c conda-forge \
+-c bioconda circos samtools bedtools ucsc-bigwigaverageoverbed</code></pre>
+                    
+                    <p>数据处理环境：</p>
+                    <pre><code class="language-bash">conda create -n circos_python \
+--override-channels \
+-c conda-forge \
+-c bioconda \
+--strict-channel-priority \
+python=3.11 \
+circos \
+pybigwig \
+bedtools \
+samtools</code></pre>
+
+                <h2>工作目录</h2>
+                    <p>绘制一张圈图需要以下文件：</p>
+                    <pre><code class="language-txt">circos_project/
+├── circos.conf             # 主配置文件
+├── config/                 # 子配置文件夹
+│   ├── colors.conf         # 颜色配置
+│   ├── image.conf          # 输出图像配置
+│   ├── ticks.conf          # 刻度配置
+│   ├── ideogram.conf       # 核型配置
+│   └── tracks.conf         # 轨道配置
+├── data/                   # 绘图数据存放文件夹
+└── output/                 # 图像输出文件夹</code></pre>
+                    <p>运行该脚本即可生成这些文件：</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>目录生成</h5>
+                                <span>文件格式：.py | 大小：5.9 KB</span>
+                            </div>
+                        </div>
+                        <a href="./create_circos_project.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                    <p>所有数据准备完毕后，运行以下命令进行绘图：</p>
+                    <pre><code class="language-bash">circos -conf circos.conf\</code></pre>
+
+                <h2>核型数据</h2>
+                    <p>核型数据是 circos 图的骨架，其它数据都要在它的基础上进行绘制，我们只需要输入需要绘制的基因组 <code>.fasta</code> 文件，它就会输出绘图数据 <code>karyotype.txt</code>。我们可以直接绘制出主干图：</p>
+
+                    <div style="display: flex; justify-content: space-between; gap: 20px; margin: 15px 0;">
+                        <img src="./1.svg" style="width: calc(50% - 10px); height: auto;" alt="图1">
+                        <img src="./2.svg" style="width: calc(50% - 10px); height: auto;" alt="图2">
+                    </div>
+                    
+                    <p>颜色是在绘图数据 <code>karyotype.txt</code> 的最后一个字段进行指定：</p>
+                    <pre><code class="language-txt">chr - chr01 chr01 0 27647870 circle_color_01 # 调用 colors.conf 中 circle_color_01 色
+chr - chr02 chr02 0 31096438 circle_color_01
+chr - chr03 chr03 0 39314961 circle_color_01
+chr - chr04 chr04 0 37438762 circle_color_01
+chr - chr05 chr05 0 25539781 circle_color_01
+chr - chr06 chr06 0 23843756 circle_color_01
+chr - chr07 chr07 0 37672283 circle_color_01
+chr - chr08 chr08 0 31434319 circle_color_01
+chr - chr09 chr09 0 44001791 circle_color_01
+chr - chr10 chr10 0 36687349 circle_color_01
+chr - chr11 chr11 0 31676019 circle_color_01
+chr - chr12 chr12 0 30027947 circle_color_02 # 调用 colors.conf 中 circle_color_02 色</code></pre>
+                    <p>而至于想怎样画图，则在核型配置文件 <code>ideogram.conf</code> 中进行设置。</p>
+
+
+                <h2>轨道数据</h2>
+                    <p>所有轨道都分为 <code>数据</code> 和 <code>配置</code> 两个文件，其中数据文件移动到 <code>.data/</code> 文件夹下，配置文件数据块粘贴在 <code>tracks.conf</code> 配置下。相关数据处理均在数据处理环境中进行，相关脚本工具使用 <code>-- help</code> 显示用法。所有轨道原始数据集染色体名称都要一致。</p>
+                    <h3>GC 含量轨道</h3>
+                        <p>输入基因组 <code>.fasta</code> 文件。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>GC 轨道</h5>
+                                    <span>文件格式：.py | 大小：10.0 KB</span>
+                                </div>
+                            </div>
+                            <a href="./prepare_gc_track.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                    <h3>基因密度轨道</h3>
+                        <p>输入基因组注释 <code>.gff/gtf/gff3</code> 文件。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>基因密度轨道</h5>
+                                    <span>文件格式：.py | 大小：22.7 KB</span>
+                                </div>
+                            </div>
+                            <a href="./prepare_gene_density_track.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                    <h3>bw 轨道</h3>
+                        <p>这个轨道用处极大，输入由 bigwig 生成的 <code>.bw</code> 文件。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>bw 轨道</h5>
+                                    <span>文件格式：.py | 大小：11.9 KB</span>
+                                </div>
+                            </div>
+                            <a href="./prepare_bigwig_track.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+
+                <h2>轨道配置</h2>
+                    <p>每一个轨道都是由<code>&lt;plot&gt;&lt;/plot&gt;</code>块控制，不同的轨道样式有不同的控制参数：</p>
+                    <h3>line 线轨道</h3>
+                        <pre><code class="language-txt">&lt;plot&gt; # 轨道设置开始
+type = line                 # 轨道类型为 line
+file = data/03_g1_gc.txt    # 数据文件路径
+r0 = 0.80r                  # 该轨道圈在轨道画板起始处
+r1 = 0.88r                  # 该轨道圈在轨道画板终止处
+min = 0.20                  # 数据显示范围最小值
+max = 0.80                  # 数据显示范围最大值
+color = circle_color_03     # 颜色
+thickness = 2p              # line 型轨道线描边粗细
+
+
+&lt;axes&gt; # 轨道轴线设置块开始
+&lt;axis&gt;
+spacing = 0.2r              # 每隔轨道高度的 20% 绘制一条浅灰色辅助线。
+color = circle_color_03     # 轨道颜色
+thickness = 1p              # 轨道描边粗细
+&lt;/axis&gt;
+&lt;/axes&gt; # 轨道轴线设置块结束
+&lt;/plot&gt; # 轨道设置结束</code></pre>
+                    <h3>histogram 柱轨道</h3>
+                        <pre><code class="language-txt">&lt;plot&gt; # 轨道设置开始
+type = histogram                # 轨道类型为 histogram
+file = data/gene_density.txt    # 数据文件路径
+r0 = 0.90r                      # 该轨道圈在轨道画板起始处
+r1 = 0.98r                      # 该轨道圈在轨道画板终止处
+min = 0.20                      # 数据显示范围最小值
+max = 0.80                      # 数据显示范围最大值
+color = circle_color_03         # 柱子描边颜色，当描边设为 0 时，此项无效
+fill_color = circle_color_02    # 柱子填充颜色
+thickness = 2p                  # 柱子描边
+extend_bin = no                 # 关闭柱子描边
+
+
+&lt;axes&gt; # 轨道轴线设置块开始
+&lt;axis&gt;
+spacing = 0.2r                  # 每隔轨道高度的 20% 绘制一条浅灰色辅助线。
+color = circle_color_03         # 轨道颜色
+thickness = 1p                  # 轨道描边粗细
+&lt;/axis&gt; # 轨道轴线设置块结束
+&lt;/axes&gt;
+&lt;/plot&gt; # 轨道设置结束</code></pre>
+                    <h3>轨道底色参数</h3>
+                    <pre><code class="language-txt"># 给每一个数据轨道添加底色
+&lt;backgrounds>
+&lt;background>
+color = vvlgrey     # 自定颜色或 Circos 色，这里再强调一遍以防你跳着看
+&lt;/background>
+&lt;/backgrounds>
+
+# 还可以根据数值范围设置不同底色：
+&lt;backgrounds>
+
+&lt;background>
+color = vvlgrey
+y0 = 0r             # 在轨道 0 到 0.5 处设置 vvlgrey 色
+y1 = 0.5r
+&lt;/background>
+
+&lt;background>
+color = vlgrey
+y0 = 0.5r
+y1 = 1r             # 在轨道 0。5 到 1.0 处设置 vlgrey 色
+&lt;/background>
+
+&lt;/backgrounds></code></pre>
+                    
+
+                <h2>图例</h2>
+                    <p>在主配置文件夹下运行该脚本，脚本会自动读取轨道配置和颜色配置来绘制图例。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>图例</h5>
+                                <span>文件格式：.py | 大小：29.6 KB</span>
+                            </div>
+                        </div>
+                        <a href="./create_circos_legend.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; gap: 20px; margin: 15px 0;">
+                        <img src="./3.svg" style="width: calc(50% - 10px); height: auto;" alt="图3">
+                        <img src="./4.svg" style="width: calc(50% - 10px); height: auto;" alt="图4">
+                    </div>
+                    
+                    
+
+
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="297.86" height="173.5"
+     viewBox="0 0 297.86 173.5">
+  <path d="M 24.1,16 H 16 V 56.5 H 24.1" fill="none" stroke="#D34E4E" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>
+  <text x="28.06" y="30.04" font-family="Arial, Noto Sans CJK SC, sans-serif" font-size="18" fill="#222222">19</text>
+  <text x="28.06" y="56.5" font-family="Arial, Noto Sans CJK SC, sans-serif" font-size="18" fill="#222222">0</text>
+  <text x="93.76" y="36.25" font-family="Arial, Noto Sans CJK SC, sans-serif" font-size="18" dominant-baseline="middle" fill="#222222">Gene density</text>
+  <path d="M 24.1,66.5 H 16 V 107 H 24.1" fill="none" stroke="#63A375" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>
+  <text x="28.06" y="80.54" font-family="Arial, Noto Sans CJK SC, sans-serif" font-size="18" fill="#222222">0.5</text>
+  <text x="28.06" y="107" font-family="Arial, Noto Sans CJK SC, sans-serif" font-size="18" fill="#222222">0.4</text>
+  <text x="93.76" y="86.75" font-family="Arial, Noto Sans CJK SC, sans-serif" font-size="18" dominant-baseline="middle" fill="#222222">GC content</text>
+  <path d="M 24.1,117 H 16 V 157.5 H 24.1" fill="none" stroke="#E0A458" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>
+  <text x="28.06" y="131.04" font-family="Arial, Noto Sans CJK SC, sans-serif" font-size="18" fill="#222222">80000</text>
+  <text x="28.06" y="157.5" font-family="Arial, Noto Sans CJK SC, sans-serif" font-size="18" fill="#222222">0</text>
+  <text x="93.76" y="137.25" font-family="Arial, Noto Sans CJK SC, sans-serif" font-size="18" dominant-baseline="middle" fill="#222222">Sequencing coverage</text>
+</svg>
