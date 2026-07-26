@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/07/25_15:42:08
-// 文章总数: 74
+// 生成时间: 2026/07/25_19:30:16
+// 文章总数: 75
 
 window.ARTICLE_DATABASE = [
     {
@@ -241,6 +241,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-07-06",
         "summary": "基因组拼装打磨：剔除细胞器染色体",
         "path": "articles/dry_lab/assemble/02. 基因组打磨/02. 基因组打磨.html",
+        "featured": false
+    },
+    {
+        "title": "02. 色谱",
+        "collection": "analytical_chemistry",
+        "date": "2026-07-26",
+        "summary": "粒子的滤纸",
+        "path": "articles/wet_lab/04. 分析化学/02. 色谱/02. 色谱.html",
         "featured": false
     },
     {

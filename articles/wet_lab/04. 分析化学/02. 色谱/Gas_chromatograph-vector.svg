@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="864.52" height="451.48" version="1.1" viewBox="-2 27 605.16 316.04">
+<g stroke="#000" stroke-width="2">
+<g fill="none">
+<path d="m410.37 169.32h36.696v36.062h-36.696z"/>
+<path d="m222.28 88.715h37.123v36.415h-37.123z"/>
+<path d="m222.28 125.13 188.09-5e-5 -8e-5 187.38h-188.09z"/>
+</g>
+<g fill="none">
+<path d="m90.179 151.16-51.234-0.17202v39.75"/>
+<path d="m131.5 161.05 0.027-20-20.013 9.974z"/>
+<path d="m90.115 141.16 0.127 20 19.936-10.127z"/>
+<path d="m38.945 190.45c4.3779 0 7.2964 4.377 7.2964 7.296v16.052h-14.593v-16.052c0-2.919 2.9186-7.296 7.2964-7.296z"/>
+<path d="m38.574 213.63c-12.323 0-20.538 12.324-20.539 20.539l-3.46e-4 11.186h-0.0163v68h41.089v-34h0.0053l3.46e-4 -45.186c6.3e-5 -8.215-8.2159-20.539-20.539-20.539z"/>
+<line x1="240.49" x2="240.49" y1="89.157" y2="151.56"/>
+<line x1="316.33" x2="316.33" y1="218.82" y2="218.82"/>
+<path d="m409.32 187.25-91.169 0.29811c-5.3743 0.25373-10.636 1.5904-15.486 3.8425-9.6994 4.5043-17.752 12.671-21.776 23.173-8.8212 23.024 3.8542 49.145 26.66 57.747 24.764 9.341 52.784-4.3176 61.925-28.865 9.8505-26.452-4.7625-56.32-31.001-65.986-28.095-10.35-59.763 5.1917-69.942 33.075-10.841 29.697 5.6072 63.124 35.096 73.804 31.263 11.323 66.41-6.0106 77.582-37.068 11.797-32.796-6.4034-69.628-38.996-81.282-34.299-12.264-72.783 6.7865-84.911 40.884-12.724 35.774 7.161 75.882 42.736 88.475 37.223 13.177 78.927-7.5275 91.978-44.554 13.623-38.648-7.8868-81.922-46.34-95.425-8.337-2.9274-17.174-4.3909-25.935-4.321-196.84-0.20753-122.37-0.01309-188.23-0.00189" stroke-linejoin="round" stroke-width="2"/>
+<path d="m428.59 169.81v-87.268l66.756-0.0884"/>
+<rect x="495.24" y="39.206" width="98.1" height="86.725"/>
+<rect x="501.49" y="45.155" width="86.35" height="75.13"/>
+<line x1="447.06" x2="541.8" y1="187.35" y2="187.4"/>
+<line x1="465.3" x2="443.21" y1="245.08" y2="219.94"/>
+<line x1="291.2" x2="267.48" y1="46.125" y2="69.847"/>
+<line x1="86.019" x2="104.05" y1="101.81" y2="133.27"/>
+<path d="m501.89 98.85h27.488l6.894-35.355 7.536 35.334 10.17 0.0939 5.13-21.386 4.3 21.933 24.394 0.17679"/>
+</g>
+<path d="m541.8 182.4-5e-3 10 10.002-4.994z"/>
+<path d="m439.45 223.24 7.514-6.599-10.356-4.214z"/>
+<path d="m271.01 73.382-7.071-7.0711-3.535 10.607z"/>
+<path d="m108.39 130.78-8.676 4.973 9.31 6.19z"/>
+</g>
+<g font-family="sans-serif" font-size="13px">
+<switch><text x="38.168751" y="334.7753" text-anchor="middle" id="trsvg9-no" systemLanguage="no">
+<tspan x="38.168751" y="334.7753" id="trsvg1-no">Bæregass</tspan>
+</text><text x="38.168751" y="334.7753" text-anchor="middle" id="trsvg9">
+<tspan x="38.168751" y="334.7753" id="trsvg1">Carrier gas</tspan>
+</text></switch>
+<switch><text x="85.969154" y="94.950005" text-anchor="middle" id="trsvg10">
+<tspan x="85.969154" y="94.950005" id="trsvg2">Flow controller</tspan>
+</text></switch>
+<switch><text x="296.46918" y="42.325001" id="trsvg11-no" systemLanguage="no"><tspan x="296.46918" y="42.325001" id="trsvg3-no">Injektor</tspan>
+<tspan x="296.46918" y="58.325001" id="trsvg4-no"> </tspan>
+</text><text x="296.46918" y="42.325001" id="trsvg11"><tspan x="296.46918" y="42.325001" id="trsvg3">Sample</tspan>
+<tspan x="296.46918" y="58.325001" id="trsvg4">injector</tspan>
+</text></switch>
+<g text-anchor="middle">
+<switch><text x="323.66916" y="235.8253" id="trsvg12-no" systemLanguage="no">
+<tspan x="323.66916" y="235.8253" id="trsvg5-no">Kolonne-ovn</tspan>
+</text><text x="323.66916" y="235.8253" id="trsvg12">
+<tspan x="323.66916" y="235.8253" id="trsvg5">Column</tspan>
+</text></switch>
+<switch><text x="315.66916" y="329.82532" id="trsvg13-no" systemLanguage="no">
+<tspan x="315.66916" y="329.82532" id="trsvg6-no">Kolonneovn</tspan>
+</text><text x="315.66916" y="329.82532" id="trsvg13">
+<tspan x="315.66916" y="329.82532" id="trsvg6">Column oven</tspan>
+</text></switch>
+<switch><text x="466.74216" y="262.62241" id="trsvg14-no" systemLanguage="no">
+<tspan x="466.74216" y="262.62241" id="trsvg7-no">Detektor</tspan>
+</text><text x="466.74216" y="262.62241" id="trsvg14">
+<tspan x="466.74216" y="262.62241" id="trsvg7">Detector</tspan>
+</text></switch>
+</g>
+<switch><text x="558.97113" y="192.12256" id="trsvg15-no" systemLanguage="no">
+<tspan x="558.97113" y="192.12256" id="trsvg8-no">Avfall</tspan>
+</text><text x="558.97113" y="192.12256" id="trsvg15">
+<tspan x="558.97113" y="192.12256" id="trsvg8">Waste</tspan>
+</text></switch>
+</g>
+</svg>

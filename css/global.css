@@ -370,34 +370,41 @@ html.site-dark.site-background-image .site-footer { background: rgba(13, 23, 32,
 .content p { margin-bottom: 1.2rem; text-align: justify; }
 .content img { display: block; max-width: 100%; height: auto; margin: 2rem auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-/* 左侧文字、右侧图片的通用图文布局 */
+/* 可调方向与尺寸的文字环绕图片 */
 .text-image-row {
     --text-image-width: 320px;
     --text-image-max-width: 40%;
-    display: flex;
-    align-items: flex-start;
-    gap: 24px;
+    display: flow-root;
 }
-.text-image-content { flex: 1; min-width: 0; }
 .text-image-content > :first-child { margin-top: 0; }
 .content .text-image-row > img {
     width: var(--text-image-width);
     max-width: var(--text-image-max-width);
     height: auto;
     object-fit: contain;
-    margin: 0;
+    margin-top: 0;
+    margin-bottom: 1rem;
 }
-.text-image-left > img { order: -1; }
-.text-image-right > img { order: 1; }
+.content .text-image-left > img {
+    float: left;
+    margin-right: 1.5rem;
+    margin-left: 0;
+}
+.content .text-image-right > img {
+    float: right;
+    margin-right: 0;
+    margin-left: 1.5rem;
+}
 .text-image-small { --text-image-width: 240px; }
 .text-image-medium { --text-image-width: 320px; }
 .text-image-large { --text-image-width: 420px; --text-image-max-width: 50%; }
 
 @media (max-width: 700px) {
-    .text-image-row { flex-direction: column; }
     .content .text-image-row > img {
+        float: none;
         width: min(100%, var(--text-image-width));
         max-width: 100%;
+        margin: 0 auto 1rem;
     }
 }
 
