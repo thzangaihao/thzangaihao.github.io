@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/07/25_19:30:16
-// 文章总数: 75
+// 生成时间: 2026/07/27_14:46:06
+// 文章总数: 76
 
 window.ARTICLE_DATABASE = [
     {
@@ -321,6 +321,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-03-15",
         "summary": "基因注释文件的操作",
         "path": "articles/resources/software/03. gffread/03. gffread.html",
+        "featured": false
+    },
+    {
+        "title": "03. 光谱",
+        "collection": "analytical_chemistry",
+        "date": "2026-07-27",
+        "summary": "粒子的相机",
+        "path": "articles/wet_lab/04. 分析化学/03. 光谱/03. 光谱.html",
         "featured": false
     },
     {
