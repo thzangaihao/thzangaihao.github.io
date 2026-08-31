@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>01. 变异记录 vcf 文件 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="population">
+        <meta name="collection-title" content="群体基因组学">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-08-30">
+        <meta name="description" content="AABB:AaBB:AABb:AaBb:Aabb:aaBb......的高级记法">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>01. 变异记录 vcf 文件</h1>
+            
+            <div class="content">
+                <h2>开门见山</h2>
+                    <p><code>.vcf</code> 文件和 <code>.gtf</code> 文件一样，都是依赖于 <code>.fasta</code> 文件所存在的。</p>值得注意的是，<code>.vcf</code> 文件可以将多个样本的变异都记录在一个文件里。
+                    <p><code>.vcf</code> 文件有三部分组成：元信息行（## 开头）、列标题行（#CHROM 开头） 和 数据表行。数据部分共有 9 个标准固定列，后接 1 个或多个 样本列。</p>
+                    <p>这个是一个标准的 <code>.vcf</code> 文件：</p>
+                    <pre><code class="language-txt">
+##fileformat=VCFv4.2
+##fileDate=20260830
+##source=ExampleCallingPipeline
+##reference=GRCh38
+#CHROM	POS	    ID	        REF	ALT	    QUAL	FILTER	INFO	            FORMAT          SAMPLE1	            SAMPLE2
+chr1	123456	rs6054257	G	A	    29	    PASS	DP=14;AF=0.5;AA=G	GT:GQ:DP:AD	    0/1:35:14:7,7	    0/0:40:10:10,0
+chr1	123457	.	        A	T,C	    60	    PASS	DP=25;AF=0.4,0.1	GT:GQ:DP:AD	    1/2:45:15:0,12,3	0/1:50:10:7,3,0
+                    </code></pre>
+                    <p>其中字段含义如下：</p>
+                    <ol>
+                        <li>CHROM</li>变异所在的染色体，对应 <code>.fasta</code> 文件中染色体名称。
+                        <li>POS</li>变异所在的碱基位置，不管插入/确实/SNP，都是基于一个碱基作为坐标表示的。
+                        <li>ID</li>许多变异数据库中的变异 ID，如果没有，你可以自己去搭建 ID 体系或者写个点。
+                        <li>REF</li>参考基因组在 POS 单点碱基坐标的原始碱基。
+                        <li>ALT</li>编译后的结果，有多个结果时（例如多个等位基因），用半角逗号分隔。
+                        <li>QUAL</li>这个碱基的质量/可信程度，Phred 格式，可用点省略不写。
+                        <li>FILTER</li>过滤状态。如果通过了所有的质控阈值，填 PASS；如果未通过，会写明具体的原因。
+                        <li>INFO</li>存储这个变异位点的其它信息，用字典结构存储（KEY=VALUE），多个键值对用半角分号隔开。
+                        <li>FORMAT</li>后面样本的数据格式，相当于子字段的定义，和样本具体的数据一一对应，详细子字段见下。
+                        <li>SAMPLE</li>这就是我说的可以存储多个样本信息的原因，你可以无限延生下去，构建一个超级大的矩阵，这样的巨无霸矩阵我们在一些 GWAS 分析时会用到。
+                    </ol>
+                    <p>FORMAT 子字段一般有如下：</p>
+                    <ol>
+                        <li>GT</li>Genetype，基因型，不同倍型有不同的记录方法，详细见下。
+                        <li>GQ</li>Genotype Quality，基因型质量值。
+                        <li>DP</li>Read Depth，该样本的覆盖深度，该特定样本在这个位点支持的 Reads 数量。
+                        <li>AD</li>Allele Depths，等位基因深度，分别支持 REF 和各个 ALT 碱基的 reads 数量。以逗号隔开，例如 7,7 表示支持 REF 有 7 条，支持 ALT 有 7 条。
+                    </ol>
+                    <p>不同倍型生物具体记录有一点差异，主要体现在 GT 上：</p>
+                    <ol>
+                        <li>单倍体</li>单倍体每个基因座只有 1 个 等位基因，因此 GT 字段只有一个数字。0 代表和 REF 一样，无突变；1 代表突变为 ALT 的第一个突变类型；2 代表突变为 ALT 的第二个突变类型，依此类推。
+                        <li>二倍体</li>GT 字段由 2 个数字 组成，中间用 / 或 | 连接。未相位化使用 /，意思是仅知道存在这些等位基因，但不清楚分别来自哪条同源染色体。已相位化使用 |，意思是明确知道各个等位基因在单倍体单倍型上的来源和连锁关系。数字含义同单倍体。
+                        <li>多倍体</li>多倍体和二倍体表达方式类似，只不过是用更多的 / 或 | 分隔。
+                    </ol>
+                    <blockquote>我不知道我说清楚了没，对于多样本、多等位突变，总之要记住一句话：在 VCF 标准中，同一个基因组位置（CHROM + POS）如果存在多种突变，必须合并在同一个数据行中记录，而不能拆分成多行。</blockquote>
+
+                <h2>例题与练习题</h2>
+                    <h3>豌豆的黄绿</h3>
+                        <p>豌豆是二倍体，我们考虑颜色性状：黄色/绿色，其中黄色是显性性状，绿色是隐形性状，在高中，我们用 A 来表示黄色基因，a 表示绿色基因。</p>
+                        <p>假设颜色性状在一号染色体的 100 号碱基处，参考基因黄色在 100 号碱基处为 A，绿色为 G，填空以下 VCF 文件：</p>
+                        <table><thead><tr><th>CHROM</th><th>POS</th><th>ID</th><th>REF</th><th>ALT</th><th>QUAL</th><th>FILTER</th><th>INFO</th><th>FORMAT</th><th>Sample_AA</th><th>Sample_Aa</th><th>Sample_aa</th></tr></thead><tbody><tr><td>chr01</td><td>100</td><td>.</td><td>A</td><td>G</td><td>30</td><td>PASS</td><td>DP=14</td><td>GT</td><td>___</td><td>___</td><td>___</td></tr></tbody></table>
+                        <p>答案是：</p>
+                        <table><thead><tr><th>CHROM</th><th>POS</th><th>ID</th><th>REF</th><th>ALT</th><th>QUAL</th><th>FILTER</th><th>INFO</th><th>FORMAT</th><th>Sample_AA</th><th>Sample_Aa</th><th>Sample_aa</th></tr></thead><tbody><tr><td>chr01</td><td>100</td><td>.</td><td>A</td><td>G</td><td>30</td><td>PASS</td><td>DP=14</td><td>GT</td><td>0/0</td><td>0/1</td><td>1/1</td></tr></tbody></table>
+                    <h3>豌豆的黄绿与圆皱</h3>
+                        <p>颜色假设不变，加入新性状，圆皱，圆形为显性，B 表示，皱缩为隐形，b 表示，则有如下情况（9:3:3:1）：</p>
+                        <img src="./1.png">
+                        <p>假设圆/皱基因在二号染色体的 100 号氨基酸位置上，突变类型一样，一共有 3 × 3 九种基因型，分别写出它们的 VCF 文件：</p>
+                        <table><thead><tr><th>CHROM</th><th>POS</th><th>ID</th><th>REF</th><th>ALT</th><th>QUAL</th><th>FILTER</th><th>INFO</th><th>FORMAT</th><th>AABB</th><th>AaBB</th><th>aaBB</th><th>AABb</th><th>AaBb</th><th>aaBb</th><th>Aabb</th><th>AaBb</th><th>aabb</th></tr></thead><tbody><tr><td>chr01</td><td>100</td><td>.</td><td>A</td><td>G</td><td>30</td><td>PASS</td><td>DP=14</td><td>GT</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___</td></tr><tr><td>chr02</td><td>100</td><td>.</td><td>A</td><td>G</td><td>30</td><td>PASS</td><td>DP=14</td><td>GT</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___</td></tr></tbody></table>
+                        <p>答案为：</p>
+                        <table><thead><tr><th>CHROM</th><th>POS</th><th>ID</th><th>REF</th><th>ALT</th><th>QUAL</th><th>FILTER</th><th>INFO</th><th>FORMAT</th><th>AABB</th><th>AaBB</th><th>aaBB</th><th>AABb</th><th>AaBb</th><th>aaBb</th><th>Aabb</th><th>AaBb</th><th>aabb</th></tr></thead><tbody><tr><td>chr01</td><td>100</td><td>.</td><td>A</td><td>G</td><td>30</td><td>PASS</td><td>DP=14</td><td>GT</td><td>0/0</td><td>0/1</td><td>1/1</td><td>0/0</td><td>0/1</td><td>1/1</td><td>0/0</td><td>0/1</td><td>1/1</td></tr><tr><td>chr02</td><td>100</td><td>.</td><td>A</td><td>G</td><td>30</td><td>PASS</td><td>DP=14</td><td>GT</td><td>0/0</td><td>0/0</td><td>0/0</td><td>0/1</td><td>0/1</td><td>0/1</td><td>1/1</td><td>1/1</td><td>1/1</td></tr></tbody></table>
+                    <h3>多等位基因</h3>
+                        <p>假设某二倍体植物在 1 号染色体 100 号位置上参考基因位点为 A，共有两种变异，分别是 T/G，分别记为 $A_1$、$A_2$、$A_3$，填空以下信息：</p>
+                        <table><thead><tr><th>CHROM</th><th>POS</th><th>ID</th><th>REF</th><th>ALT</th><th>QUAL</th><th>FILTER</th><th>INFO</th><th>FORMAT</th><th>A1A1</th><th>A1A2</th><th>A1A3</th><th>A2A2</th><th>A2A3</th><th>A3A3 </th></tr></thead><tbody><tr><td>chr01</td><td>100</td><td>.</td><td>A</td><td>G</td><td>30</td><td>PASS</td><td>DP=14</td><td>GT</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___</td><td>___ </td></tr></tbody></table>
+                        <p>答案为：</p>
+                        <table><thead><tr><th>CHROM</th><th>POS</th><th>ID</th><th>REF</th><th>ALT</th><th>QUAL</th><th>FILTER</th><th>INFO</th><th>FORMAT</th><th>A1A1</th><th>A1A2</th><th>A1A3</th><th>A2A2</th><th>A2A3</th><th>A3A3 </th></tr></thead><tbody><tr><td>chr01</td><td>100</td><td>.</td><td>A</td><td>T,G</td><td>30</td><td>PASS</td><td>DP=14</td><td>GT</td><td>0/0</td><td>0/1</td><td>0/2</td><td>1/1</td><td>1/2</td><td>2/2 </td></tr></tbody></table>
+                    <h3>练习题</h3>
+                        <iframe src="./VCF_Practice_Questions.pdf" type="application/pdf"></iframe>
+                        
+
+
+
+
+
+            </div>
+        </div>
+         
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

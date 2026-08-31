@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/07/27_14:46:06
-// 文章总数: 76
+// 生成时间: 2026/08/31_11:22:09
+// 文章总数: 78
 
 window.ARTICLE_DATABASE = [
     {
@@ -58,6 +58,14 @@ window.ARTICLE_DATABASE = [
         "summary": "列联分析、独立性检验与卡方检验",
         "path": "articles/dry_lab/gwas/01. 全基因组关联分析基础原理/01. 全基因组关联分析基础原理.html",
         "featured": true
+    },
+    {
+        "title": "01. 变异记录 vcf 文件",
+        "collection": "population",
+        "date": "2026-08-30",
+        "summary": "AABB:AaBB:AABb:AaBb:Aabb:aaBb......的高级记法",
+        "path": "articles/dry_lab/population/01. 变异记录 vcf 文件/01. 变异记录 vcf 文件.html",
+        "featured": false
     },
     {
         "title": "01. 基因组基因预测",
@@ -417,6 +425,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-01-21",
         "summary": "Vina 刚性对接自动化",
         "path": "articles/resources/python/04. 分子对接系列/04. 分子对接系列.html",
+        "featured": false
+    },
+    {
+        "title": "04. 多倍型基因组注释策略",
+        "collection": "assemble",
+        "date": "2026-08-27",
+        "summary": "复杂多倍型基因组基因功能注释与分类",
+        "path": "articles/dry_lab/assemble/04. 多倍型基因组注释策略/04. 多倍型基因组注释策略.html",
         "featured": false
     },
     {
