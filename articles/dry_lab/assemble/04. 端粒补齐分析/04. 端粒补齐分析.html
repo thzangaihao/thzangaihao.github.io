@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>04. 端粒补齐分析 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="assemble"> 
+        <meta name="collection-title" content="基因组组装">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-08-31">
+        <meta name="description" content="T2T 的进一步组装">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>04. 端粒补齐分析</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                    <p>使用 Hifiasm 进行基因组拼接并经过细胞器过滤后，我们得到了 contig 级别的数据。幸运的话，我们能把大部分染色体都拼装成 T2T 的，但是，有一部分染色体，因为 ONT 数据权重（或者你压根没有 ONT），并不能达到 T2T，具体可能是单端粒或无端粒，这个时候就需要我们的 ONT 数据进行回组装。这篇技术博客主要讲解了如何进行回组装修订和简易技术原理介绍。</p>
+                    <p>在这里我是基于我手上的水稻基因组的单倍分型组装做的流程归纳，包含了大部分情况：</p>
+                    <img src="./1.png">
+                <h2>端粒探测</h2>
+                    <p>本栏目第一个博客最后面的端粒检查只检查两端，但是也完全有可能被拼接到了基因组内部，下面这个小脚本可以生成染色体上每一个区域端粒的存在数据，并可以借助绘图工具进行可视化。</p>
+                    <p>它的使用很简单，我们只需要提供 <code>.fasta</code> 文件即可进行检测。</p>
+                    <p>这个脚本会自动检测你输入的端粒序列（如果你不知道端粒序列，可以用第一篇博客末尾的那个脚本进行自动探测），按照指定不重叠连续小块（默认 10000bp）进行划分，得到每一小块端粒总长度占比，取值为 [0,1]，输出为一个 CSV 文件，如果环境中安装了 matplotlib 及相关库，他还会自己生成一张 svg 图片，可视化每一条染色体的信号。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>信号检测</h5>
+                                    <span>文件格式：.py | 大小：8.4 KB</span>
+                                </div>
+                            </div>
+                            <a href="./telomere_signal.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                        <img src="./2.png">
+                    <p>如果染色体内部没有很强的端粒信号，我们就可以将我们的工作重心放到染色体两端上来。</p>
+
+            </div>
+        </div>
+         
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

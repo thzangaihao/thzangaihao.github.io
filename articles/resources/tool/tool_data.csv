@@ -6,3 +6,4 @@ id,name,script_path,description
 5,fastq 双端测序文件合并,./scripts/fastq_merge_pairend.py,"针对双端测序优化：提供多个 fastq 双端测序文件，按样本 R1/R2 合并为总 R1/R2 fastq 文件。"
 6,注释文件过滤,./scripts/注释文件过滤.py,"提供 <code>.gff3</code>、<code>.gff</code>、<code>.gtf</code> 注释文件，按 feature 类型过滤，默认保留 <code>gene/mRNA/transcript/exon/CDS</code>，适合提取基因结构相关注释。"
 7,snapgene 特征 csv 文件转 gtf 文件,./scripts/snapgene_features_to_gtf.py,"提供 snapgene 特征 csv 文件，转换为 gtf 注释文件。"
+8,FASTA 文件染色体重命名,./scripts/rename_fasta_chromosomes.py,"提供 <code>.fasta</code> 文件，按用户提供的染色体重命名列表，重命名染色体序列。"

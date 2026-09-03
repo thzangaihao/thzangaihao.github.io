@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>01. 培养皿及菌落识别统计 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="eye"> 
+        <meta name="collection-title" content="计算机视觉">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-09-03">
+        <meta name="description" content="识别培养皿并自动统计菌落直径">
+        <meta name="featured" content="true">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>01. 培养皿及菌落识别统计</h1>
+            <div class="content">
+                <h2>前言</h2>
+                    <p>在科研工作者，我们经常需要通过测量菌落的直径来作为数据指标，但是，测量这件事情耗费了大量人力，时间，以及估读会影响准确性。基于此，我开发了Windows上的一个自动识别培养皿和菌落的脚本程序。</p>
+                <h2>软件与说明书</h2>
+                    <p>关于这个工具的使用说明都在压缩包里面的使用说明.md文件中，以下是工具文件：</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>培养基裁剪</h5>
+                                    <span>文件格式：.zip | 大小：16.0 KB</span>
+                                </div>
+                            </div>
+                            <a href="./培养皿裁剪.zip" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                    <p>关于手机上的串流摄像头，我这里推荐使用 <a href="https://play.google.com/store/apps/details?id=com.pas.webcam" target="_blank" style="color: #3498db;">IP WebCam</a> 这个软件，它可以在 Google Play 上下载到，免费版就已经够用了。在这里建议串流质量拉到最高（默认 50，你拉到 100，对应的就是码率），分辨率也拉到最高（我的摄像头支持 3840×2160），帧率拉低一点，在 10 fps 就已经够了（我们主要还是拍照嘛，你设置个 120 fps 又不是打游戏），这样总体带宽码率在 100 Mbps 以下，成像效果就非常不错了。</p>
+                    <p>目前因为我没有高级的摄像机（我的摄像机就是手机），所以我们并没有搞有线连接的摄像头数据流方案，如果你用雷电4协议的话，理论带宽就能到到双向 40 Gbps，这可不得了啊不得了，100 Mbps 说实话还是有点糊的呢。</p>
+                    <p>更多说明你就看说明书吧！</p>
+                <h2>预览效果</h2>
+                    <img src="./1.png">
+
+                    
+
+
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

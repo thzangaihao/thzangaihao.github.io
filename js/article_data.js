@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/08/31_11:22:09
-// 文章总数: 78
+// 生成时间: 2026/09/03_16:19:14
+// 文章总数: 79
 
 window.ARTICLE_DATABASE = [
     {
@@ -66,6 +66,14 @@ window.ARTICLE_DATABASE = [
         "summary": "AABB:AaBB:AABb:AaBb:Aabb:aaBb......的高级记法",
         "path": "articles/dry_lab/population/01. 变异记录 vcf 文件/01. 变异记录 vcf 文件.html",
         "featured": false
+    },
+    {
+        "title": "01. 培养皿及菌落识别统计",
+        "collection": "eye",
+        "date": "2026-09-03",
+        "summary": "识别培养皿并自动统计菌落直径",
+        "path": "articles/resources/eye/01. 培养皿及菌落识别统计/01. 培养皿及菌落识别统计.html",
+        "featured": true
     },
     {
         "title": "01. 基因组基因预测",
@@ -428,14 +436,6 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
-        "title": "04. 多倍型基因组注释策略",
-        "collection": "assemble",
-        "date": "2026-08-27",
-        "summary": "复杂多倍型基因组基因功能注释与分类",
-        "path": "articles/dry_lab/assemble/04. 多倍型基因组注释策略/04. 多倍型基因组注释策略.html",
-        "featured": false
-    },
-    {
         "title": "04. 富集分析图",
         "collection": "figure",
         "date": "2026-03-21",
@@ -450,6 +450,14 @@ window.ARTICLE_DATABASE = [
         "summary": "数据可视化降维三巨头-快",
         "path": "articles/dry_lab/algorithm/04. 数据降维系列：PCA/04. 数据降维系列：PCA.html",
         "featured": true
+    },
+    {
+        "title": "04. 端粒补齐分析",
+        "collection": "assemble",
+        "date": "2026-08-31",
+        "summary": "T2T 的进一步组装",
+        "path": "articles/dry_lab/assemble/04. 端粒补齐分析/04. 端粒补齐分析.html",
+        "featured": false
     },
     {
         "title": "04. 蛋白与已知 DNA 基序对接",
@@ -500,19 +508,19 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
-        "title": "05. 染色体层级图",
-        "collection": "figure",
-        "date": "2026-03-21",
-        "summary": "基因组的多层级展示图",
-        "path": "articles/resources/gallery/05. 染色体层级图/05. 染色体层级图.html",
-        "featured": false
-    },
-    {
         "title": "05. 生物文件处理",
         "collection": "python",
         "date": "2026-01-22",
         "summary": "生物信息文件格式转换，文件整合",
         "path": "articles/resources/python/05. 生物文件处理/05. 生物文件处理.html",
+        "featured": false
+    },
+    {
+        "title": "05. 线性染色体图",
+        "collection": "figure",
+        "date": "2026-09-01",
+        "summary": "基因组的多层级展示图",
+        "path": "articles/resources/gallery/05. 线性染色体图/05. 线性染色体图.html",
         "featured": false
     },
     {
