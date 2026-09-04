@@ -36,13 +36,14 @@
             </div>
         </header>
 
-        <section class="cheat-toolbar" aria-label="搜索速查表">
+        <section class="cheat-toolbar catalog-toolbar" aria-label="搜索速查表">
             <label class="cheat-search" for="sheetSearch">
                 <i class="fas fa-search" aria-hidden="true"></i>
                 <input id="sheetSearch" type="search" placeholder="搜索速查表名称…" autocomplete="off">
                 <kbd>/</kbd>
             </label>
         </section>
+        <div id="sheetCount" class="catalog-count" aria-live="polite"></div>
 
         <section class="sheet-grid" id="sheetGrid" aria-label="速查表列表">
             <article class="sheet-card" data-title="matplotlib 速查表">
@@ -86,18 +87,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             const search = document.getElementById('sheetSearch');
             const cards = [...document.querySelectorAll('.sheet-card')];
-            const resultCount = document.getElementById('resultCount');
+            const sheetCount = document.getElementById('sheetCount');
             const emptyState = document.getElementById('emptyState');
 
             function updateResults() {
                 const query = search.value.trim().toLowerCase();
                 let visible = 0;
                 cards.forEach(card => {
-                    const show = !query || card.dataset.title.includes(query);
+                    const show = !query || card.textContent.toLowerCase().includes(query);
                     card.hidden = !show;
                     if (show) visible++;
                 });
-                if (resultCount) resultCount.textContent = visible;
+                sheetCount.textContent = query
+                    ? `显示 ${visible} / ${cards.length} 个速查表`
+                    : `共 ${cards.length} 个速查表`;
                 emptyState.hidden = visible !== 0;
             }
 
@@ -118,6 +121,7 @@
                 updateResults();
                 search.focus();
             });
+            updateResults();
         });
     </script>
 </body>

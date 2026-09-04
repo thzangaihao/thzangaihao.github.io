@@ -26,13 +26,37 @@
 .cheat-search kbd { position: absolute; top: 50%; right: .9rem; transform: translateY(-50%); min-width: 25px; padding: .1rem .35rem; border: 1px solid #dce4ea; border-bottom-width: 2px; border-radius: 6px; background: #f7f9fb; color: #789; text-align: center; font-family: inherit; }
 .result-line { margin: 1.2rem .15rem .8rem; color: #81909d; font-size: .83rem; }
 
+/* 列表页搜索框与双栏列表的左栏严格对齐。 */
+.catalog-toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .8rem;
+    margin-bottom: 0;
+}
+.catalog-toolbar .cheat-search {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+.catalog-count {
+    min-height: 1.2rem;
+    margin: .75rem .15rem .8rem;
+    color: var(--text-secondary);
+    font-size: .8rem;
+}
+
+@media (max-width: 720px) {
+    .catalog-toolbar { grid-template-columns: 1fr; }
+    .sheet-grid,
+    .resource-unified .plasmid-grid { grid-template-columns: 1fr; }
+}
+
 .sheet-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
-.sheet-card { position: relative; overflow: hidden; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .85rem; min-height: 92px; padding: .85rem 1rem; border: 1px solid var(--border-color); border-radius: 14px; background: var(--surface-1); box-shadow: 0 4px 14px var(--shadow-color); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-.sheet-card:hover { transform: translateY(-2px); border-color: #cbdce7; box-shadow: 0 9px 22px rgba(36,54,71,.09); }
+.sheet-card { position: relative; overflow: hidden; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .85rem; min-height: 92px; padding: .85rem 1rem; border: 1px solid var(--border-color); border-left: 3px solid transparent; border-radius: 14px; background: var(--surface-1); box-shadow: 0 4px 14px var(--shadow-color); }
 .sheet-card[hidden] { display: none; }
-.card-accent { position: absolute; inset: 0 auto 0 0; width: 3px; }
-.accent-blue { background: #3c9ed2; }
-.accent-green { background: #38a47a; }
+.card-accent { display: none; }
+.accent-blue,
+.accent-green { background: transparent; }
 .sheet-icon { width: 46px; height: 46px; display: grid; place-items: center; margin: 0; border-radius: 12px; font-size: 1.15rem; }
 .blue-icon { color: #278fc7; background: #e8f5fc; }
 .green-icon { color: #29936c; background: #e7f7f0; }
@@ -47,15 +71,27 @@
 
 /* 资源站三级页共享列表语言 */
 .resource-unified .plasmid-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
-.resource-unified .plasmid-card { position: relative; min-height: 150px; padding: 1.1rem 1.2rem; border: 1px solid #e0e7ed; border-top: 1px solid #e0e7ed; border-left: 3px solid #3c9ed2; border-radius: 14px; box-shadow: 0 4px 14px rgba(36,54,71,.045); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-.resource-unified .plasmid-card:hover { transform: translateY(-2px); border-color: #cbdce7; border-left-color: #3c9ed2; box-shadow: 0 9px 22px rgba(36,54,71,.09); }
+.resource-unified .plasmid-card { position: relative; min-height: 150px; padding: 1.1rem 1.2rem; border: 1px solid #e0e7ed; border-top: 1px solid #e0e7ed; border-left: 3px solid transparent; border-radius: 14px; box-shadow: 0 4px 14px var(--shadow-color); }
+
+/* 质粒库、工具库和速查表共用同一套卡片悬浮预设。 */
+.sheet-card,
+.resource-unified .plasmid-card {
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.sheet-card:hover,
+.resource-unified .plasmid-card:hover {
+    transform: translateY(-2px);
+    border-color: #cbdce7;
+    border-left-color: #3c9ed2;
+    box-shadow: 0 9px 22px rgba(36,54,71,.09);
+}
 .resource-unified .plasmid-card h3 { margin: 0 0 .35rem; color: #263b4d; font-size: 1rem; line-height: 1.35; }
 .resource-unified .plasmid-card .plasmid-type { margin-bottom: .65rem; padding: .18rem .45rem; border-radius: 5px; background: #eef4f7; color: #66808f; font-size: .7rem; }
 .resource-unified .plasmid-card p { margin: 0 0 .7rem !important; color: #7d8b96; font-size: .78rem; line-height: 1.5; }
 .resource-unified .plasmid-card .plasmid-meta { margin-top: auto; padding-top: .6rem; color: #8796a1; font-size: .73rem; }
 .resource-unified .palette-toolbar { margin-top: 2rem; }
 .resource-unified .generator-shell { border-color: #e0e7ed; border-radius: 14px; box-shadow: 0 9px 28px rgba(36,54,71,.07); }
-.resource-unified .tool-card { min-height: 92px; padding-right: 4rem; border-left-color: #3c9ed2; }
+.resource-unified .tool-card { min-height: 92px; padding-right: 4rem; }
 .resource-unified .tool-card p { overflow: hidden; color: #7d8b96; font-size: .75rem; line-height: 1.45; white-space: nowrap; text-overflow: ellipsis; }
 .resource-unified .tool-download-btn { background: #2c3e50; box-shadow: none; }
 .resource-unified .tool-download-btn:hover { background: #3498db; transform: translateY(-50%) scale(1.05); box-shadow: 0 6px 14px rgba(52,152,219,.22); }
@@ -81,6 +117,11 @@ html.site-dark body.cheat-sheet-page {
 }
 html.site-dark body.cheat-sheet-page :where(.plasmid-card, .sheet-card, .theme-card) {
     border-color: #344553;
+}
+html.site-dark body.cheat-sheet-page :is(.sheet-card:hover, .resource-unified .plasmid-card:hover) {
+    border-color: #405360;
+    border-left-color: #3c9ed2;
+    box-shadow: 0 9px 22px rgba(0,0,0,.22);
 }
 html.site-dark body.cheat-sheet-page :where(.plasmid-card h3, .sheet-card h2, .theme-card h3, .empty-state h2) {
     color: var(--text-main);
@@ -116,5 +157,5 @@ html.site-dark body.cheat-sheet-page .contribution-note strong { color: #d5e2e9;
 
 
 @media (prefers-reduced-motion: reduce) {
-    .sheet-card, .cheat-search input { transition: none; }
+    .sheet-card, .resource-unified .plasmid-card, .cheat-search input { transition: none; }
 }

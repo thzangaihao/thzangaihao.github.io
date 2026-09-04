@@ -37,13 +37,14 @@
                 <div class="hero-mark resource-mark" aria-hidden="true"><i class="fa-solid fa-circle-notch fa-rotate-by" style="--fa-rotate-angle:45deg"></i></div>
             </header>
 
-            <div class="cheat-toolbar">
+            <div class="cheat-toolbar catalog-toolbar">
                 <label class="cheat-search" for="searchInput">
                     <i class="fas fa-search"></i>
                     <input type="text" id="searchInput" placeholder="搜索质粒名称、抗性或分类...">
                     <kbd>/</kbd>
                 </label>
             </div>
+            <div id="plasmidCount" class="catalog-count" aria-live="polite"></div>
 
             <div class="plasmid-grid" id="plasmidGrid">
                 <!-- 质粒卡片由JS动态生成 -->
@@ -55,6 +56,8 @@
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 let plasmidData = [];
+                const searchInput = document.getElementById('searchInput');
+                const plasmidCount = document.getElementById('plasmidCount');
 
                 // 解析CSV文件
                 Papa.parse("plasmid_data.csv", {
@@ -64,7 +67,7 @@
                     encoding: "UTF-8",
                     complete: function(results) {
                         plasmidData = results.data;
-                        renderGrid(plasmidData);
+                        applySearch();
                     },
                     error: function(err) {
                         document.getElementById('plasmidGrid').innerHTML = '<p style="color: red;">数据加载失败，请检查CSV文件。</p>';
@@ -72,9 +75,10 @@
                 });
 
                 // 搜索功能
-                const searchInput = document.getElementById('searchInput');
-                searchInput.addEventListener('input', (e) => {
-                    const term = e.target.value.toLowerCase();
+                searchInput.addEventListener('input', applySearch);
+
+                function applySearch() {
+                    const term = searchInput.value.trim().toLowerCase();
                     const filtered = plasmidData.filter(p => 
                         (p.name && p.name.toLowerCase().includes(term)) ||
                         (p.resistance && p.resistance.toLowerCase().includes(term)) ||
@@ -82,7 +86,10 @@
                         (p.description && p.description.toLowerCase().includes(term))
                     );
                     renderGrid(filtered);
-                });
+                    plasmidCount.textContent = term
+                        ? `显示 ${filtered.length} / ${plasmidData.length} 个质粒`
+                        : `共 ${plasmidData.length} 个质粒`;
+                }
 
                 document.addEventListener('keydown', event => {
                     if (event.key === '/' && document.activeElement !== searchInput) {

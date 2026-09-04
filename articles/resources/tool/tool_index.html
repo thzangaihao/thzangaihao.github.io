@@ -13,13 +13,21 @@
             #toolGrid {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+                align-items: start;
+                gap: .8rem;
+            }
+
+            .tool-column {
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
                 gap: .8rem;
             }
 
             .tool-card {
                 position: relative;
                 padding: 1rem 4rem 1rem 1.15rem;
-                cursor: default;
+                cursor: pointer;
                 width: 100%;
                 display: block;
                 margin: 0;
@@ -60,16 +68,194 @@
                 box-shadow: none;
             }
 
-            .tool-card p {
+            .tool-card:focus-visible {
+                outline: 3px solid rgba(52, 152, 219, .25);
+                outline-offset: 3px;
+            }
+
+            .tool-card h3::after {
+                content: "\f078";
+                display: inline-block;
+                margin-left: .55rem;
+                color: var(--accent-color);
+                font-family: "Font Awesome 6 Free";
+                font-size: .68rem;
+                font-weight: 900;
+                transition: transform .32s ease;
+            }
+
+            .tool-card.expanded h3::after { transform: rotate(180deg); }
+
+            .tool-description {
+                height: calc(1.45em + .28rem);
+                overflow: hidden;
+                font-size: .75rem;
+                transition: height .36s cubic-bezier(.22, .8, .3, 1);
+                will-change: height;
+            }
+
+            .resource-unified .tool-card .tool-description p {
                 display: block;
-                -webkit-line-clamp: unset;
-                -webkit-box-orient: unset;
+                margin: 0 !important;
+                padding-top: .28rem;
+                overflow: hidden;
+                line-height: 1.45;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+
+            .resource-unified .tool-card.expanded .tool-description p {
+                display: block;
                 overflow: visible;
-                text-overflow: initial;
-                margin: .28rem 0 0;
+                white-space: normal;
+                text-overflow: clip;
+                overflow-wrap: anywhere;
+                word-break: break-word;
             }
 
             .tool-download-btn { transform: translateY(-50%); }
+
+            .tool-toolbar {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                align-items: stretch;
+                gap: .8rem;
+            }
+
+            .tool-toolbar .cheat-search {
+                width: 100%;
+                max-width: none;
+                min-width: 0;
+            }
+
+            .format-filters {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) 76px;
+                gap: .65rem;
+                min-width: 0;
+            }
+
+            .format-filter {
+                position: relative;
+            }
+
+            .format-filter-toggle {
+                height: 50px;
+                width: 100%;
+                padding: 0 .9rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: .7rem;
+                border: 1px solid var(--border-color);
+                border-radius: 14px;
+                background: var(--surface-1);
+                color: var(--text-main);
+                box-shadow: 0 5px 16px var(--shadow-color);
+                cursor: pointer;
+                font: inherit;
+            }
+
+            .filter-label {
+                min-width: 0;
+                display: inline-flex;
+                align-items: center;
+                gap: .45rem;
+            }
+
+            .filter-label-text {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .format-filter-toggle:hover,
+            .format-filter-toggle[aria-expanded="true"] {
+                border-color: var(--accent-color);
+            }
+
+            .filter-count {
+                min-width: 1.35rem;
+                height: 1.35rem;
+                padding: 0 .35rem;
+                display: none;
+                place-items: center;
+                border-radius: 999px;
+                background: var(--accent-color);
+                color: #fff;
+                font-size: .72rem;
+                font-weight: 700;
+            }
+
+            .filter-count.visible { display: inline-grid; }
+
+            .format-filter-menu {
+                position: absolute;
+                top: calc(100% + .45rem);
+                right: 0;
+                z-index: 20;
+                width: max-content;
+                min-width: 190px;
+                max-height: 290px;
+                overflow-y: auto;
+                padding: .55rem;
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                background: var(--surface-1);
+                box-shadow: 0 14px 34px rgba(31, 52, 71, .18);
+            }
+
+            .format-filter-menu[hidden] { display: none; }
+
+            .format-option {
+                display: flex;
+                align-items: center;
+                gap: .55rem;
+                padding: .48rem .55rem;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: .88rem;
+            }
+
+            .format-option:hover { background: var(--surface-hover); }
+            .format-option input { accent-color: var(--accent-color); }
+
+            .clear-filters {
+                height: 50px;
+                width: 76px;
+                padding: 0;
+                border: 0;
+                background: transparent;
+                color: var(--text-secondary);
+                cursor: pointer;
+                font: inherit;
+                font-size: .85rem;
+            }
+
+            .clear-filters:hover { color: var(--accent-color); }
+            .clear-filters[hidden] {
+                display: block;
+                visibility: hidden;
+                pointer-events: none;
+            }
+
+            .filter-status {
+                grid-column: 1 / -1;
+                min-height: 1.2rem;
+                margin: -.25rem 0 0 .15rem;
+                color: var(--text-secondary);
+                font-size: .8rem;
+            }
+
+            @media (max-width: 720px) {
+                .tool-toolbar { grid-template-columns: 1fr; }
+                .format-filters { width: 100%; }
+                .format-filter { flex: 1; min-width: 0; }
+                .format-filter-toggle { width: 100%; }
+                .format-filter-menu { left: 0; right: auto; }
+                .clear-filters { flex: 0 0 76px; }
+                #toolGrid { grid-template-columns: 1fr; }
+            }
 
 
 
@@ -103,12 +289,32 @@
                 <div class="hero-mark resource-mark" aria-hidden="true"><i class="fa-solid fa-screwdriver-wrench"></i></div>
             </header>
 
-            <div class="cheat-toolbar">
+            <div class="cheat-toolbar tool-toolbar">
                 <label class="cheat-search" for="searchInput">
                     <i class="fas fa-search"></i>
                     <input type="text" id="searchInput" placeholder="搜索工具名称或用途...">
                     <kbd>/</kbd>
                 </label>
+                <div class="format-filters" aria-label="文件格式筛选">
+                    <div class="format-filter" data-field="input_format">
+                        <button class="format-filter-toggle" type="button" aria-expanded="false">
+                            <span class="filter-label"><i class="fas fa-file-import"></i><span class="filter-label-text" data-default="输入格式">输入格式</span></span>
+                            <span class="filter-count" aria-hidden="true">0</span>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="format-filter-menu" hidden></div>
+                    </div>
+                    <div class="format-filter" data-field="output_format">
+                        <button class="format-filter-toggle" type="button" aria-expanded="false">
+                            <span class="filter-label"><i class="fas fa-file-export"></i><span class="filter-label-text" data-default="输出格式">输出格式</span></span>
+                            <span class="filter-count" aria-hidden="true">0</span>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="format-filter-menu" hidden></div>
+                    </div>
+                    <button id="clearFilters" class="clear-filters" type="button" hidden>清除筛选</button>
+                </div>
+                <div id="filterStatus" class="filter-status" aria-live="polite"></div>
             </div>
 
             <div class="plasmid-grid" id="toolGrid">
@@ -121,6 +327,12 @@
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 let toolData = [];
+                const expandedTools = new Set();
+                const selectedFormats = {
+                    input_format: new Set(),
+                    output_format: new Set()
+                };
+                const mobileLayout = window.matchMedia('(max-width: 720px)');
 
                 Papa.parse("tool_data.csv", {
                     download: true,
@@ -129,7 +341,8 @@
                     encoding: "UTF-8",
                     complete: function(results) {
                         toolData = results.data.filter(t => t.id && t.name);
-                        renderGrid(toolData);
+                        buildFormatFilters();
+                        applyFilters();
                     },
                     error: function() {
                         document.getElementById('toolGrid').innerHTML = '<p style="color: red;">数据加载失败，请检查 CSV 文件。</p>';
@@ -137,14 +350,106 @@
                 });
 
                 const searchInput = document.getElementById('searchInput');
-                searchInput.addEventListener('input', (e) => {
-                    const term = e.target.value.toLowerCase();
-                    const filtered = toolData.filter(t =>
-                        (t.name && t.name.toLowerCase().includes(term)) ||
-                        (t.description && t.description.toLowerCase().includes(term))
-                    );
-                    renderGrid(filtered);
+                searchInput.addEventListener('input', applyFilters);
+                mobileLayout.addEventListener('change', applyFilters);
+
+                document.getElementById('clearFilters').addEventListener('click', () => {
+                    Object.values(selectedFormats).forEach(selection => selection.clear());
+                    document.querySelectorAll('.format-option input').forEach(input => { input.checked = false; });
+                    updateFilterControls();
+                    applyFilters();
                 });
+
+                document.querySelectorAll('.format-filter').forEach(filter => {
+                    const toggle = filter.querySelector('.format-filter-toggle');
+                    const menu = filter.querySelector('.format-filter-menu');
+                    toggle.addEventListener('click', () => {
+                        const willOpen = menu.hidden;
+                        closeFilterMenus();
+                        menu.hidden = !willOpen;
+                        toggle.setAttribute('aria-expanded', String(willOpen));
+                    });
+                });
+
+                document.addEventListener('click', event => {
+                    if (!event.target.closest('.format-filter')) closeFilterMenus();
+                });
+
+                function splitFormats(value) {
+                    return (value || '').split('|').map(format => format.trim()).filter(Boolean);
+                }
+
+                function buildFormatFilters() {
+                    document.querySelectorAll('.format-filter').forEach(filter => {
+                        const field = filter.dataset.field;
+                        const menu = filter.querySelector('.format-filter-menu');
+                        const formats = [...new Set(toolData.flatMap(tool => splitFormats(tool[field])))]
+                            .sort((a, b) => a.localeCompare(b, 'zh-CN'));
+
+                        menu.innerHTML = '';
+                        formats.forEach(format => {
+                            const label = document.createElement('label');
+                            label.className = 'format-option';
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.value = format;
+                            checkbox.addEventListener('change', () => {
+                                if (checkbox.checked) selectedFormats[field].add(format);
+                                else selectedFormats[field].delete(format);
+                                updateFilterControls();
+                                applyFilters();
+                            });
+                            label.append(checkbox, document.createTextNode(format));
+                            menu.appendChild(label);
+                        });
+                    });
+                }
+
+                function closeFilterMenus() {
+                    document.querySelectorAll('.format-filter').forEach(filter => {
+                        filter.querySelector('.format-filter-menu').hidden = true;
+                        filter.querySelector('.format-filter-toggle').setAttribute('aria-expanded', 'false');
+                    });
+                }
+
+                function updateFilterControls() {
+                    let totalSelected = 0;
+                    document.querySelectorAll('.format-filter').forEach(filter => {
+                        const selected = [...selectedFormats[filter.dataset.field]];
+                        const count = selected.length;
+                        totalSelected += count;
+                        const badge = filter.querySelector('.filter-count');
+                        const label = filter.querySelector('.filter-label-text');
+                        const toggle = filter.querySelector('.format-filter-toggle');
+                        badge.textContent = count;
+                        badge.classList.toggle('visible', count > 0);
+                        label.textContent = count ? selected.join('、') : label.dataset.default;
+                        toggle.title = count ? `已选：${selected.join('、')}` : '';
+                        toggle.setAttribute('aria-label', count
+                            ? `${label.dataset.default}，已选：${selected.join('、')}`
+                            : label.dataset.default);
+                    });
+                    document.getElementById('clearFilters').hidden = totalSelected === 0;
+                }
+
+                function applyFilters() {
+                    const term = searchInput.value.trim().toLowerCase();
+                    const filtered = toolData.filter(t => {
+                        const matchesSearch =
+                        (t.name && t.name.toLowerCase().includes(term)) ||
+                        (t.description && t.description.toLowerCase().includes(term));
+                        const matchesFormats = Object.entries(selectedFormats).every(([field, selection]) => {
+                            const toolFormats = splitFormats(t[field]);
+                            return [...selection].every(format => toolFormats.includes(format));
+                        });
+                        return matchesSearch && matchesFormats;
+                    });
+                    renderGrid(filtered);
+                    const activeCount = Object.values(selectedFormats).reduce((sum, set) => sum + set.size, 0);
+                    document.getElementById('filterStatus').textContent = activeCount
+                        ? `已按 ${activeCount} 个格式条件筛选，显示 ${filtered.length} / ${toolData.length} 个工具`
+                        : `共 ${toolData.length} 个工具`;
+                }
 
                 document.addEventListener('keydown', event => {
                     if (event.key === '/' && document.activeElement !== searchInput) {
@@ -162,9 +467,22 @@
                         return;
                     }
 
-                    data.forEach(t => {
+                    const columnCount = mobileLayout.matches ? 1 : 2;
+                    const columns = Array.from({ length: columnCount }, () => {
+                        const column = document.createElement('div');
+                        column.className = 'tool-column';
+                        grid.appendChild(column);
+                        return column;
+                    });
+
+                    data.forEach((t, index) => {
                         const card = document.createElement('div');
                         card.className = 'plasmid-card tool-card';
+                        card.tabIndex = 0;
+                        card.setAttribute('role', 'button');
+                        card.setAttribute('aria-expanded', String(expandedTools.has(t.id)));
+                        card.setAttribute('aria-label', `${t.name}，点击展开或收起说明`);
+                        if (expandedTools.has(t.id)) card.classList.add('expanded');
                         const downloadButton = t.script_path
                             ? `<a class="tool-download-btn" href="${t.script_path}" download title="下载脚本" aria-label="下载 ${t.name} 脚本"><i class="fas fa-download"></i></a>`
                             : `<span class="tool-download-btn disabled" title="暂无脚本" aria-label="暂无脚本"><i class="fas fa-download"></i></span>`;
@@ -172,10 +490,52 @@
                         card.innerHTML = `
                             ${downloadButton}
                             <h3>${t.name}</h3>
-                            <p title="${t.description || ''}">${t.description || '暂无用途描述'}</p>
+                            <div class="tool-description"><p>${t.description || '暂无用途描述'}</p></div>
                         `;
-                        grid.appendChild(card);
+                        const description = card.querySelector('.tool-description');
+                        if (expandedTools.has(t.id)) description.style.height = 'auto';
+                        card.addEventListener('click', event => {
+                            if (event.target.closest('.tool-download-btn')) return;
+                            toggleCard(card, description, t.id);
+                        });
+                        card.addEventListener('keydown', event => {
+                            if (event.key !== 'Enter' && event.key !== ' ') return;
+                            event.preventDefault();
+                            toggleCard(card, description, t.id);
+                        });
+                        columns[index % columnCount].appendChild(card);
                     });
+                }
+
+                function toggleCard(card, description, toolId) {
+                    const willExpand = !card.classList.contains('expanded');
+                    const startHeight = description.getBoundingClientRect().height;
+                    description.ontransitionend = null;
+
+                    if (willExpand) {
+                        card.classList.add('expanded');
+                        expandedTools.add(toolId);
+                        description.style.height = 'auto';
+                    } else {
+                        expandedTools.delete(toolId);
+                        card.classList.remove('expanded');
+                        description.style.height = '';
+                    }
+
+                    const targetHeight = willExpand
+                        ? description.scrollHeight
+                        : description.getBoundingClientRect().height;
+
+                    description.style.height = `${startHeight}px`;
+                    description.getBoundingClientRect();
+                    requestAnimationFrame(() => { description.style.height = `${targetHeight}px`; });
+
+                    card.setAttribute('aria-expanded', String(willExpand));
+                    description.ontransitionend = event => {
+                        if (event.propertyName !== 'height') return;
+                        description.style.height = willExpand ? 'auto' : '';
+                        description.ontransitionend = null;
+                    };
                 }
             });
         </script>
