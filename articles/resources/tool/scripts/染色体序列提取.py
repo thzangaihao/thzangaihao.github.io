@@ -1,349 +1,253 @@
+#!/usr/bin/env python3
+"""从 FASTA/GFF3 提取指定序列；支持每行一个 ID 的批量清单。"""
+
+import argparse
 import re
 import sys
 from pathlib import Path
 
+FASTA_SUFFIXES = {".fasta", ".fa", ".fna"}
+GFF_SUFFIXES = {".gff", ".gff3"}
+LIST_SUFFIXES = {".txt", ".list", ".tsv", ".csv"}
 
-def select_from_list(items, prompt, is_file=False, base_dir=None):
-    """交互式命令行菜单，返回单个条目。"""
+
+def unique(items):
+    """按首次出现顺序去重。"""
+    return list(dict.fromkeys(items))
+
+
+def select_from_list(items, prompt, base_dir=None):
     print(f"\n{prompt}")
-    for i, item in enumerate(items):
-        if is_file and base_dir:
+    for number, item in enumerate(items, 1):
+        display = item
+        if base_dir and isinstance(item, Path):
             try:
-                display_name = item.relative_to(base_dir)
+                display = item.relative_to(base_dir)
             except ValueError:
-                display_name = item.name
-        else:
-            display_name = item
-        print(f"[{i + 1}] {display_name}")
-
+                pass
+        print(f"[{number}] {display}")
     while True:
-        try:
-            choice = int(input(f"\n请输入对应数字进行选择 (1-{len(items)}，输入 0 退出): "))
-            if choice == 0:
-                print("已退出程序。")
-                sys.exit(0)
-            if 1 <= choice <= len(items):
-                return items[choice - 1]
-            print("⚠️ 数字超出范围，请重新输入。")
-        except ValueError:
-            print("⚠️ 无效输入，请输入数字。")
+        value = input(f"请选择 (1-{len(items)}，0 退出): ").strip()
+        if value == "0":
+            raise SystemExit(0)
+        if value.isdigit() and 1 <= int(value) <= len(items):
+            return items[int(value) - 1]
+        print("输入无效，请重新输入。")
 
 
-def select_multiple_from_list(items, prompt):
-    """支持 all、逗号分隔、范围连接的多选菜单。"""
-    print(f"\n{prompt}")
-    for i, item in enumerate(items):
-        print(f"[{i + 1}] {item}")
-
-    print("\n选择方式示例：")
-    print("  1,3,5        提取第 1、3、5 条")
-    print("  2-6          提取第 2 到 6 条")
-    print("  1,4-7,chr10  混合使用数字、范围和染色体 ID")
-    print("  all          提取全部")
-
-    while True:
-        raw = input("请输入要提取的染色体/Scaffold (输入 0 退出): ").strip()
-        if raw == "0":
-            print("已退出程序。")
-            sys.exit(0)
-
-        try:
-            selected = parse_chromosome_selection(raw, items)
-        except ValueError as exc:
-            print(f"⚠️ {exc}")
-            continue
-
-        if selected:
-            print(f"\n✅ 已选择 {len(selected)} 条：{', '.join(selected)}")
-            return selected
-        print("⚠️ 未选择任何条目，请重新输入。")
-
-
-def parse_chromosome_selection(raw, items):
-    """解析 all、逗号列表、数字范围和染色体 ID。"""
-    if not raw:
-        raise ValueError("输入为空，请重新输入。")
-
-    if raw.strip().lower() == "all":
-        return list(items)
-
-    selected = []
-    seen = set()
-    tokens = [part.strip() for part in raw.split(",") if part.strip()]
-
-    for token in tokens:
-        matches = resolve_selection_token(token, items)
-        for item in matches:
-            if item not in seen:
-                selected.append(item)
-                seen.add(item)
-
-    return selected
-
-
-def resolve_selection_token(token, items):
-    """解析单个选择片段：单项或范围。"""
-    exact = find_item_by_name(token, items)
-    if exact is not None:
-        return [exact]
-
-    if "-" in token:
-        left, right = [part.strip() for part in token.split("-", 1)]
-        if not left or not right:
-            raise ValueError(f"范围 '{token}' 不完整，请使用类似 2-6 的格式。")
-
-        start = resolve_item_index(left, items)
-        end = resolve_item_index(right, items)
-        if start is None or end is None:
-            raise ValueError(f"无法识别范围 '{token}'，请确认两端是序号或染色体 ID。")
-        if start > end:
-            start, end = end, start
-        return items[start:end + 1]
-
-    index = resolve_item_index(token, items)
-    if index is None:
-        raise ValueError(f"无法识别 '{token}'，请使用列表序号、染色体 ID、范围或 all。")
-    return [items[index]]
-
-
-def resolve_item_index(value, items):
-    """将序号或染色体 ID 解析为 0-based index。"""
-    if value.isdigit():
-        index = int(value) - 1
-        if 0 <= index < len(items):
-            return index
-        raise ValueError(f"序号 {value} 超出范围 1-{len(items)}。")
-
-    item = find_item_by_name(value, items)
-    if item is not None:
-        return items.index(item)
-    return None
-
-
-def find_item_by_name(value, items):
-    """优先精确匹配染色体 ID，同时兼容大小写不敏感匹配。"""
-    if value in items:
-        return value
-
-    lowered = value.lower()
-    for item in items:
-        if item.lower() == lowered:
-            return item
-    return None
-
-
-def select_output_mode(selected_count):
-    """选择合并输出或分别输出。"""
-    if selected_count <= 1:
-        return "separate"
-
-    print("\n📦 多条染色体输出方式：")
-    print("[1] 合并输出到一个文件")
-    print("[2] 分别输出为多个文件")
-
-    while True:
-        choice = input("请选择输出方式 (1-2，默认 1): ").strip() or "1"
-        if choice == "1":
-            return "merge"
-        if choice == "2":
-            return "separate"
-        print("⚠️ 无效输入，请输入 1 或 2。")
-
-
-def get_chromosomes_from_fasta(filepath):
-    """从 FASTA 文件中快速提取所有染色体 ID。"""
-    chroms = []
-    with open(filepath, "r", encoding="utf-8") as f:
-        for line in f:
-            if line.startswith(">"):
-                chrom_id = line[1:].strip().split()[0]
-                chroms.append(chrom_id)
-    return chroms
-
-
-def get_chromosomes_from_gff(filepath):
-    """从 GFF3 文件中提取所有染色体/Scaffold ID。"""
-    chroms = []
-    seen = set()
-    with open(filepath, "r", encoding="utf-8") as f:
-        for line in f:
-            if line.startswith("#"):
+def read_id_list(filepath):
+    """读取清单首列；空行和 # 注释行会忽略，重复 ID 自动去重。"""
+    ids = []
+    with open(filepath, "r", encoding="utf-8-sig") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line or line.startswith("#"):
                 continue
-            parts = line.split("\t")
-            if len(parts) > 1:
-                chrom_id = parts[0]
-                if chrom_id not in seen:
-                    seen.add(chrom_id)
-                    chroms.append(chrom_id)
-    return chroms
+            # 兼容每行一个 ID，以及以空白、制表符或逗号分隔的表格首列。
+            sequence_id = re.split(r"[\s,]+", line, maxsplit=1)[0]
+            if sequence_id:
+                ids.append(sequence_id)
+    return unique(ids)
+
+
+def get_ids(filepath, is_fasta):
+    ids = []
+    with open(filepath, "r", encoding="utf-8-sig") as handle:
+        for line in handle:
+            if is_fasta and line.startswith(">"):
+                ids.append(line[1:].strip().split()[0])
+            elif not is_fasta and not line.startswith("#"):
+                fields = line.rstrip("\n").split("\t")
+                if len(fields) >= 2:
+                    ids.append(fields[0])
+    return unique(ids)
+
+
+def resolve_manual_token(token, available):
+    """解析单个 ID、菜单序号或菜单范围。"""
+    by_lower = {item.lower(): item for item in available}
+    if token.lower() in by_lower:
+        return [by_lower[token.lower()]]
+    if "-" in token:
+        left, right = token.split("-", 1)
+        if left.isdigit() and right.isdigit():
+            start, end = int(left), int(right)
+            if 1 <= start <= len(available) and 1 <= end <= len(available):
+                start, end = sorted((start, end))
+                return available[start - 1:end]
+    if token.isdigit() and 1 <= int(token) <= len(available):
+        return [available[int(token) - 1]]
+    raise ValueError(f"无法识别“{token}”")
+
+
+def choose_targets(available, script_dir):
+    print("\n目标 ID 输入方式：\n[1] 屏幕列表手工选择\n[2] 批量清单（每行一个 ID）")
+    while True:
+        choice = input("请选择 (1-2，默认 2): ").strip() or "2"
+        if choice in {"1", "2"}:
+            break
+        print("请输入 1 或 2。")
+    if choice == "2":
+        files = sorted(p for p in script_dir.rglob("*") if p.is_file() and p.suffix.lower() in LIST_SUFFIXES)
+        if files:
+            filepath = select_from_list(files, "请选择 ID 清单：", script_dir)
+        else:
+            filepath = Path(input("清单路径: ").strip().strip('"')).expanduser()
+        ids = read_id_list(filepath)
+        if not ids:
+            raise ValueError(f"清单为空：{filepath}")
+        return ids
+
+    print("\n可用 ID：")
+    for number, item in enumerate(available, 1):
+        print(f"[{number}] {item}")
+    print("示例：1,3,5 / 2-6 / query001,query002 / all")
+    while True:
+        raw = input("请输入目标: ").strip()
+        if raw.lower() == "all":
+            return list(available)
+        try:
+            selected = []
+            for token in (part.strip() for part in raw.split(",")):
+                if token:
+                    selected.extend(resolve_manual_token(token, available))
+            if selected:
+                return unique(selected)
+            raise ValueError("输入不能为空")
+        except ValueError as exc:
+            print(f"输入有误：{exc}")
 
 
 def safe_filename(text):
-    """生成适合 Windows/Linux 文件名的安全字符串。"""
     return re.sub(r'[\\/:*?"<>|\s]+', "_", text).strip("_") or "selected"
 
 
-def build_merged_output_path(input_file, selected_chroms, output_dir, extension):
-    """构建合并输出文件名。"""
-    if len(selected_chroms) > 5:
-        label = "all"
-    else:
-        label = "_".join(safe_filename(chrom) for chrom in selected_chroms)
-    return output_dir / f"{input_file.stem}_{label}{extension}"
-
-
-def extract_fasta(input_file, target_chroms, output_dir, output_mode):
-    """逐行提取一个或多个染色体的 FASTA 序列。"""
-    target_set = set(target_chroms)
-    found = set()
-
-    if output_mode == "merge":
-        output_file = build_merged_output_path(input_file, target_chroms, output_dir, ".fasta")
-        keep = False
-        with open(input_file, "r", encoding="utf-8") as fin, open(output_file, "w", encoding="utf-8") as fout:
-            for line in fin:
-                if line.startswith(">"):
-                    current_chrom = line[1:].strip().split()[0]
-                    keep = current_chrom in target_set
-                    if keep:
-                        found.add(current_chrom)
-                        fout.write(line)
-                elif keep:
-                    fout.write(line)
-        return ([output_file] if found else []), found
-
-    handles = {}
-    output_files = {}
-    keep_handle = None
+def extract_fasta(input_file, targets, output_dir, mode):
+    target_set, found = set(targets), set()
+    handles, paths = {}, {}
+    merged = output_dir / f"{input_file.stem}_batch.fasta"
+    merged_handle = open(merged, "w", encoding="utf-8") if mode == "merge" else None
     try:
-        with open(input_file, "r", encoding="utf-8") as fin:
-            for line in fin:
+        with open(input_file, "r", encoding="utf-8-sig") as source:
+            current_handle = None
+            for line in source:
                 if line.startswith(">"):
-                    current_chrom = line[1:].strip().split()[0]
-                    if current_chrom in target_set:
-                        found.add(current_chrom)
-                        if current_chrom not in handles:
-                            output_file = output_dir / f"{safe_filename(current_chrom)}.fasta"
-                            output_files[current_chrom] = output_file
-                            handles[current_chrom] = open(output_file, "w", encoding="utf-8")
-                        keep_handle = handles[current_chrom]
-                        keep_handle.write(line)
-                    else:
-                        keep_handle = None
-                elif keep_handle:
-                    keep_handle.write(line)
+                    current = line[1:].strip().split()[0]
+                    current_handle = None
+                    if current in target_set:
+                        found.add(current)
+                        if merged_handle:
+                            current_handle = merged_handle
+                        else:
+                            path = output_dir / f"{safe_filename(current)}.fasta"
+                            paths[current] = path
+                            if current not in handles:
+                                handles[current] = open(path, "w", encoding="utf-8")
+                            current_handle = handles[current]
+                if current_handle:
+                    current_handle.write(line)
     finally:
+        if merged_handle:
+            merged_handle.close()
         for handle in handles.values():
             handle.close()
+    if mode == "merge":
+        if not found:
+            merged.unlink(missing_ok=True)
+            return [], found
+        return [merged], found
+    return [paths[item] for item in targets if item in found], found
 
-    return [output_files[chrom] for chrom in target_chroms if chrom in found], found
 
-
-def extract_gff(input_file, target_chroms, output_dir, output_mode):
-    """逐行提取一个或多个染色体的 GFF3 注释信息。"""
-    target_set = set(target_chroms)
-    found = set()
-
-    if output_mode == "merge":
-        output_file = build_merged_output_path(input_file, target_chroms, output_dir, ".gff3")
-        with open(input_file, "r", encoding="utf-8") as fin, open(output_file, "w", encoding="utf-8") as fout:
-            wrote_version = False
-            for line in fin:
-                if line.startswith("##gff-version"):
-                    if not wrote_version:
-                        fout.write(line)
-                        wrote_version = True
-                elif line.startswith("#"):
-                    continue
-                else:
-                    parts = line.split("\t")
-                    if len(parts) > 1 and parts[0] in target_set:
-                        found.add(parts[0])
-                        fout.write(line)
-        return ([output_file] if found else []), found
-
-    handles = {}
-    output_files = {}
+def extract_gff(input_file, targets, output_dir, mode):
+    target_set, found = set(targets), set()
+    handles, paths = {}, {}
+    merged = output_dir / f"{input_file.stem}_batch.gff3"
+    merged_handle = open(merged, "w", encoding="utf-8") if mode == "merge" else None
+    if merged_handle:
+        merged_handle.write("##gff-version 3\n")
     try:
-        with open(input_file, "r", encoding="utf-8") as fin:
-            for line in fin:
+        with open(input_file, "r", encoding="utf-8-sig") as source:
+            for line in source:
                 if line.startswith("#"):
                     continue
-
-                parts = line.split("\t")
-                if len(parts) <= 1 or parts[0] not in target_set:
+                fields = line.rstrip("\n").split("\t")
+                if len(fields) < 2 or fields[0] not in target_set:
                     continue
-
-                chrom = parts[0]
-                found.add(chrom)
-                if chrom not in handles:
-                    output_file = output_dir / f"{safe_filename(chrom)}.gff3"
-                    output_files[chrom] = output_file
-                    handles[chrom] = open(output_file, "w", encoding="utf-8")
-                    handles[chrom].write("##gff-version 3\n")
-                handles[chrom].write(line)
+                current = fields[0]
+                found.add(current)
+                if merged_handle:
+                    merged_handle.write(line)
+                else:
+                    if current not in handles:
+                        path = output_dir / f"{safe_filename(current)}.gff3"
+                        paths[current] = path
+                        handles[current] = open(path, "w", encoding="utf-8")
+                        handles[current].write("##gff-version 3\n")
+                    handles[current].write(line)
     finally:
+        if merged_handle:
+            merged_handle.close()
         for handle in handles.values():
             handle.close()
+    if mode == "merge":
+        if not found:
+            merged.unlink(missing_ok=True)
+            return [], found
+        return [merged], found
+    return [paths[item] for item in targets if item in found], found
 
-    return [output_files[chrom] for chrom in target_chroms if chrom in found], found
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("-i", "--input", type=Path, help="输入 FASTA/GFF3")
+    parser.add_argument("-l", "--list", dest="id_list", type=Path, help="批量 ID 清单")
+    parser.add_argument("-o", "--output-dir", type=Path, help="输出目录")
+    parser.add_argument("--mode", choices=("merge", "separate"), default="merge")
+    return parser.parse_args(argv)
 
 
-def main():
-    print("=" * 55)
-    print(" 🧬 染色体序列/注释提取工具 (FASTA/GFF3)")
-    print("=" * 55)
-
+def main(argv=None):
+    args = parse_args(argv)
     script_dir = Path(__file__).resolve().parent
-    print(f"📂 脚本运行及输出目录固定为: {script_dir}\n")
+    input_file = args.input
+    interactive = input_file is None
+    if interactive:
+        files = sorted(p for p in script_dir.rglob("*") if p.is_file() and p.suffix.lower() in FASTA_SUFFIXES | GFF_SUFFIXES)
+        if not files:
+            print("未找到 FASTA/GFF3 文件。", file=sys.stderr)
+            return 1
+        input_file = select_from_list(files, "请选择要处理的文件：", script_dir)
+    input_file = input_file.resolve()
+    if not input_file.is_file() or input_file.suffix.lower() not in FASTA_SUFFIXES | GFF_SUFFIXES:
+        print(f"输入文件不存在或格式不支持：{input_file}", file=sys.stderr)
+        return 1
 
-    files = []
-    for ext in ["*.fasta", "*.fa", "*.fna", "*.gff", "*.gff3"]:
-        files.extend(script_dir.rglob(ext))
+    is_fasta = input_file.suffix.lower() in FASTA_SUFFIXES
+    available = get_ids(input_file, is_fasta)
+    try:
+        targets = read_id_list(args.id_list) if args.id_list else choose_targets(available, script_dir)
+    except (OSError, ValueError) as exc:
+        print(f"读取 ID 清单失败：{exc}", file=sys.stderr)
+        return 1
+    output_dir = (args.output_dir or script_dir).resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    mode = args.mode
+    if interactive and len(targets) > 1:
+        mode = "separate" if input("合并输出到一个文件？(Y/n): ").strip().lower() in {"n", "no"} else "merge"
 
-    if not files:
-        print("❌ 在脚本所在的目录及子文件夹下未找到任何 FASTA 或 GFF3 文件。")
-        return
-
-    selected_file = select_from_list(files, "🔍 找到以下文件，请选择你要处理的文件：", is_file=True, base_dir=script_dir)
-    file_ext = selected_file.suffix.lower()
-    is_fasta = file_ext in [".fasta", ".fa", ".fna"]
-    is_gff = file_ext in [".gff", ".gff3"]
-
-    print("\n⏳ 正在扫描文件中的染色体信息，大文件请稍候...")
-    if is_fasta:
-        chroms = get_chromosomes_from_fasta(selected_file)
-    elif is_gff:
-        chroms = get_chromosomes_from_gff(selected_file)
-    else:
-        print("❌ 不支持的文件格式。")
-        return
-
-    if not chroms:
-        print("❌ 未在文件中解析到有效的染色体或序列 ID。")
-        return
-
-    selected_chroms = select_multiple_from_list(chroms, "🎯 扫描到以下染色体/Scaffold，请选择你要提取的目标：")
-    output_mode = select_output_mode(len(selected_chroms))
-    mode_text = "合并输出" if output_mode == "merge" else "分别输出"
-
-    print(f"\n⏳ 正在提取 {len(selected_chroms)} 条染色体/Scaffold 的数据（{mode_text}）...")
-    if is_fasta:
-        out_files, found = extract_fasta(selected_file, selected_chroms, script_dir, output_mode)
-    elif is_gff:
-        out_files, found = extract_gff(selected_file, selected_chroms, script_dir, output_mode)
-
-    if out_files:
-        print("✅ 提取完成！文件已输出到脚本同级目录：")
-        for out_file in out_files:
-            print(f"📁 {out_file}")
-
-        missing = [chrom for chrom in selected_chroms if chrom not in found]
-        if missing:
-            print(f"⚠️ 以下条目未找到匹配内容：{', '.join(missing)}")
-    else:
-        print("❌ 提取失败，未找到匹配的数据内容。")
+    extractor = extract_fasta if is_fasta else extract_gff
+    outputs, found = extractor(input_file, targets, output_dir, mode)
+    missing = [item for item in targets if item not in found]
+    print(f"\n完成：清单 {len(targets)} 个唯一 ID，找到 {len(found)} 个，缺失 {len(missing)} 个。")
+    for path in outputs:
+        print(f"输出：{path}")
+    if missing:
+        path = output_dir / f"{input_file.stem}_missing_ids.txt"
+        path.write_text("\n".join(missing) + "\n", encoding="utf-8")
+        print(f"缺失 ID 清单：{path}")
+    return 0 if found else 2
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
