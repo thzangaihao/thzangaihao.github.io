@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/09/03_16:19:14
-// 文章总数: 79
+// 生成时间: 2026/09/13_17:41:36
+// 文章总数: 81
 
 window.ARTICLE_DATABASE = [
     {
@@ -404,6 +404,14 @@ window.ARTICLE_DATABASE = [
         "featured": false
     },
     {
+        "title": "04. Molstar 颜色组",
+        "collection": "Mol",
+        "date": "2026-09-12",
+        "summary": "Mol 物体着色",
+        "path": "articles/dry_lab/mol/04. Molstar 颜色组/04. Molstar 颜色组.html",
+        "featured": false
+    },
+    {
         "title": "04. SOE PCR",
         "collection": "pcr",
         "date": "2026-06-14",
@@ -634,5 +642,13 @@ window.ARTICLE_DATABASE = [
         "summary": "圈图",
         "path": "articles/resources/gallery/12. 圈图/12. 圈图.html",
         "featured": true
+    },
+    {
+        "title": "13. ESPrint3",
+        "collection": "figure",
+        "date": "2026-09-13",
+        "summary": "多序列比对可视化",
+        "path": "articles/resources/gallery/13. ESPrint3/13. ESPrint3.html",
+        "featured": false
     }
 ];

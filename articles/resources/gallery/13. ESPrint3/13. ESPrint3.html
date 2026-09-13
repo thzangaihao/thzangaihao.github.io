@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>13. ESPrint3 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="figure"> 
+        <meta name="collection-title" content="图廊">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-09-13">
+        <meta name="description" content="多序列比对可视化">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>13. ESPrint3</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                    <p>ESPrint3 是一款基于 Web 的多序列比对结果绘图工具，我们只需要输入对比后的 <code>.fasta</code> 文件，经过调整，就可以绘制出不错的图片。但是我用的时候被不断地报错折腾的死去活来，且绘图用法单一，我就想将操作流程放到这里，在这里我们会记录最常用的 MSA 结果 + 二级比对结果图，就像下面：</p>
+                    <img src="./1.png">
+                    <p>我们可以通过这个网址进入 ESPrint3 的主页：<a href="https://espript.ibcp.fr/ESPript/ESPript/" target="_blank" style="color: #3498db;">ESPrint3</a></p>
+                <h2>页面介绍</h2>
+                    <h3>导航栏</h3>
+                    <img src="./2.png">
+                    <p>ESPrint3 有三个模式，分别是基础（BEG），进阶（ADV）和专家（EXP），我们可以在 MODE 下进行选择。在后面，我们都在进阶模式下进行绘图。</p>
+                    <p>在进阶模式下，我们就可以绘制多个层级了，我们可以在 LAYERS 下进行增加或者减少，当有多个层级时，它会在下面进行显示：</p>
+                    <img src="./3.png">
+                    <h3>信息栏</h3>
+                    <p>信息栏有如下几个：</p>
+                    <ol>
+                        <li>Aligned Sequences：输入比对后文件的地方，输入 <code>.fasta</code> 即可。</li>
+                        <li>Secondary structure depiction：输入二级结构文件的地方，官方推荐输入 <code>.pdb</code>，但是我们也可以输入 <code>.cif</code>，网站会自己进行转换的。</li>
+                        <li>Sequence similarities depiction parameters：控制“长得一样”具体参数的地方。</li>
+                        <li>Special commands and characters：伪代码控制区，我们只在这里进行颜色绘制的指定。</li>
+                        <li>Defining groups：定义组，我也不知道干什么的。</li>
+                        <li>Alignments output layout：控制轨道层级偏移与位置的地方。</li>
+                    </ol>
+                    <p>我们将在下面详细介绍。</p>
+                <h2>绘图设置</h2>
+                    <h3>Aligned Sequences</h3>
+                        <img src="./4.png">
+                        <p>注意！每一个层级都需要输入对应的 <code>.fasta</code> 文件，在一般绘制中，我们只需要将相同的文件上传就可以了，在你提交任务后它们依次绘制，所以我们保留 0 层级的数据就可以了，其它层级的都选择隐藏（Hide sequences）了！</p>
+                        <p>0 层级建议勾选 Number sequences，这样每一条序列的编号是单独现实的，而不是基于输入文件的位置，区别在下面，上方时没有勾选，下面是勾选了的：</p>
+                        <img src="./5.png">
+                    <h3>Secondary structure depiction</h3>
+                        <img src="./6.png">
+                        <p>这里上传结构文件（你没有就可以拿 AlphaFold 去跑一个），如果两个都上传，效果如下：</p>
+                        <img src="./7.png">
+                    <h3>Special commands and characters</h3>
+                        <img src="./8.png">
+                        <p>这里是负责写伪代码的，我们在这里之写一个关系：当前层级下的二级结构是对应哪条轨道的，例如：该层级的顶端结构文件对应着 <code>.fasta</code> 文件中的第2条序列，则写为 <code>X B 2</code>，其中 <code>X</code> 代表层级下的上端轨道结构数据，<code>B</code> 代表绘制为蓝色，<code>2</code> 代表是上传文件中的第二条序列。</p>
+                        <p>图片中的 <code>Z R 1</code> 代表下端轨道结构数据（<code>Z</code> 表示）画红色，对应数据为第1条序列。</p>
+                        <p>讲真这种超级饱和审美配色有点辣眼睛，建议绘制后在 Adobe illustrator 中重新映射一遍颜色，这样的话，我不建议在结构轨道中选红色，因为这样会和序列中的红色用一个色号，不方便重新映射颜色。</p>
+                        <p>ESPrint3 生成的 PDF 文件可以直接在 Adobe illustrator 中打开哦！</p>
+                    <h3>Alignments output layout</h3>
+                        <img src="./9.png">
+                        <p>我们只需要在意 Vertical shift 参数即可，它控制轨道的上下偏移，建议 0 层级不要进行偏移，其它层级向上偏移，单条二级轨道一般占2个单位，示例图是这么配置的：</p>
+                        <pre><code class="language-txt">layer0 0
+layer1 2
+layer2 4</code></pre>
+
+
+
+
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>
