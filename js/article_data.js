@@ -1,5 +1,5 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/09/15_16:11:57
+// 生成时间: 2026/09/18_21:36:00
 // 文章总数: 83
 
 window.ARTICLE_DATABASE = [
@@ -137,14 +137,6 @@ window.ARTICLE_DATABASE = [
         "date": "2026-03-31",
         "summary": "将细碎测序读段数据比对到参考基因组上",
         "path": "articles/dry_lab/compare/01. 测序读段比对/01. 测序读段比对.html",
-        "featured": false
-    },
-    {
-        "title": "01. 立木立信",
-        "collection": "blog",
-        "date": "2026-06-22",
-        "summary": "我感到难过，不是因为你欺骗了我，而是因为我再也无法相信你了",
-        "path": "articles/about/02. 笔语茶谈/01. 立木立信.html",
         "featured": false
     },
     {
@@ -665,6 +657,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-09-15",
         "summary": "基于 pyGenomeTracks 的基因的多维描述",
         "path": "articles/resources/gallery/14. 基因图/14. 基因图.html",
+        "featured": false
+    },
+    {
+        "title": "15. RNA canvas",
+        "collection": "figure",
+        "date": "2026-09-18",
+        "summary": "核酸二级结构可视化与交互",
+        "path": "articles/resources/gallery/15. RNA canvas/15. RNA canvas.html",
         "featured": false
     }
 ];

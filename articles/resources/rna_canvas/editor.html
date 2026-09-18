@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNAcanvas 编辑器</title>
+    <style>
+        html, body, #editor { width: 100%; height: 100%; margin: 0; overflow: hidden; background: white; color: #222; color-scheme: only light; }
+        #loading { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; font: 16px/1.6 Arial, sans-serif; }
+        #loading[hidden] { display: none; }
+        #loading a { color: #2479b2; }
+    </style>
+</head>
+<body>
+    <div id="editor" aria-label="RNAcanvas 编辑器"></div>
+    <div id="loading" role="status">正在加载 RNAcanvas…</div>
+    <script>
+        // Official embedded app; the iframe keeps site styles out of its UI.
+        const loading = document.getElementById('loading');
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                const timer = setTimeout(() => { script.remove(); reject(new Error('RNAcanvas load timed out')); }, 12000);
+                script.src = src;
+                script.onload = () => { clearTimeout(timer); resolve(); };
+                script.onerror = () => { clearTimeout(timer); script.remove(); reject(new Error('RNAcanvas script failed to load')); };
+                document.head.appendChild(script);
+            });
+        }
+        (async () => {
+        try {
+            try {
+                await loadScript('https://cdn.jsdelivr.net/npm/@rnacanvas/embedded@3.1.0/dist/index.js');
+            } catch (error) {
+                await loadScript('./vendor/rnacanvas-3.1.0.js');
+            }
+            const app = new window.RNAcanvas();
+            app.appendTo(document.getElementById('editor'));
+            app.domNode.style.width = '100%';
+            app.domNode.style.height = '100%';
+            loading.hidden = true;
+        } catch (error) {
+            console.error('RNAcanvas failed to initialize.', error);
+            loading.innerHTML = '<p>RNAcanvas 加载失败，请刷新页面重试。</p><a href="https://rnacanvas.app/" target="_blank" rel="noopener noreferrer">打开 RNAcanvas 官网</a>';
+        }
+        })();
+    </script>
+</body>
+</html>

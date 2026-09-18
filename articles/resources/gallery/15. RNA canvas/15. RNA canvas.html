@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>15. RNA canvas - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="figure"> 
+        <meta name="collection-title" content="图廊">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-09-18">
+        <meta name="description" content="核酸二级结构可视化与交互">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>15. RNA canvas</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                    <p>RNA canvas 是一款基于纯前端的 RNA 二级结构绘制工具，我们只需要点括号标记语言和具体的序列，他就会自动绘制。</p>
+                    <p>这个网站已经集成到资源站中的集合列表中，点击 <a href="../../rna_canvas/rna_canvas_index.html" target="_blank" style="color: #3498db;">RNA canvas</a> 即可启动。</p>
+                <h2>结构</h2>
+                    <p>在 RNA canvas 中，元素被分了五个层级，分别是碱基、一级结构、二级结构、三级结构和数字，我们用一幅图展示，顺便也当作效果示例：</p>
+                    <img src="./1.png">
+                    <ol>
+                        <li>碱基：就是 ATCG。</li>
+                        <li>一级结构：磷酸二酯键。</li>
+                        <li>二级结构：氢键，这里的氢键被表达在点括号文本里，因此能被直接绘制出来。</li>
+                        <li>三级结构：弱氢键，指概率上较低会形成的氢键，我们需要手动绘制，在图中用蓝色/白色连线表示。</li>
+                        <li>数字：用于调整数字的表现。</li>
+                    </ol>
+                <h2>工具层次</h2>
+                    <p>这个网站的工具逻辑做的太奇怪了，在这里进行一下说明。</p>
+                    <p>以下是5个一级工具：</p>
+                    <ol>
+                        <li>Drag：拖动。</li>
+                        <li>Pair：配对。</li>
+                        <li>Flatten：弄平。</li>
+                        <li>Flip：翻动。</li>
+                        <li>Edit：编辑。</li>
+                    </ol>
+                    <h3>Drag</h3>
+                        <p>我们可以使用这个工具进行结构整体或部分旋转，需要整体旋转时，拖动第一个碱基或者最后一个碱基就可以旋转了。它的次级选项 Only Expand 我也不太清楚干什么的。</p>
+                    <h3>Pair</h3>
+                        <p>选取碱基后放开，再选取另一部分，单击即可将它们手动形成二级结构，按住 Shift 单击即可创建三级结构。Show Complements 用来自动展示和你所选配对的碱基，options 用于调整自动展示细致的参数，允许非 100% 配对。</p>
+                    <h3>Flatten</h3>
+                        <p>弄平就是吧自动绘制弯曲的地方变成直线。</p>
+                    <h3>Flip</h3>
+                        <p>就是把一部分结构翻折过来。</p>
+                    <h3>Edit</h3>
+                        <p>下设五个子选项，刚好就是五个层级：碱基、一级二级三级结构和数字，当你选择具体的子选项时，在画布上拖动就可以框选对应的元素并在右栏进行进一步设置。</p>
+                        <h4>碱基</h4>
+                            <p>选取碱基可以设置乱起八糟的东西，在这里不过多赘述。</p>
+                        <h4>一级结构</h4>
+                            <p>示范图中的碱基底部连线就是通过设计一级结构画出来的：框选要画取的一级结构键-设置颜色-调整线宽覆盖碱基-调小 Base Padding -设置圆头连线-send to back 到碱基底部显示。</p>
+                        <h4>二级结构</h4>
+                            <p>同样的，在二级结构选项下框选元素，也可以进行好的设置。网站也预制了选择 AT 碱基或 CG 碱基等等。</p>
+                        <h4>三级结构</h4>
+                            <p>三级结构主要通过一级 Pair 工具进行绘制，用于描绘低概率存在的低氢键。</p>
+                    <blockquote>在理解 RNA 的二级结构时，一定要基于<code>概率学</code>层面，而不是仅单一追求<code>热力学</code>最优解。</blockquote>
+                <h2>绘画技巧</h2>
+                    <h3>描边处理</h3>
+                        <p>想要做出这种描边效果，不妨试一下这样的设置：</p>
+                        <img src="./2.png">
+                        <p>其中黄色底为一级结构本身的设置，而描边是通过给一级结构加一个矩形元素，略微调大线宽（一级结构本身10，新增元素为11），适当调整高度，使圆角处刚好相连接，直线处会自己重合，再把它 send to back 送到低端就可以了！</p>
+                    <h3>示例文件</h3>
+                        <p>可以下载这个工程文件详细浏览绘图参数等：</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>示例文件</h5>
+                                    <span>文件格式：.rnacanvas | 大小：220 KB</span>
+                                </div>
+                            </div>
+                            <a href="./example.rnacanvas" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                        <img src="./3.png">
+                
+
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

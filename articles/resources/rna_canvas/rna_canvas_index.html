@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNA canvas - 海钊知识港</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/global.css">
+    <script src="../../../js/global.js"></script>
+    <script>window.footerPath = '../../../footer.html';</script>
+    <style>
+        .rna-canvas-shell { width: 100%; height: calc(100vh - 70px); min-height: 680px; background: #fff; color-scheme: only light; }
+        .rna-canvas-shell iframe { display: block; width: 100%; height: 100%; border: 0; }
+    </style>
+</head>
+<body class="rna-canvas-page">
+    <nav>
+        <div class="logo"><a href="../../../index.html">海钊知识港</a></div>
+        <div class="nav-links">
+            <a href="../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+            <a href="../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+            <a href="../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+            <a href="../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+        </div>
+    </nav>
+    <main class="rna-canvas-shell">
+        <iframe src="https://rnacanvas.app/" title="RNAcanvas RNA 二级结构绘制工具" allow="fullscreen"></iframe>
+    </main>
+    <div id="footer-placeholder"></div>
+</body>
+</html>
