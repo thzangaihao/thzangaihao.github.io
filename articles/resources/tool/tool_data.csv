@@ -10,3 +10,4 @@ id,name,script_path,input_format,output_format,description
 9,染色体区域序列提取,./scripts/extract_fasta_region.py,FA/FASTA,FA/FASTA,"提供 <code>.fasta</code> 文件，按用户提供的染色体区域列表，提取目的染色体区域的核苷酸序列。"
 10,测序 bam 转 fastq,./scripts/测序 bam 转 fastq.py,BAM,FASTQ,"提供测序公司的 <code>.bam</code> 文件，转换为 <code>.fastq</code> 文件。"
 11,fasta 去换行,./scripts/fasta去换行.py,FA/FASTA,FA/FASTA,"提供 <code>.fasta</code> 文件，去除换行符，输出单行 <code>.fasta</code> 文件。"
+12,k-mer 文件生成,./scripts/k-mer.py,FA/FASTA,FA/FASTA,"提供 <code>.fasta</code> 文件，进行 k-mer 拆分，输出 k-mer <code>.fasta</code> 文件。"

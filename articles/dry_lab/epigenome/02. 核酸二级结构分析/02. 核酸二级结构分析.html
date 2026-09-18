@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>02. 核酸二级结构分析 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="epig"> 
+        <meta name="collection-title" content="表观组学">
+        <meta name="parent-path" content="../../dry_lab_index.html">
+        <meta name="parent-title" content="干实验">
+        <meta name="date" content="2026-09-15">
+        <meta name="description" content="Hi-C 双端测序数据构建多分辨率染色质互作矩阵">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../dry_lab_index.html" class="active"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../../resources/resources_index.html"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>02. 核酸二级结构分析</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                    <p>单链 DNA 或 RNA 会自发配对，形成茎环结构的双链，就像 tRNA 那样。基于第一性原理，我们可以完全由算法计算其二级结构形成的情况，这篇文章记录了工具使用与结果解读。</p>
+                <h2>工具</h2>
+                    <p>我最常使用的是一个叫做 <a href="http://rna.tbi.univie.ac.at/cgi-bin/RNAWebSuite/RNAfold.cgi" target="_blank" style="color: #3498db;">RNAfold Webserve</a> 的在线工具，我们直接输入单链就可以进行二级结构的检测，虽然也有离线版，但是我目前还没有用过，来日更新。</p>
+                <h2>结果解读</h2>
+                    <h3>Minimum Free Energy Prediction（最小自由能预测结果）</h3>
+                        <p>这一板块基于经典的 Zuker 算法，计算并在热力学最稳定（即自由能 $\Delta G$ 最低）状态下的单一最优 RNA 二级结构。</p>
+                    <h3>Thermodynamic Ensemble Prediction（热力学群体预测结果）</h3>
+                        <p>在生理温度下，RNA 并不是死板地固定在一个结构上，而是在多个能量接近的构象之间动态平衡。这一板块基于 McCaskill 模配分函数算法，从统计力学角度评估全构象系综。</p>
+                    <h3>点括号标记法</h3>
+                        <p>这是记录二级结构最简单的文本语言，用 <code>.</code> 表示未配对的单链碱基，用 <code>(</code> 和 <code>)</code> 表示互补配对的碱基（如 <code>(((...)))）</code>。</p>
+                        <p>点括号标记法必须与实际序列搭配使用，就像 FASTA 文件和 GTF 文件一样，例如：</p>
+                        <pre class="language-txt"><code>>molecule_name
+CGCUUCAUAUAAUCCUAAUGAUAUGGUUUGGGAGUUUCUACCAAGAGCCUUAAACUCUUGAUUAUGAAGUG
+...(((((((..((((((.........))))))......).((((((.......))))))..))))))...</code></pre>
+                        <p>借助 <a href="http://rna.tbi.univie.ac.at/forna/" target="_blank" style="color: #3498db;">Forna</a> 可视化：</p>
+                        <img src="./1.png">
+                        <p>Forna 是一个很好用的可视化前端程序，强烈建议你也去试试。</p>
+                    <h3>dp.eps 文件</h3>
+                        <p>该文件在 Results for thermodynamic ensemble prediction 下的 dot plot 数据 ESP 文件下载处，下载后得到 dp.eps 文件，它记录了配对概率点图矢量文件，本质就是个 TXT，我们可以用记事本打开它。</p>
+                        <p>该文件没有直接具体的 $\Delta G$ 能量值，因为它是基于统计学上的分析，其配对概率 $p_{ij}$ 就可以说明配对的强弱性。</p>
+                        <p>我们可以直接在浏览器中进行图像预览。</p>
+                <h2>可视化</h2>
+                    <p>我们可以参考这篇文章进行拱门图绘制：</p>
+                    <a href="..\..\..\resources\gallery\14. 基因图\14. 基因图.html" class="related-article" target="_blank">
+                        <div class="related-article-icon">
+                            <i class="fas fa-link"></i>
+                        </div>
+
+                        <div class="related-article-content">
+                            <div class="related-article-title">推荐阅读：14. 基因图</div>
+                            <div class="related-article-desc">基于 pyGenomeTracks 的基因的多维描述</div>
+                        </div>
+                        
+                        <div class="related-article-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+
+                    
+            </div>
+        </div>
+         
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

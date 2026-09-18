@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>14. pyGenomeTracks 基因图 - 海钊知识港</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="collection" content="figure"> 
+        <meta name="collection-title" content="图廊">
+        <meta name="parent-path" content="../../resources_index.html">
+        <meta name="parent-title" content="资源站">
+        <meta name="date" content="2026-09-15">
+        <meta name="description" content="基于 pyGenomeTracks 的基因的多维描述">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../../../../css/global.css">
+        
+        <script>window.footerPath = '../../../../footer.html';</script>
+        <script src="../../../../js/global.js"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+
+    <body class="article-page">
+        <nav>
+            <div class="logo"><a href="../../../../index.html">海钊知识港</a></div>
+            <div class="nav-links">
+                <a href="../../../wet_lab/wet_lab_index.html"><i class="fas fa-flask"></i> 湿实验</a>
+                <a href="../../../dry_lab/dry_lab_index.html"><i class="fas fa-code"></i> 干实验</a>
+                <a href="../../resources_index.html" class="active"><i class="fas fa-book"></i> 资源站</a>
+                <a href="../../../about/about_index.html"><i class="fas fa-user"></i> 关于我</a>
+            </div>
+            </div>
+        </nav>
+
+        <div class="article-container">
+            <h1>14. pyGenomeTracks 基因图</h1>
+            
+            <div class="content">
+                <h2>前言</h2>
+                    <p>这篇博客主要用于绘制基因的多个层级图，基于 python 语言环境的 pyGenomeTracks 库，它能够实现很复杂的基因组图。</p>
+
+                    <p>如果你看过圈图的博客，那么它的核型思想也是一样的，都是“数据文件 + 配置文件 (.ini) = 输出图像”。</p>
+                <h2>工作目录创建</h2>
+                    <p>使用以下脚本创建绘图工作环境并按照提示搭建 pyGenomeTracks 的绘图 conda 环境。</p>
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>目录生成</h5>
+                                <span>文件格式：.py | 大小：6.1 KB</span>
+                            </div>
+                        </div>
+                        <a href="./create_pygenometracks_workspace.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+                    <p>它会创建以下文件：</p>
+                    <ol>
+                        <li>tracks.ini 基础轨道配置</li>
+                        <li>data/signal.bedgraph 示例信号</li>
+                        <li>data/genes.bed 示例基因注释</li>
+                        <li>region.bed 绘图区间</li>
+                        <li>requirements.txt</li>
+                        <li>README.md</li>
+                        <li>output/ 输出目录</li>
+                        <li>plot.py 最终绘图脚本</li>
+                    </ol>
+                <h2>基础轨道配置</h2>
+                    <p>我们在 <code>data/genes.bed</code> 进行基础轨道数据配置，BED 文件有两种类型，分别是 BED6 和 BED12，前者只能画一条线，后者能画出外显子、内含子、正负链方向等等，在基础轨道上多了很多元素。我们后面统一使用 BED12 进行绘制。</p>
+                    <p>BED12 有12个字段，这些分别是：</p>
+                    <pre class="language-txt"><code>chrom       染色体或序列名称
+chromStart      整个转录本的起点
+chromEnd        整个转录本的终点
+name            特征名称或显示标签
+score           特征得分
+strand          正负链方向
+thickStart      加粗区域/CDS 的起点
+thickEnd        加粗区域/CDS 的终点
+itemRgb         该条记录的 RGB 颜色
+blockCount      外显子数量
+blockSizes      每个外显子的长度
+blockStarts     每个外显子相对于 chromStart 的起点</code></pre>
+
+                    <p>在配置文件 <code>tracks.ini</code> 基础轨道层级 [genes] 处配置：</p>
+                    <pre class="language-txt"><code>[genes]                     区块名
+file = data/genes.bed       输入数据文件路径
+file_type = bed             指定输入文件类型
+title = Gene structure      轨道标题，通常显示在轨道侧面的标签区域
+height = 1                  轨道高度，单位为厘米
+style = UCSC                风格，UCSC 会采用 UCSC Genome Browser 的基因结构样式
+display = stacked           多个基因或转录本重叠时的排布方式。stacked 表示分行堆叠，尽量避免相互遮挡。
+labels = true               是否显示标签
+fontsize = 10               字体大小
+color = #ffaa00             基因主体的填充颜色
+border_color = black        图形边框颜色，none 表示不绘制外显子边框
+
+[x-axis]
+where = bottom              在底下开始画</code></pre>
+                    <h3>文件生成</h3>
+                        <p>下面这个脚本只需要输入 GFF3 文件和 基因ID ，就可以自动生成这个基因的 BED12 文件。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>GFF3转轨道文件</h5>
+                                    <span>文件格式：.py | 大小：8.6 KB</span>
+                                </div>
+                            </div>
+                            <a href="./gff3_gene_to_bed12.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                <h2>信号轨道配置</h2>
+                    <p>它其实可以直接读取 BIGWIG2 生成的 BW2 文件，但是为了方便管理，我们统一使用 bedGraph 数据，它很简单，只有四个字段，分别是染色体、起点、终点、信号值：</p>
+                    <pre class="language-txt"><code>c05	3571500	3572000	5
+c05	3572000	3572500	12
+c05	3572500	3573000	48
+c05	3573000	3573500	76
+c05	3573500	3574000	30</code></pre>
+                    <p>这是一段标准的信号轨道配置文件：</p>
+                    <pre class="language-txt"><code>[cis]                           块名，可以自定义叫什么
+file = data/cis.bedgraph        数据文件位置
+file_type = bedgraph            数据文件类型
+title = CDS_CIS_K=300           轨道名称
+height = 3                      轨道高度
+color = #3b82f6                 填充颜色
+min_value = 0                   轨道最小值
+max_value = 500                 轨道最大值
+type = fill                     轨道类型：line/fill/points，后加冒号可调整描边，例如line:2
+show_data_range = true          纵坐标范围显示</code></pre>
+
+
+                <h2>二维数据轨道</h2>
+                    <h3>核酸二级结构分析与拱门图</h3>
+                        <p>数据文件是这样记录的：前三列表示第一个碱基的基因组区间，中间三列表示第二个碱基的基因组区间，第七列表示一些其它评分，可省略。数据文件我们叫做 dp.links 文件。</p>
+                        <pre class="language-txt"><code>c05	3572736	3572737	c05	3572800	3572801	0.95
+c05	3572740	3572741	c05	3572792	3572793	0.87
+c05	3572750	3572751	c05	3572775	3572776	0.72</code></pre>
+                        <p>配置文件：</p>
+                        <pre class="language-txt"><code>[RNA structure arcs]
+file = data/rna_structure.links
+file_type = links                   
+title = RNA structure
+height = 4
+links_type = arcs                   绘制拱门
+color = #2563eb
+line_width = 1.5                    拱门线宽
+alpha = 0.8                         透明度，范围为 0～1
+use_middle = true                   连接两个区间的中心，适合单碱基区间
+compact_arcs_level = 0              拱门高度与两个碱基间的距离成比例</code></pre>
+                        <p>其它参数</p>
+                        <pre class="language-txt"><code>orientation = inverted      拱门朝下
+compact_arcs_level = 0      拱门高度与两个碱基间的距离成比例
+compact_arcs_level = 1      对长距离拱门进行一定压缩
+compact_arcs_level = 2      所有拱门高度接近一致
+如果第七列是配对概率，还可以尝试用颜色梯度表示分值：
+color = viridis
+min_value = 0
+max_value = 1</code></pre>
+                        <p>下面这个脚本能将分析得到的 dp.eps 文件转换为 dp.links 文件，但基因组坐标需要借助映射脚本重新映射：</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>dp.eps 转 dp.links</h5>
+                                    <span>文件格式：.py | 大小：3.3 KB</span>
+                                </div>
+                            </div>
+                            <a href="./rnafold_dp_to_links.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+                        <p>而这个脚本能将 dp.links 文件转换为一维的 bedgraph 文件，用于展示基因上的互作强度，但是去处了和谁互作的信息。</p>
+                        <div class="download-card">
+                            <div class="download-info">
+                                <i class="fas fa-file-code"></i> <div class="file-details">
+                                    <h5>dp.links 转 bedgraph</h5>
+                                    <span>文件格式：.py | 大小：4.0 KB</span>
+                                </div>
+                            </div>
+                            <a href="./links_to_bedgraph.py" download class="download-btn">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </a>
+                        </div>
+
+
+
+
+
+
+
+
+                <h2>绘图配置</h2>
+                    <p>配置文件 <code>tracks.ini</code> 的头部区域可以配置绘图参数：</p>
+                    <pre class="language-txt"><code># Plot settings read by plot.py
+# plot_region = c05:3572563-3574783     绘图的具体区域
+# plot_output = output/example.png      输出文件位置设置，可以改为svg输出矢量图
+# plot_dpi = 300                        当输出位图时，此处修改分辨率</code></pre>
+                    <p>配置中的层级顺序决定了绘制顺序。</p>
+                    <p>下面这个可以调整轨道之间的间隙：</p>
+                    <pre class="language-txt"><code>[spacer]
+height = 0.3</code></pre>
+
+
+                <h2>基因组映射脚本</h2>
+                    <p>对所有从1开头的 dp.limks 文件和 bedgraph 文件的基因组坐标重新映射，输入为文件中的如下的格式。每一行都代表一个左闭右闭区间，在区间内映射，在区间外跳过：</p>
+                    <pre class="language-txt"><code>3572108,3572986
+3573107,3573304
+3573362,3574783</code></pre>
+
+                    <div class="download-card">
+                        <div class="download-info">
+                            <i class="fas fa-file-code"></i> <div class="file-details">
+                                <h5>重映射脚本</h5>
+                                <span>文件格式：.py | 大小：8.2 KB</span>
+                            </div>
+                        </div>
+                        <a href="./remap_track_coordinates.py" download class="download-btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </a>
+                    </div>
+
+
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+    </body>
+</html>

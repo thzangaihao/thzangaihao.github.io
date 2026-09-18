@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/09/13_17:41:36
-// 文章总数: 81
+// 生成时间: 2026/09/15_16:11:57
+// 文章总数: 83
 
 window.ARTICLE_DATABASE = [
     {
@@ -241,6 +241,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-03-25",
         "summary": "如何量化计算物种差异？",
         "path": "articles/dry_lab/algorithm/02. 建树算法/02. 建树算法.html",
+        "featured": false
+    },
+    {
+        "title": "02. 核酸二级结构分析",
+        "collection": "epig",
+        "date": "2026-09-15",
+        "summary": "Hi-C 双端测序数据构建多分辨率染色质互作矩阵",
+        "path": "articles/dry_lab/epigenome/02. 核酸二级结构分析/02. 核酸二级结构分析.html",
         "featured": false
     },
     {
@@ -649,6 +657,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-09-13",
         "summary": "多序列比对可视化",
         "path": "articles/resources/gallery/13. ESPrint3/13. ESPrint3.html",
+        "featured": false
+    },
+    {
+        "title": "14. pyGenomeTracks 基因图",
+        "collection": "figure",
+        "date": "2026-09-15",
+        "summary": "基于 pyGenomeTracks 的基因的多维描述",
+        "path": "articles/resources/gallery/14. 基因图/14. 基因图.html",
         "featured": false
     }
 ];
