@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/09/18_21:36:00
-// 文章总数: 83
+// 生成时间: 2026/09/19_14:48:23
+// 文章总数: 84
 
 window.ARTICLE_DATABASE = [
     {
@@ -58,6 +58,14 @@ window.ARTICLE_DATABASE = [
         "summary": "列联分析、独立性检验与卡方检验",
         "path": "articles/dry_lab/gwas/01. 全基因组关联分析基础原理/01. 全基因组关联分析基础原理.html",
         "featured": true
+    },
+    {
+        "title": "01. 出版社与学会的故事",
+        "collection": "blog",
+        "date": "2026-09-19",
+        "summary": "科学，商业与资本",
+        "path": "articles/about/02. 笔语茶谈/01. 出版社与学会的故事/01. 出版社与学会的故事.html",
+        "featured": false
     },
     {
         "title": "01. 变异记录 vcf 文件",
