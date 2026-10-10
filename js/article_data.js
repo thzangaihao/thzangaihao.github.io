@@ -1,6 +1,6 @@
 // 自动生成的文件，请勿手动修改
-// 生成时间: 2026/09/19_14:48:23
-// 文章总数: 84
+// 生成时间: 2026/10/10_10:34:23
+// 文章总数: 85
 
 window.ARTICLE_DATABASE = [
     {
@@ -249,6 +249,14 @@ window.ARTICLE_DATABASE = [
         "date": "2026-09-15",
         "summary": "Hi-C 双端测序数据构建多分辨率染色质互作矩阵",
         "path": "articles/dry_lab/epigenome/02. 核酸二级结构分析/02. 核酸二级结构分析.html",
+        "featured": false
+    },
+    {
+        "title": "02. 泛基因组分析 - 希普夫定律拟合",
+        "collection": "population",
+        "date": "2026-10-10",
+        "summary": "希普夫定律拟合与稀疏化曲线分析",
+        "path": "articles/dry_lab/population/02. 泛基因组分析-希普夫定律（Heap's Law）拟合/02. 泛基因组分析-希普夫定律（Heap's Law）拟合.html",
         "featured": false
     },
     {
